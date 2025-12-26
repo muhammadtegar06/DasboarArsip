@@ -1,0 +1,11 @@
+Hak Akses 	: Administrator
+Username 	: administrator
+Password 	: 123
+
+Hak Akses 	: Admin Gudang
+Username 	: admin gudang
+Password 	: 123
+
+Hak Akses 	: Kepala Gudang
+Username 	: kepala gudang
+Password 	: 123
