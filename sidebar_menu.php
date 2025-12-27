@@ -31,7 +31,6 @@ else {
 			</li>
 		<?php
 		}
-
 		// jika menu data barang (tampil data / tampil detail / form entri / form ubah) dipilih, menu data barang aktif
 		if ($_GET['module'] == 'barang' || $_GET['module'] == 'tampil_detail_barang' || $_GET['module'] == 'form_entri_barang' || $_GET['module'] == 'form_ubah_barang') { ?>
 			<li class="nav-section">
@@ -184,7 +183,6 @@ else {
 			</li>
 		<?php
 		}
-
 		// jika menu barang masuk (tampil data / form entri) dipilih, menu barang masuk aktif
 		if ($_GET['module'] == 'barang_masuk' || $_GET['module'] == 'form_entri_barang_masuk') { ?>
 			<li class="nav-section">
@@ -412,159 +410,6 @@ else {
 		<?php
 		}
 
-		// jika menu data barang (tampil data / tampil detail / form entri / form ubah) dipilih, menu data barang aktif
-		if ($_GET['module'] == 'barang' || $_GET['module'] == 'tampil_detail_barang' || $_GET['module'] == 'form_entri_barang' || $_GET['module'] == 'form_ubah_barang') { ?>
-			<li class="nav-section">
-				<span class="sidebar-mini-icon">
-					<i class="fa fa-ellipsis-h"></i>
-				</span>
-				<h4 class="text-section">Master</h4>
-			</li>
-
-			<li class="nav-item active submenu">
-				<a data-toggle="collapse" href="#barang">
-					<i class="fas fa-clone"></i>
-					<p>Barang</p>
-					<span class="caret"></span>
-				</a>
-
-				<div class="collapse show" id="barang">
-					<ul class="nav nav-collapse">
-						<li class="active">
-							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=satuan">
-								<span class="sub-item">Satuan</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</li>
-		<?php
-		}
-		// jika menu jenis barang (tampil data / form entri / form ubah) dipilih, menu jenis barang aktif
-		elseif ($_GET['module'] == 'jenis' || $_GET['module'] == 'form_entri_jenis' || $_GET['module'] == 'form_ubah_jenis') { ?>
-			<li class="nav-section">
-				<span class="sidebar-mini-icon">
-					<i class="fa fa-ellipsis-h"></i>
-				</span>
-				<h4 class="text-section">Master</h4>
-			</li>
-
-			<li class="nav-item active submenu">
-				<a data-toggle="collapse" href="#barang">
-					<i class="fas fa-clone"></i>
-					<p>Barang</p>
-					<span class="caret"></span>
-				</a>
-
-				<div class="collapse show" id="barang">
-					<ul class="nav nav-collapse">
-						<li>
-							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
-							</a>
-						</li>
-						<li class="active">
-							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=satuan">
-								<span class="sub-item">Satuan</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</li>
-		<?php
-		}
-		// jika menu satuan (tampil data / form entri / form ubah) dipilih, menu satuan aktif
-		elseif ($_GET['module'] == 'satuan' || $_GET['module'] == 'form_entri_satuan' || $_GET['module'] == 'form_ubah_satuan') { ?>
-			<li class="nav-section">
-				<span class="sidebar-mini-icon">
-					<i class="fa fa-ellipsis-h"></i>
-				</span>
-				<h4 class="text-section">Master</h4>
-			</li>
-
-			<li class="nav-item active submenu">
-				<a data-toggle="collapse" href="#barang">
-					<i class="fas fa-clone"></i>
-					<p>Barang</p>
-					<span class="caret"></span>
-				</a>
-
-				<div class="collapse show" id="barang">
-					<ul class="nav nav-collapse">
-						<li>
-							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
-							</a>
-						</li>
-						<li class="active">
-							<a href="?module=satuan">
-								<span class="sub-item">Satuan</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</li>
-		<?php
-		}
-		// jika tidak dipilih, menu barang tidak aktif
-		else { ?>
-			<li class="nav-section">
-				<span class="sidebar-mini-icon">
-					<i class="fa fa-ellipsis-h"></i>
-				</span>
-				<h4 class="text-section">Master</h4>
-			</li>
-
-			<li class="nav-item">
-				<a data-toggle="collapse" href="#barang">
-					<i class="fas fa-clone"></i>
-					<p>Barang</p>
-					<span class="caret"></span>
-				</a>
-
-				<div class="collapse" id="barang">
-					<ul class="nav nav-collapse">
-						<li>
-							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=satuan">
-								<span class="sub-item">Satuan</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</li>
-		<?php
-		}
-
 		// jika menu barang masuk (tampil data / form entri) dipilih, menu barang masuk aktif
 		if ($_GET['module'] == 'barang_masuk' || $_GET['module'] == 'form_entri_barang_masuk') { ?>
 			<li class="nav-section">
@@ -577,7 +422,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=barang_masuk">
 					<i class="fas fa-sign-in-alt"></i>
-					<p>Barang Masuk</p>
+					<p>Input Box Baru</p>
 				</a>
 			</li>
 		<?php
@@ -594,7 +439,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=barang_masuk">
 					<i class="fas fa-sign-in-alt"></i>
-					<p>Barang Masuk</p>
+					<p>Input Box Baru</p>
 				</a>
 			</li>
 		<?php
@@ -605,7 +450,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Barang Keluar</p>
+					<p>Status Box</p>
 				</a>
 			</li>
 		<?php
@@ -615,7 +460,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Barang Keluar</p>
+					<p>Status Box</p>
 				</a>
 			</li>
 		<?php

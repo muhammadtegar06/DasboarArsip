@@ -1,58 +1,78 @@
 <?php
-// mencegah direct access file PHP agar file PHP tidak bisa diakses secara langsung dari browser dan hanya dapat dijalankan ketika di include oleh file lain
-// jika file diakses secara langsung
+// Mencegah direct access file PHP
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
-    // alihkan ke halaman error 404
     header('location: 404.html');
 }
-// jika file di include oleh file lain, tampilkan isi file
-else { ?>
+else {
+    // Daftar Divisi (Array)
+    $daftar_divisi = [
+        "DSPN" => "Divisi Sekretariat Perusahaan",
+        "DTPI" => "Divisi Satuan Pengawasan Intern",
+        "DTAN" => "Divisi Tanaman",
+        "DTPL" => "Divisi Teknik & Pengolahan",
+        "DINF" => "Divisi Infrastruktur",
+        "DITN" => "Divisi Investasi Tanaman",
+        "DPSN" => "Divisi Pemasaran",
+        "DRPL" => "Divisi Rantai Pasok & Logistik",
+        "DPEN" => "Divisi Pengadaan",
+        "DSKP" => "Divisi Strategi Perusahaan & Pengendalian Kinerja Anak Perusahaan",
+        "DSMS" => "Divisi Sistem Manajemen & Sustainability",
+        "DRPH" => "Divisi Riset, Pengembangan Bisnis & Hilirisasi",
+        "DKSH" => "Divisi Keuangan Strategis dan Hubungan Investor",
+        "DPBA" => "Divisi Perbendaharaan & Anggaran",
+        "DAPN" => "Divisi Akuntansi & Perpajakan",
+        "DMRS" => "Divisi Manajemen Risiko",
+        "DPSB" => "Divisi Pengembangan SDM dan Budaya",
+        "DSDM" => "Divisi Operasional SDM",
+        "DHPU" => "Divisi HPS & Umum",
+        "DTIS" => "Divisi Teknologi Informasi",
+        "DHKT" => "Divisi Hubungan Kelembagaan dan TJSL",
+        "DHKM" => "Divisi Hukum",
+        "DPSR" => "Divisi PSR dan Plasma",
+        "DPMO" => "Project Management Office"
+    ];
+?>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-4">
             <div class="page-header text-white">
-                <!-- judul halaman -->
-                <h4 class="page-title text-white"><i class="fas fa-file-signature mr-2"></i> Laporan Stok</h4>
-                <!-- breadcrumbs -->
+                <h4 class="page-title text-white"><i class="fas fa-file-alt mr-2"></i> Laporan Arsip Per Divisi</h4>
                 <ul class="breadcrumbs">
                     <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
                     <li class="separator"><i class="flaticon-right-arrow"></i></li>
                     <li class="nav-item"><a>Laporan</a></li>
                     <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Stok</a></li>
+                    <li class="nav-item"><a>Per Divisi</a></li>
                 </ul>
             </div>
         </div>
     </div>
 
     <?php
-    // mengecek data hasil submit dari form filter
-    // jika tidak ada data yang dikirim (button tampilkan belum diklik) 
+    // --- KONDISI 1: FORM FILTER BELUM DISUBMIT ---
     if (!isset($_POST['tampil'])) { ?>
         <div class="page-inner mt--5">
             <div class="card">
                 <div class="card-header">
-                    <!-- judul form -->
-                    <div class="card-title">Cukup Seluruh saja</div>
+                    <div class="card-title">Filter Divisi</div>
                 </div>
-                <!-- form filter data -->
                 <div class="card-body">
                     <form action="?module=laporan_stok" method="post" class="needs-validation" novalidate>
                         <div class="row">
-                            <div class="col-lg-5">
+                            <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>Stok <span class="text-danger">*</span></label>
-                                    <select name="stok" class="form-control select2-single" autocomplete="off" required>
-                                        <option selected disabled value="">-- Pilih --</option>
-                                        <option value="Seluruh">Seluruh</option>
-                                        <option value="Minimum">Minimum</option>
+                                    <label>Pilih Divisi <span class="text-danger">*</span></label>
+                                    <select name="divisi" class="form-control select2" required>
+                                        <option value="">-- Silahkan Pilih --</option>
+                                        <?php foreach($daftar_divisi as $kode => $nama): ?>
+                                            <option value="<?= $kode ?>"><?= $kode ?> - <?= $nama ?></option>
+                                        <?php endforeach; ?>
                                     </select>
-                                    <div class="invalid-feedback">Stok tidak boleh kosong.</div>
+                                    <div class="invalid-feedback">Divisi harus dipilih.</div>
                                 </div>
                             </div>
 
                             <div class="col-lg-3">
                                 <div class="form-group pt-3">
-                                    <!-- button tampil data -->
                                     <input type="submit" name="tampil" value="Tampilkan" class="btn btn-secondary btn-round btn-block mt-4">
                                 </div>
                             </div>
@@ -63,45 +83,43 @@ else { ?>
         </div>
     <?php
     }
-    // jika ada data yang dikirim (button tampilkan diklik)
+    // --- KONDISI 2: FORM SUDAH DISUBMIT (TAMPIL DATA) ---
     else {
-        // ambil data hasil submit dari form filter
-        $stok = $_POST['stok'];
+        $divisi_pilih = $_POST['divisi'];
+        // Mengambil nama lengkap divisi dari array berdasarkan kode yang dipilih
+        $nama_divisi_lengkap = isset($daftar_divisi[$divisi_pilih]) ? $daftar_divisi[$divisi_pilih] : $divisi_pilih;
     ?>
         <div class="page-inner mt--5">
             <div class="card">
                 <div class="card-header">
-                    <!-- judul form -->
-                    <div class="card-title">Filter Data Stok</div>
+                    <div class="card-title">Filter Divisi</div>
                 </div>
-                <!-- form filter data -->
                 <div class="card-body">
-                    <form action="?module=laporan_stok" method="post" class="needs-validation" novalidate>
+                    <form action="?module=laporan_stok" method="post">
                         <div class="row">
-                            <div class="col-lg-5">
+                            <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>Stok <span class="text-danger">*</span></label>
-                                    <select name="stok" class="form-control select2-single" autocomplete="off" required>
-                                        <option value="<?php echo $_POST['stok']; ?>"><?php echo $_POST['stok']; ?></option>
-                                        <option disabled value="">-- Pilih --</option>
-                                        <option value="Seluruh">Seluruh</option>
-                                        <option value="Minimum">Minimum</option>
+                                    <label>Pilih Divisi <span class="text-danger">*</span></label>
+                                    <select name="divisi" class="form-control select2" required>
+                                        <option value="">-- Silahkan Pilih --</option>
+                                        <?php foreach($daftar_divisi as $kode => $nama): ?>
+                                            <option value="<?= $kode ?>" <?= ($kode == $divisi_pilih) ? 'selected' : '' ?>>
+                                                <?= $kode ?> - <?= $nama ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
-                                    <div class="invalid-feedback">Stok tidak boleh kosong.</div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <div class="form-group pt-3">
-                                    <!-- button tampil data -->
                                     <input type="submit" name="tampil" value="Tampilkan" class="btn btn-secondary btn-round btn-block mt-4">
                                 </div>
                             </div>
 
                             <div class="col-lg-2 pr-0">
                                 <div class="form-group pt-3">
-                                    <!-- button cetak laporan -->
-                                    <a href="modules/laporan-stok/cetak.php?stok=<?php echo $stok; ?>" target="_blank" class="btn btn-warning btn-round btn-block mt-4">
+                                    <a href="modules/laporan-stok/cetak.php?divisi=<?= $divisi_pilih ?>" target="_blank" class="btn btn-warning btn-round btn-block mt-4">
                                         <span class="btn-label"><i class="fa fa-print mr-2"></i></span> Cetak
                                     </a>
                                 </div>
@@ -109,8 +127,7 @@ else { ?>
 
                             <div class="col-lg-2 pl-0">
                                 <div class="form-group pt-3">
-                                    <!-- button export laporan -->
-                                    <a href="modules/laporan-stok/export.php?stok=<?php echo $stok; ?>" target="_blank" class="btn btn-success btn-round btn-block mt-4">
+                                    <a href="modules/laporan-stok/export.php?divisi=<?= $divisi_pilih ?>" target="_blank" class="btn btn-success btn-round btn-block mt-4">
                                         <span class="btn-label"><i class="fa fa-file-excel mr-2"></i></span> Export
                                     </a>
                                 </div>
@@ -121,116 +138,69 @@ else { ?>
             </div>
 
             <div class="card">
-                <?php
-                // mengecek filter data stok
-                // jika filter data stok "Seluruh" dipilih
-                if ($stok == 'Seluruh') { ?>
-                    <!-- tampilkan laporan stok seluruh barang -->
-                    <div class="card-header">
-                        <!-- judul tabel -->
-                        <div class="card-title"><i class="fas fa-file-alt mr-2"></i> Laporan Stok Seluruh Barang</div>
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-list-alt mr-2"></i> Data Arsip: <strong><?= $divisi_pilih ?></strong>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <!-- tabel untuk menampilkan data dari database -->
-                            <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
-                                <thead>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No.</th>
+                                    <th class="text-center">ID Transaksi</th>
+                                    <th class="text-center">Tanggal</th>
+                                    <th class="text-center">Divisi</th>
+                                    <th class="text-center">Total Box</th>
+                                    <th class="text-center">Total Bantex</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $no = 1;
+                                // Query ke tabel tbl_barang_masuk berdasarkan DIVISI
+                                // Pastikan kolom 'divisi' ada di tbl_barang_masuk
+                                $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_masuk 
+                                                                WHERE divisi = '$divisi_pilih' 
+                                                                ORDER BY tanggal DESC, id_transaksi DESC")
+                                                                or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+                                
+                                while ($data = mysqli_fetch_assoc($query)) { 
+                                    // Handling data kosong jika kolom belum terisi penuh
+                                    $t_box = isset($data['total_box']) ? $data['total_box'] : 0;
+                                    $t_bantex = isset($data['jumlah']) ? $data['jumlah'] : 0;
+                                    $status = isset($data['status']) ? $data['status'] : '-';
+                                ?>
                                     <tr>
-                                        <th class="text-center">No.</th>
-                                        <th class="text-center">ID Barang</th>
-                                        <th class="text-center">Nama Barang</th>
-                                        <th class="text-center">Jenis Barang</th>
-                                        <th class="text-center">Stok</th>
-                                        <th class="text-center">Satuan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    // variabel untuk nomor urut tabel
-                                    $no = 1;
-                                    // sql statement untuk menampilkan data dari tabel "tbl_barang", tabel "tbl_jenis", dan tabel "tbl_satuan"
-                                    $query = mysqli_query($mysqli, "SELECT a.id_barang, a.nama_barang, a.jenis, a.stok_minimum, a.stok, a.satuan, b.nama_jenis, c.nama_satuan
-                                                                    FROM tbl_barang as a INNER JOIN tbl_jenis as b INNER JOIN tbl_satuan as c 
-                                                                    ON a.jenis=b.id_jenis AND a.satuan=c.id_satuan 
-                                                                    ORDER BY a.id_barang ASC")
-                                                                    or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
-                                    // ambil data hasil query
-                                    while ($data = mysqli_fetch_assoc($query)) { ?>
-                                        <!-- tampilkan data -->
-                                        <tr>
-                                            <td width="50" class="text-center"><?php echo $no++; ?></td>
-                                            <td width="80" class="text-center"><?php echo $data['id_barang']; ?></td>
-                                            <td width="200"><?php echo $data['nama_barang']; ?></td>
-                                            <td width="150"><?php echo $data['nama_jenis']; ?></td>
+                                        <td width="50" class="text-center"><?= $no++; ?></td>
+                                        <td width="100" class="text-center"><?= $data['id_transaksi']; ?></td>
+                                        <td width="100" class="text-center"><?= date('d-m-Y', strtotime($data['tanggal'])); ?></td>
+                                        <td width="200"><?= $data['divisi']; ?></td>
+                                        <td width="100" class="text-center">
+                                            <span class="badge badge-count"><?= $t_box ?> Box</span>
+                                        </td>
+                                        <td width="100" class="text-center">
+                                            <?= number_format($t_bantex, 0, '', '.'); ?>
+                                        </td>
+                                        <td width="100" class="text-center">
                                             <?php
-                                            // mengecek data "stok"
-                                            // jika data stok minim
-                                            if ($data['stok'] <= $data['stok_minimum']) { ?>
-                                                <!-- tampilkan data dengan warna background -->
-                                                <td width="70" class="text-right"><span class="badge badge-warning"><?php echo $data['stok']; ?></span></td>
-                                            <?php }
-                                            // jika data stok tidak minim
-                                            else { ?>
-                                                <!-- tampilkan data tanpa warna background -->
-                                                <td width="70" class="text-right"><?php echo $data['stok']; ?></td>
-                                            <?php } ?>
-                                            <td width="70"><?php echo $data['nama_satuan']; ?></td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                <?php
-                }
-                // jika filter data stok "Minimum" dipilih
-                else { ?>
-                    <!-- tampilkan laporan stok barang yang mencapai batas minimum -->
-                    <div class="card-header">
-                        <!-- judul tabel -->
-                        <div class="card-title"><i class="fas fa-file-alt mr-2"></i> Laporan Stok Barang yang Mencapai Batas Minimum</div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <!-- tabel untuk menampilkan data dari database -->
-                            <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">No.</th>
-                                        <th class="text-center">ID Barang</th>
-                                        <th class="text-center">Nama Barang</th>
-                                        <th class="text-center">Jenis Barang</th>
-                                        <th class="text-center">Stok</th>
-                                        <th class="text-center">Satuan</th>
+                                            if ($status == 'ACC') {
+                                                echo '<span class="badge badge-success">ACC</span>';
+                                            } elseif ($status == 'Reject') {
+                                                echo '<span class="badge badge-danger">Reject</span>';
+                                            } else {
+                                                echo '<span class="badge badge-warning">Waiting</span>';
+                                            }
+                                            ?>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    // variabel untuk nomor urut tabel
-                                    $no = 1;
-                                    // sql statement untuk menampilkan data dari tabel "tbl_barang", tabel "tbl_jenis", dan tabel "tbl_satuan" berdasarkan "stok"
-                                    $query = mysqli_query($mysqli, "SELECT a.id_barang, a.nama_barang, a.jenis, a.stok_minimum, a.stok, a.satuan, b.nama_jenis, c.nama_satuan
-                                                                    FROM tbl_barang as a INNER JOIN tbl_jenis as b INNER JOIN tbl_satuan as c 
-                                                                    ON a.jenis=b.id_jenis AND a.satuan=c.id_satuan 
-                                                                    WHERE a.stok<=a.stok_minimum ORDER BY a.id_barang ASC")
-                                                                    or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
-                                    // ambil data hasil query
-                                    while ($data = mysqli_fetch_assoc($query)) { ?>
-                                        <!-- tampilkan data -->
-                                        <tr>
-                                            <td width="50" class="text-center"><?php echo $no++; ?></td>
-                                            <td width="80" class="text-center"><?php echo $data['id_barang']; ?></td>
-                                            <td width="200"><?php echo $data['nama_barang']; ?></td>
-                                            <td width="150"><?php echo $data['nama_jenis']; ?></td>
-                                            <td width="70" class="text-right"><?php echo $data['stok']; ?></td>
-                                            <td width="70"><?php echo $data['nama_satuan']; ?></td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                <?php } ?>
+                            </tbody>
+                        </table>
                     </div>
-                <?php } ?>
+                </div>
             </div>
         </div>
 <?php

@@ -79,7 +79,7 @@ else {
                                 <th class="text-center">Box</th>
                                 <th class="text-center">RF ID</th>
                                 <th class="text-center">Bantex</th>
-                                <th class="text-center">Aksi ada nav bar accept, edit , reject, print, view</th>
+                                <th class="text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -93,25 +93,28 @@ else {
                                                             ORDER BY a.id_transaksi DESC")
                                                             or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
                             // ambil data hasil query
-                            while ($data = mysqli_fetch_assoc($query)) { ?>
-                                <!-- tampilkan data -->
+                            while ($data = mysqli_fetch_assoc($query)) {
+                                // dapatkan status, fallback ke 'waiting' jika tidak ada
+                                $status_text = isset($data['status']) ? strtolower(trim($data['status'])) : 'waiting';
+                                if ($status_text === 'accept' || $status_text === 'accepted') {
+                                    $status_badge = '<span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Accept</span>';
+                                } elseif ($status_text === 'reject' || $status_text === 'rejected') {
+                                    $status_badge = '<span class="badge badge-danger"><i class="fas fa-times-circle mr-1"></i> Reject</span>';
+                                } else {
+                                    $status_badge = '<span class="badge badge-warning"><i class="fas fa-clock mr-1"></i> Waiting</span>';
+                                }
+                                ?>
                                 <tr>
                                     <td width="50" class="text-center"><?php echo $no++; ?></td>
-                                    <td width="90" class="text-center"><?php echo $data['id_transaksi']; ?></td>
+                                    <td width="90" class="text-center"><?php echo htmlspecialchars($data['id_transaksi']); ?></td>
                                     <td width="70" class="text-center"><?php echo date('d-m-Y', strtotime($data['tanggal'])); ?></td>
-                                    <td width="220"><?php echo $data['barang']; ?> - <?php echo $data['nama_barang']; ?></td>
+                                    <td width="220"><?php echo htmlspecialchars($data['barang'] . ' - ' . $data['nama_barang']); ?></td>
                                     <td width="100" class="text-right"><?php echo number_format($data['jumlah'], 0, '', '.'); ?></td>
-                                    <td width="60"><?php echo $data['nama_satuan']; ?></td>
-                                    <td width="50" class="text-center">
-                                        <div>
-                                            <!-- button hapus data -->
-                                            <a href="modules/barang-masuk/proses_hapus.php?id=<?php echo $data['id_transaksi']; ?>" onclick="return confirm('Anda yakin ingin menghapus data barang masuk <?php echo $data['id_transaksi']; ?>?')" class="btn btn-icon btn-round btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Hapus">
-                                                <i class="fas fa-trash fa-sm"></i>
-                                            </a>
-                                        </div>
-                                    </td>
+                                    <td width="60"><?php echo htmlspecialchars($data['nama_satuan']); ?></td>
+                                    <td width="120" class="text-center"><?php echo $status_badge; ?></td>
                                 </tr>
                             <?php } ?>
+                        </tbody>
                         </tbody>
                     </table>
                 </div>
