@@ -117,29 +117,6 @@ else {
                             // ambil data hasil query
                             while ($data = mysqli_fetch_assoc($query)) { ?>
                                 <!-- tampilkan data -->
-                                <tr>
-                                    <td width="50" class="text-center"><?php echo $no++; ?></td>
-                                    <td width="100" class="text-center"><?php echo $data['id_barang']; ?></td>
-                                    <td width="200"><?php echo $data['nama_barang']; ?></td>
-                                    <td width="80" class="text-right"><?php echo $data['stok']; ?></td>
-                                    <td width="100"><?php echo $data['nama_satuan']; ?></td>
-                                    <td width="100" class="text-center">
-                                        <div>
-                                            <!-- button detail data -->
-                                            <a href="?module=tampil_detail_barang&id=<?php echo $data['id_barang']; ?>" class="btn btn-icon btn-round btn-primary btn-sm mr-md-1" data-toggle="tooltip" data-placement="top" title="Detail">
-                                                <i class="fas fa-clone fa-sm"></i>
-                                            </a>
-                                            <!-- button ubah data -->
-                                            <a href="?module=form_ubah_barang&id=<?php echo $data['id_barang']; ?>" class="btn btn-icon btn-round btn-secondary btn-sm mr-md-1" data-toggle="tooltip" data-placement="top" title="Ubah">
-                                                <i class="fas fa-pencil-alt fa-sm"></i>
-                                            </a>
-                                            <!-- button hapus data -->
-                                            <a href="modules/barang/proses_hapus.php?id=<?php echo $data['id_barang']; ?>" onclick="return confirm('Anda yakin ingin menghapus data barang <?php echo $data['nama_barang']; ?>?')" class="btn btn-icon btn-round btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Hapus">
-                                                <i class="fas fa-trash fa-sm"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
                             <?php } ?>
                         </tbody>
                     </table>

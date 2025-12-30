@@ -73,7 +73,7 @@ else { ?>
 					<a href="?module=dashboard" class="logo">
 						<div class="navbar-brand">
 							<span><i class="fab fa-gofore fa-lg text-warning"></i></span>
-							<span class="text-white">udang Material</span>
+							<span class="text-white">udang Arsip</span>
 						</div>
 					</a>
 					<!-- Navbar Toggler -->
@@ -172,14 +172,6 @@ else { ?>
 				</div>
 				<!-- End Main Content -->
 
-				<!-- Footer -->
-				<footer class="footer">
-					<div class="container-fluid">
-						<div class="copyright ml-auto">
-							<span>Copyright &copy; 2021 - <a href="https://pustakakoding.com/" class="text-brand">Pustaka Koding</a>. All rights reserved.</span>
-						</div>
-					</div>
-				</footer>
 				<!-- End Footer -->
 			</div>
 		</div>

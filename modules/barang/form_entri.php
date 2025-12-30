@@ -31,7 +31,7 @@ else { ?>
         <div class="card">
             <div class="card-header">
                 <!-- judul form -->
-                <div class="card-title">Entri Data Barang</div>
+                <div class="card-title">Entri Data Dokument</div>
             </div>
             <!-- form entri data -->
             <form action="modules/barang/proses_simpan.php" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
@@ -64,19 +64,19 @@ else { ?>
                                 // menambahkan karakter "B" diawal dan karakter "0" disebelah kiri nomor urut
                                 $id_barang = "B" . str_pad($nomor_urut, 4, "0", STR_PAD_LEFT);
                                 ?>
-                                <label>ID Barang <span class="text-danger">*</span></label>
+                                <label>ID Dokuemnt <span class="text-danger">*</span></label>
                                 <!-- tampilkan "id_barang" -->
                                 <input type="text" name="id_barang" class="form-control" value="<?php echo $id_barang; ?>" readonly>
                             </div>
 
                             <div class="form-group">
-                                <label>Nama Barang <span class="text-danger">*</span></label>
+                                <label>Nama Dokumen <span class="text-danger">*</span></label>
                                 <input type="text" name="nama_barang" class="form-control" autocomplete="off" required>
                                 <div class="invalid-feedback">Nama barang tidak boleh kosong.</div>
                             </div>
 
                             <div class="form-group">
-                                <label>Jenis Barang <span class="text-danger">*</span></label>
+                                <label>Jenis Dokuemnt <span class="text-danger">*</span></label>
                                 <select name="jenis" class="form-control select2-single" autocomplete="off" required>
                                     <option selected disabled value="">-- Pilih --</option>
                                     <?php

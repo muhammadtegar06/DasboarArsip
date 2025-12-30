@@ -14,13 +14,13 @@ else {
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-4">
             <div class="page-header text-white">
-                <h4 class="page-title text-white"><i class="fas fa-file-import mr-2"></i> Laporan Barang Masuk</h4>
+                <h4 class="page-title text-white"><i class="fas fa-file-import mr-2"></i> Laporan Box Keluar  </h4>
                 <ul class="breadcrumbs">
                     <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
                     <li class="separator"><i class="flaticon-right-arrow"></i></li>
                     <li class="nav-item"><a>Laporan</a></li>
                     <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Barang Masuk</a></li>
+                    <li class="nav-item"><a>Box Keluar</a></li>
                 </ul>
             </div>
         </div>
@@ -97,7 +97,7 @@ else {
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Bulan <span class="text-danger">*</span></label>
-                                    <select name="bulan" class="form-control" required>
+                                    <select name="bulan" class="form-control select2-single" required>
                                         <option value="">-- Pilih Bulan --</option>
                                         <?php foreach($nama_bulan as $key => $val): ?>
                                             <option value="<?= $key ?>" <?= ($key == $bulan_pilih) ? 'selected' : '' ?>>
@@ -111,7 +111,7 @@ else {
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Tahun <span class="text-danger">*</span></label>
-                                    <select name="tahun" class="form-control" required>
+                                    <select name="tahun" class="form-control select2-single" required>
                                         <option value="">-- Pilih Tahun --</option>
                                         <?php
                                         $tahun_sekarang = date('Y');

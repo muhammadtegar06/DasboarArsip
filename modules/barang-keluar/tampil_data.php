@@ -75,7 +75,7 @@ else {
 
                             while ($data = mysqli_fetch_assoc($query)) { 
                                 $id_transaksi = $data['id_transaksi'];
-                                $divisi       = $data['divisi'];
+                                // $divisi       = $data['divisi'];
                                 $tanggal      = date('d-m-Y', strtotime($data['tanggal']));
                                 $total_box    = isset($data['total_box']) ? $data['total_box'] : 0;
                                 $rf_id        = isset($data['rf_id']) ? $data['rf_id'] : '-';

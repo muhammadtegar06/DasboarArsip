@@ -79,12 +79,12 @@ else {
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
                 <div class="page-header text-white">
                     <!-- judul halaman -->
-                    <h4 class="page-title text-white"><i class="fas fa-clone mr-2"></i> Jenis Barang</h4>
+                    <h4 class="page-title text-white"><i class="fas fa-clone mr-2"></i> Jenis Dokument</h4>
                     <!-- breadcrumbs -->
                     <ul class="breadcrumbs">
                         <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
                         <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                        <li class="nav-item"><a href="?module=jenis" class="text-white">Jenis Barang</a></li>
+                        <li class="nav-item"><a href="?module=jenis" class="text-white">Jenis Dokument</a></li>
                         <li class="separator"><i class="flaticon-right-arrow"></i></li>
                         <li class="nav-item"><a>Data</a></li>
                     </ul>
@@ -107,7 +107,7 @@ else {
         <div class="card">
             <div class="card-header">
                 <!-- judul tabel -->
-                <div class="card-title">Data Jenis Barang</div>
+                <div class="card-title">Data Jenis Dokument</div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -116,7 +116,7 @@ else {
                         <thead>
                             <tr>
                                 <th class="text-center">No.</th>
-                                <th class="text-center">Jenis Barang</th>
+                                <th class="text-center">Jenis Dokument</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -130,22 +130,7 @@ else {
                             // ambil data hasil query
                             while ($data = mysqli_fetch_assoc($query)) { ?>
                                 <!-- tampilkan data -->
-                                <tr>
-                                    <td width="30" class="text-center"><?php echo $no++; ?></td>
-                                    <td width="300"><?php echo $data['nama_jenis']; ?></td>
-                                    <td width="70" class="text-center">
-                                        <div>
-                                            <!-- button ubah data -->
-                                            <a href="?module=form_ubah_jenis&id=<?php echo $data['id_jenis']; ?>" class="btn btn-icon btn-round btn-secondary btn-sm mr-md-1" data-toggle="tooltip" data-placement="top" title="Ubah">
-                                                <i class="fas fa-pencil-alt fa-sm"></i>
-                                            </a>
-                                            <!-- button hapus data -->
-                                            <a href="modules/jenis/proses_hapus.php?id=<?php echo $data['id_jenis']; ?>" onclick="return confirm('Anda yakin ingin menghapus data jenis barang <?php echo $data['nama_jenis']; ?>?')" class="btn btn-icon btn-round btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Hapus">
-                                                <i class="fas fa-trash fa-sm"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+
                             <?php } ?>
                         </tbody>
                     </table>

@@ -61,7 +61,7 @@ else {
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>Pilih Divisi <span class="text-danger">*</span></label>
-                                    <select name="divisi" class="form-control select2" required>
+                                    <select name="divisi" class="form-control select2-single" required>
                                         <option value="">-- Silahkan Pilih --</option>
                                         <?php foreach($daftar_divisi as $kode => $nama): ?>
                                             <option value="<?= $kode ?>"><?= $kode ?> - <?= $nama ?></option>

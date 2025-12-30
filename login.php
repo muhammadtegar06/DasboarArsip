@@ -19,7 +19,7 @@
 	<meta name="author" content="Indra Styawantoro" />
 
 	<!-- Title -->
-	<title>Sistem Informasi Persediaan Barang Gudang Material</title>
+	<title>Repository Arsip</title>
 
 	<!-- Favicon icon -->
 	<link rel="icon" href="assets/img/favicon.png" type="image/x-icon" />
@@ -44,6 +44,7 @@
 	<!-- CSS Files -->
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/css/atlantis.min.css">
+	<link rel="stylesheet" href="assets/css/theme-overrides.css">
 	<link rel="stylesheet" href="assets/css/login.css">
 </head>
 
@@ -94,9 +95,9 @@
 	<div class="wrapper wrapper-login">
 		<div class="container container-login animated fadeIn">
 			<!-- logo -->
-			<div class="text-center mb-4"><img src="assets/img/logo.png" alt="Logo" width="95px"></div>
+			<div class="text-center mb-4"><img src="assets/img/logo1.png" alt="Logo" width="95px"></div>
 			<!-- judul -->
-			<h3 class="text-center mb-5">Sistem Informasi Persediaan Barang <br>Gudang Material</h3>
+			<h3 class="text-center mb-5">Repository Arsip</h3>
 			<!-- form login -->
 			<form action="proses_login.php" method="post" class="needs-validation" novalidate>
 				<div class="form-group form-floating-label">
@@ -117,12 +118,6 @@
 				<div class="form-action mt-2">
 					<!-- button login -->
 					<input type="submit" name="login" value="LOGIN" class="btn btn-secondary btn-rounded btn-login btn-block">
-				</div>
-
-				<!-- footer -->
-				<div class="login-footer mt-5">
-					<span class="msg">&copy; 2021 -</span>
-					<a href="https://pustakakoding.com/" class="text-brand">Pustaka Koding</a>.
 				</div>
 			</form>
 		</div>

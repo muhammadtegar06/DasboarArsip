@@ -43,7 +43,7 @@ else {
 			<li class="nav-item active submenu">
 				<a data-toggle="collapse" href="#barang">
 					<i class="fas fa-clone"></i>
-					<p>Barang</p>
+					<p>Dokument</p>
 					<span class="caret"></span>
 				</a>
 
@@ -51,16 +51,16 @@ else {
 					<ul class="nav nav-collapse">
 						<li class="active">
 							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
+								<span class="sub-item">Data Dokument</span>
 							</a>
 						</li>
 						<li>
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
+								<span class="sub-item">Jenis Dokument</span>
 							</a>
 						</li>
 						<li>
-							<a href="?module=satuan">
+								<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
 							</a>
 						</li>
@@ -81,7 +81,7 @@ else {
 			<li class="nav-item active submenu">
 				<a data-toggle="collapse" href="#barang">
 					<i class="fas fa-clone"></i>
-					<p>Barang</p>
+					<p>Dokument</p>
 					<span class="caret"></span>
 				</a>
 
@@ -89,12 +89,12 @@ else {
 					<ul class="nav nav-collapse">
 						<li>
 							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
+								<span class="sub-item">Data Dokuemnt</span>
 							</a>
 						</li>
 						<li class="active">
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
+								<span class="sub-item">Jenis Dokuemnt</span>
 							</a>
 						</li>
 						<li>
@@ -119,7 +119,7 @@ else {
 			<li class="nav-item active submenu">
 				<a data-toggle="collapse" href="#barang">
 					<i class="fas fa-clone"></i>
-					<p>Barang</p>
+					<p>Dokument</p>
 					<span class="caret"></span>
 				</a>
 
@@ -127,12 +127,12 @@ else {
 					<ul class="nav nav-collapse">
 						<li>
 							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
+								<span class="sub-item">Data Dokument</span>
 							</a>
 						</li>
 						<li>
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
+								<span class="sub-item">Jenis Dokument</span>
 							</a>
 						</li>
 						<li class="active">
@@ -157,7 +157,7 @@ else {
 			<li class="nav-item">
 				<a data-toggle="collapse" href="#barang">
 					<i class="fas fa-clone"></i>
-					<p>Barang</p>
+					<p>Dokuemnt</p>
 					<span class="caret"></span>
 				</a>
 
@@ -165,12 +165,12 @@ else {
 					<ul class="nav nav-collapse">
 						<li>
 							<a href="?module=barang">
-								<span class="sub-item">Data Barang</span>
+								<span class="sub-item">Data Dokument</span>
 							</a>
 						</li>
 						<li>
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Barang</span>
+								<span class="sub-item">Jenis Dokument</span>
 							</a>
 						</li>
 						<li>
@@ -189,13 +189,13 @@ else {
 				<span class="sidebar-mini-icon">
 					<i class="fa fa-ellipsis-h"></i>
 				</span>
-				<h4 class="text-section">Transaksi</h4>
+				<h4 class="text-section">Transaksi Box</h4>
 			</li>
 
 			<li class="nav-item active">
 				<a href="?module=barang_masuk">
 					<i class="fas fa-sign-in-alt"></i>
-					<p>Barang Masuk</p>
+					<p>Pengajuan Box</p>
 				</a>
 			</li>
 		<?php
@@ -206,13 +206,13 @@ else {
 				<span class="sidebar-mini-icon">
 					<i class="fa fa-ellipsis-h"></i>
 				</span>
-				<h4 class="text-section">Transaksi</h4>
+				<h4 class="text-section">Transaksi Box</h4>
 			</li>
 
 			<li class="nav-item">
 				<a href="?module=barang_masuk">
 					<i class="fas fa-sign-in-alt"></i>
-					<p>Barang Masuk</p>
+					<p>Pengajuan Box</p>
 				</a>
 			</li>
 		<?php
@@ -223,7 +223,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Barang Keluar</p>
+					<p>Pengiriman Box</p>
 				</a>
 			</li>
 		<?php
@@ -233,7 +233,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Barang Keluar</p>
+					<p>Pengiriman Box</p>
 				</a>
 			</li>
 		<?php
@@ -268,7 +268,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_stok">
 					<i class="fas fa-file-signature"></i>
-					<p>Laporan Stok</p>
+					<p>Laporan Stok Box</p>
 				</a>
 			</li>
 		<?php
@@ -279,7 +279,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Barang Masuk</p>
+					<p>Laporan Pengajuan Box</p>
 				</a>
 			</li>
 		<?php
@@ -289,7 +289,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Barang Masuk</p>
+					<p>Laporan Pengajuan Box</p>
 				</a>
 			</li>
 		<?php
@@ -300,7 +300,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Barang Keluar</p>
+					<p>Laporan Box Keluar</p>
 				</a>
 			</li>
 		<?php
@@ -310,7 +310,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Barang Keluar</p>
+					<p>Laporan Box Keluar</p>
 				</a>
 			</li>
 		<?php
@@ -416,7 +416,7 @@ else {
 				<span class="sidebar-mini-icon">
 					<i class="fa fa-ellipsis-h"></i>
 				</span>
-				<h4 class="text-section">Transaksi</h4>
+				<h4 class="text-section">Transaksi Box</h4>
 			</li>
 
 			<li class="nav-item active">
@@ -433,7 +433,7 @@ else {
 				<span class="sidebar-mini-icon">
 					<i class="fa fa-ellipsis-h"></i>
 				</span>
-				<h4 class="text-section">Transaksi</h4>
+				<h4 class="text-section">Transaksi Box</h4>
 			</li>
 
 			<li class="nav-item">
@@ -460,7 +460,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Status Box</p>
+					<p>Status</p>
 				</a>
 			</li>
 		<?php
@@ -506,7 +506,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Barang Masuk</p>
+					<p>Laporan Box Masuk</p>
 				</a>
 			</li>
 		<?php
@@ -516,7 +516,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Barang Masuk</p>
+					<p>Laporan Box Masuk</p>
 				</a>
 			</li>
 		<?php
@@ -527,7 +527,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Barang Keluar</p>
+					<p>Laporan Box Keluar</p>
 				</a>
 			</li>
 		<?php
@@ -537,7 +537,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Barang Keluar</p>
+					<p>Laporan Box Keluar</p>
 				</a>
 			</li>
 		<?php
@@ -642,7 +642,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Barang Masuk</p>
+					<p>Laporan Box Masuk</p>
 				</a>
 			</li>
 		<?php
@@ -652,7 +652,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Barang Masuk</p>
+					<p>Laporan Box Masuk</p>
 				</a>
 			</li>
 		<?php
@@ -663,7 +663,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Barang Keluar</p>
+					<p>Laporan Box Keluar</p>
 				</a>
 			</li>
 		<?php
@@ -673,7 +673,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Barang Keluar</p>
+					<p>Laporan Box Keluar</p>
 				</a>
 			</li>
 		<?php
