@@ -1,10 +1,10 @@
 <?php
-// mencegah direct access file PHP
+// Mencegah direct access
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
-} else { 
-    // Daftar Divisi sesuai permintaan
-    $daftar_divisi = [
+} else {
+    // Array Data Divisi
+    $divisi_list = [
         "DSPN" => "Divisi Sekretariat Perusahaan",
         "DTPI" => "Divisi Satuan Pengawasan Intern",
         "DTAN" => "Divisi Tanaman",
@@ -32,303 +32,449 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     ];
 ?>
 
-    <div class="panel-header bg-primary-gradient">
-        <div class="page-inner py-4">
-            <div class="page-header text-white">
-                <h4 class="page-title text-white"><i class="fas fa-archive mr-2"></i> Repository Arsip</h4>
-                <ul class="breadcrumbs">
-                    <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
-                    <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a href="?module=barang_masuk" class="text-white">Arsip</a></li>
-                    <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Input Baru</a></li>
-                </ul>
-            </div>
+<style>
+    .bg-gray-50 { background-color: #f9fafb; }
+    .border-dashed { border-style: dashed; }
+    .transition { transition: all 0.3s ease; }
+    .bantex-item { border-left: 4px solid #1572e8; }
+    .form-section { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; }
+</style>
+
+<div class="panel-header bg-primary-gradient">
+    <div class="page-inner py-4">
+        <div class="page-header text-white">
+            <h4 class="page-title text-white"><i class="fas fa-archive mr-2"></i> Repository Arsip</h4>
         </div>
     </div>
+</div>
 
-    <div class="page-inner mt--5">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Kelola dokumen dan bantex arsip dengan mudah</div>
-            </div>
+<div class="page-inner mt--5">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Kelola dokumen dan bantex arsip dengan mudah</div>
+        </div>
+        <div class="card-body">
             
-            <form action="modules/barang-masuk/proses_simpan.php" method="post" id="formArsip">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Divisi <span class="text-danger">*</span></label>
-                                <select name="divisi" class="form-control select2" required>
-                                    <option value="">-- Pilih Divisi --</option>
-                                    <?php foreach($daftar_divisi as $kode => $nama): ?>
-                                        <option value="<?= $kode ?>"><?= $kode ?> - <?= $nama ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Lokasi Arsip <span class="text-danger">*</span></label>
-                                <select name="lokasi_arsip" class="form-control" required>
-                                    <option value="HO" selected>Head Office (HO)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="font-weight-bold">Bantex & Dokumen</h4>
-                        <div>
-                            <span class="badge badge-primary">Total Bantex: <span id="count-bantex">0</span></span>
-                            <span class="badge badge-warning">Total Box: <span id="count-box">0</span></span>
-                        </div>
-                    </div>
-
-                    <div id="box-container">
-                        <div class="alert alert-light text-center border-dashed" id="empty-state">
-                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">Belum ada bantex ditambahkan. Klik tombol di bawah untuk memulai.</p>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn btn-primary btn-block mt-3" data-toggle="modal" data-target="#modalBantex">
-                        <i class="fas fa-plus mr-2"></i> Tambah Bantex
-                    </button>
-
-                    <br><br>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-success btn-block btn-lg">
-                                <i class="fas fa-paper-plane mr-2"></i> Submit Arsip
-                            </button>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="reset" class="btn btn-secondary btn-block btn-lg" onclick="resetForm()">
-                                <i class="fas fa-times-circle mr-2"></i> Reset
-                            </button>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="?module=barang_masuk" class="btn btn-info btn-block btn-lg">
-                                <i class="fas fa-list mr-2"></i> Lihat Data Surat Masuk
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <div class="alert alert-info mt-3" role="alert">
-            <i class="fas fa-info-circle mr-2"></i> 
-            <strong>Informasi:</strong> Setiap kotak dapat menampung hingga 6 bantex. Sistem akan secara otomatis membuat kotak baru ketika jumlah bantex mencapai 6.
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalBantex" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title font-weight-bold">Form Bantex Baru</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label>Nama Bantex <span class="text-danger">*</span></label>
-                        <input type="text" id="modal_nama_bantex" class="form-control" placeholder="Contoh: Bantex Kontrak 2023">
+                        <label class="font-weight-bold">Divisi <span class="text-danger">*</span></label>
+                        <select id="divisi" class="form-control select2" style="width:100%">
+                            <option value="">-- Pilih Divisi --</option>
+                            <?php foreach($divisi_list as $kode => $nama): ?>
+                                <option value="<?= $kode ?>"><?= $kode ?> - <?= $nama ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Lokasi Arsip <span class="text-danger">*</span></label>
+                        <select id="lokasi_arsip" class="form-control">
+                            <option value="">-- Pilih Lokasi --</option>
+                            <option value="HO">Head Office (HO)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="font-weight-bold mb-0">Bantex & Dokumen</h4>
+                <div class="text-right">
+                    <div class="small text-muted">Total Bantex: <span class="font-weight-bold text-primary" id="countBantex">0</span></div>
+                    <div class="small text-muted">Total Box: <span class="font-weight-bold text-success" id="countBox">0</span></div>
+                </div>
+            </div>
+
+            <div id="boxListContainer" class="mb-3">
+                <div class="alert alert-light border border-dashed text-center text-muted p-5">
+                    <i class="fas fa-box-open fa-3x mb-3 text-gray-300"></i>
+                    <p class="mb-0">Belum ada bantex ditambahkan</p>
+                </div>
+            </div>
+
+            <button type="button" id="btnShowForm" class="btn btn-primary btn-block font-weight-bold py-2 mb-4" onclick="showInlineForm()">
+                <i class="fas fa-plus mr-2"></i> Tambah Bantex
+            </button>
+
+            <div id="formInlineBantex" class="form-section mb-4 shadow-sm" style="display: none;">
+                <h5 class="font-weight-bold border-bottom pb-2 mb-3">Form Bantex Baru</h5>
+                
+                <div class="form-group p-0 mb-3">
+                    <label class="font-weight-bold">Nama Bantex <span class="text-danger">*</span></label>
+                    <input type="text" id="inputNamaBantex" class="form-control" placeholder="Contoh: Bantex Kontrak 2023">
+                </div>
+
+                <div class="bg-white border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="mb-0 font-weight-bold text-muted">Dokumen dalam Bantex <span class="text-danger">*</span></label>
+                        <button type="button" class="btn btn-xs btn-secondary" onclick="addDocRow()">
+                            <i class="fas fa-plus mr-1"></i> Tambah Dokumen
+                        </button>
                     </div>
 
-                    <label>Dokumen dalam Bantex <span class="text-danger">*</span></label>
-                    <div class="input-group mb-2">
-                        <input type="text" id="modal_nama_dokumen" class="form-control" placeholder="Nama dokumen">
-                        <input type="text" id="modal_periode_dokumen" class="form-control col-3" placeholder="Periode (V/2023)">
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary" type="button" id="btn-add-doc-list">+ Tambah Dokumen</button>
+                    <div class="row mb-2 px-2 text-muted font-weight-bold" style="font-size: 11px; text-transform: uppercase;">
+                        <div class="col-5">Nama Dokumen</div>
+                        <div class="col-3">Bulan</div>
+                        <div class="col-3">Tahun</div>
+                        <div class="col-1"></div>
+                    </div>
+
+                    <div id="docRowsContainer">
                         </div>
-                    </div>
-                    
-                    <ul class="list-group mb-3" id="temp-doc-list">
-                        </ul>
+                </div>
 
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-success btn-block font-weight-bold" onclick="saveInlineBantex()">
+                            <i class="fas fa-check mr-2"></i> Simpan Bantex
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary btn-block font-weight-bold" onclick="hideInlineForm()">
+                            <i class="fas fa-times mr-2"></i> Batal
+                        </button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success btn-block" id="btn-simpan-bantex">
-                        <i class="fas fa-save mr-2"></i> Simpan Bantex
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-block mt-0" data-dismiss="modal">
-                        <i class="fas fa-times mr-2"></i> Batal
+            </div>
+
+            <div class="border-top pt-4 row">
+                <div class="col-md-6 mb-2">
+                    <button type="button" onclick="handlePreSubmit()" class="btn btn-success btn-block btn-lg font-weight-bold shadow">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Arsip
                     </button>
                 </div>
+                <div class="col-md-6 mb-2">
+                    <a href="?module=barang_masuk" class="btn btn-info btn-block btn-lg font-weight-bold">
+                        Lihat Data Surat Masuk
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="card-footer bg-blue-50" style="background-color: #e1f5fe;">
+            <div class="d-flex align-items-start text-info">
+                <i class="fas fa-info-circle mr-2 mt-1"></i>
+                <small><strong>Informasi:</strong> Setiap kotak dapat menampung hingga 6 bantex. Sistem akan secara otomatis membuat kotak baru ketika jumlah bantex mencapai 6.</small>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Variabel Global menyimpan data bantex
-        let bantexList = [];
-        const MAX_BANTEX_PER_BOX = 6;
-        let tempDocs = []; // Dokumen sementara di dalam modal
+<div class="modal fade" id="modalConfirm" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header bg-success text-white py-3">
+                <h5 class="modal-title font-weight-bold">
+                    <i class="fas fa-check-circle mr-2"></i> Konfirmasi Data Surat Masuk
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
-        $(document).ready(function() {
-            // 1. Logika Menambah Dokumen di dalam Modal
-            $('#btn-add-doc-list').click(function(){
-                let docName = $('#modal_nama_dokumen').val();
-                let docPeriod = $('#modal_periode_dokumen').val();
-
-                if(docName === "") {
-                    alert("Nama dokumen tidak boleh kosong!");
-                    return;
-                }
-
-                let docObj = { nama: docName, periode: docPeriod };
-                tempDocs.push(docObj);
-
-                // Render ke list sementara
-                renderTempDocs();
+            <div class="modal-body p-4 bg-light">
                 
-                // Reset input dokumen
-                $('#modal_nama_dokumen').val('');
-                $('#modal_periode_dokumen').val('');
-                $('#modal_nama_dokumen').focus();
-            });
+                <div class="bg-white p-3 rounded shadow-sm mb-3">
+                    <h6 class="font-weight-bold text-dark border-bottom pb-2 mb-3">Informasi Pengajuan</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted d-block font-weight-bold text-uppercase" style="font-size: 10px;">Divisi</small>
+                            <span class="font-weight-bold text-dark" id="confDivisi">-</span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted d-block font-weight-bold text-uppercase" style="font-size: 10px;">Lokasi Arsip</small>
+                            <span class="font-weight-bold text-dark" id="confLokasi">-</span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted d-block font-weight-bold text-uppercase" style="font-size: 10px;">Tanggal Pengajuan</small>
+                            <span class="font-weight-bold text-dark"><?= date('Y-m-d') ?></span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <small class="text-muted d-block font-weight-bold text-uppercase" style="font-size: 10px;">Total Bantex</small>
+                            <span class="font-weight-bold text-dark"><span id="confTotalBantex">0</span> Bantex</span>
+                        </div>
+                    </div>
+                </div>
 
-            // 2. Logika Simpan Bantex dari Modal ke Halaman Utama
-            $('#btn-simpan-bantex').click(function(){
-                let namaBantex = $('#modal_nama_bantex').val();
-                
-                if(namaBantex === "") {
-                    alert("Nama Bantex harus diisi!");
-                    return;
-                }
-                if(tempDocs.length === 0) {
-                    if(!confirm("Anda belum menambahkan dokumen ke dalam bantex ini. Lanjutkan?")) return;
-                }
+                <h6 class="font-weight-bold text-dark mb-2">Daftar Dokumen</h6>
+                <div id="confDocList" class="mb-3" style="max-height: 250px; overflow-y: auto;">
+                    </div>
 
-                // Masukkan ke array global
-                bantexList.push({
-                    nama: namaBantex,
-                    dokumen: tempDocs
-                });
+                <div class="alert alert-success border-success bg-white text-center shadow-sm">
+                    <div class="row">
+                        <div class="col-6 border-right border-success">
+                            <small class="text-success font-weight-bold">TOTAL BANTEX</small>
+                            <h2 class="font-weight-bold text-dark mb-0" id="confCountBantex">0</h2>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-success font-weight-bold">TOTAL BOX</small>
+                            <h2 class="font-weight-bold text-dark mb-0" id="confCountBox">0</h2>
+                        </div>
+                    </div>
+                    <div class="small text-success mt-2">(6 Bantex = 1 Box)</div>
+                </div>
 
-                // Reset Modal & Variable Sementara
-                $('#modal_nama_bantex').val('');
-                tempDocs = [];
-                $('#temp-doc-list').empty();
-                $('#modalBantex').modal('hide');
+            </div>
 
-                // Render Ulang Tampilan Box
-                renderBoxes();
-            });
+            <div class="modal-footer bg-white">
+                <button type="button" class="btn btn-secondary btn-round font-weight-bold" data-dismiss="modal">
+                    Kembali Edit
+                </button>
+                <button type="button" onclick="submitFinal()" class="btn btn-success btn-round px-4 font-weight-bold shadow">
+                    Konfirmasi & Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global State
+    let bantexList = [];
+    const MAX_PER_BOX = 6;
+
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+
+    // --- HELPER FUNCTION UNTUK DROPDOWN ---
+    function getMonthOptions() {
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let options = '<option value="">- Bulan -</option>';
+        months.forEach(m => {
+            options += `<option value="${m}">${m}</option>`;
+        });
+        return options;
+    }
+
+    function getYearOptions() {
+        let currentYear = new Date().getFullYear();
+        let options = '<option value="">- Tahun -</option>';
+        for(let i = currentYear - 5; i <= currentYear + 5; i++) {
+            let selected = (i === currentYear) ? 'selected' : '';
+            options += `<option value="${i}" ${selected}>${i}</option>`;
+        }
+        return options;
+    }
+
+    // --- 1. LOGIKA INLINE FORM ---
+
+    function showInlineForm() {
+        $('#inputNamaBantex').val('');
+        $('#docRowsContainer').empty();
+        
+        // Tambah 1 baris default
+        addDocRow();
+        
+        $('#btnShowForm').hide();
+        $('#formInlineBantex').fadeIn();
+    }
+
+    function hideInlineForm() {
+        $('#formInlineBantex').hide();
+        $('#btnShowForm').fadeIn();
+    }
+
+    // Tambah Baris Dokumen (2 Kolom Select: Bulan & Tahun)
+    function addDocRow() {
+        let html = `
+        <div class="row mb-2 doc-row align-items-center">
+            <div class="col-5 pr-1">
+                <input type="text" class="form-control form-control-sm doc-name" placeholder="Nama Dokumen">
+            </div>
+            <div class="col-3 px-1">
+                <select class="form-control form-control-sm doc-month">
+                    ${getMonthOptions()}
+                </select>
+            </div>
+            <div class="col-3 px-1">
+                <select class="form-control form-control-sm doc-year">
+                    ${getYearOptions()}
+                </select>
+            </div>
+            <div class="col-1 pl-1 text-center">
+                <button type="button" class="btn btn-xs btn-danger btn-round" onclick="removeRow(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>`;
+        $('#docRowsContainer').append(html);
+    }
+
+    function removeRow(btn) {
+        // Cek sisa baris
+        if($('#docRowsContainer').children().length > 1) {
+            $(btn).closest('.doc-row').remove();
+        } else {
+            alert("Minimal harus ada 1 dokumen!");
+        }
+    }
+
+    function saveInlineBantex() {
+        let nama = $('#inputNamaBantex').val();
+        if(!nama.trim()) { alert("Nama Bantex wajib diisi"); return; }
+
+        let docs = [];
+        let valid = true;
+
+        $('.doc-row').each(function() {
+            let dName = $(this).find('.doc-name').val();
+            let dMonth = $(this).find('.doc-month').val();
+            let dYear = $(this).find('.doc-year').val();
+
+            if(dName && dMonth && dYear) {
+                // Format Periode: "Bulan Tahun" (Contoh: Januari 2025)
+                let fullPeriod = dMonth + " " + dYear;
+                docs.push({ name: dName, period: fullPeriod });
+            } else if(dName || dMonth || dYear) {
+                valid = false;
+            }
         });
 
-        // Fungsi Render List Dokumen di Modal
-        function renderTempDocs() {
-            let html = '';
-            tempDocs.forEach((doc, index) => {
-                html += `<li class="list-group-item d-flex justify-content-between align-items-center p-2">
-                            ${doc.nama} <span class="badge badge-info">${doc.periode}</span>
-                            <button type="button" class="btn btn-sm btn-danger btn-round" onclick="removeTempDoc(${index})">x</button>
-                         </li>`;
-            });
-            $('#temp-doc-list').html(html);
+        if(!valid) { alert("Lengkapi nama dokumen, bulan, dan tahun!"); return; }
+        if(docs.length === 0) { alert("Minimal isi 1 dokumen!"); return; }
+
+        bantexList.push({
+            id: Date.now(),
+            nama_bantex: nama,
+            dokumen: docs
+        });
+
+        renderBoxList();
+        hideInlineForm();
+    }
+
+    // --- 2. RENDER LIST BOX ---
+
+    function renderBoxList() {
+        let container = $('#boxListContainer');
+        container.empty();
+
+        let totalBantex = bantexList.length;
+        let totalBox = Math.ceil(totalBantex / MAX_PER_BOX);
+
+        $('#countBantex').text(totalBantex);
+        $('#countBox').text(totalBox);
+
+        if(totalBantex === 0) {
+            container.html(`
+                <div class="alert alert-light border border-dashed text-center text-muted p-5">
+                    <i class="fas fa-box-open fa-3x mb-3 text-gray-300"></i>
+                    <p class="mb-0">Belum ada bantex ditambahkan</p>
+                </div>`);
+            return;
         }
 
-        function removeTempDoc(index) {
-            tempDocs.splice(index, 1);
-            renderTempDocs();
-        }
-
-        // Fungsi Utama: Render Box dan Bantex
-        function renderBoxes() {
-            let container = $('#box-container');
-            container.empty();
-
-            if (bantexList.length === 0) {
-                $('#empty-state').show();
-                $('#count-bantex').text(0);
-                $('#count-box').text(0);
-                return;
-            }
-
-            $('#empty-state').hide();
+        let boxCounter = 1;
+        for(let i = 0; i < totalBantex; i += MAX_PER_BOX) {
+            let chunk = bantexList.slice(i, i + MAX_PER_BOX);
             
-            let currentBoxIndex = 1;
-            let html = '';
+            let htmlBox = `
+            <div class="card mb-3 border border-primary bg-light">
+                <div class="card-header py-2 bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary font-weight-bold">
+                        <i class="fas fa-box mr-2"></i> Box ${boxCounter}
+                    </h5>
+                    ${chunk.length === 6 ? '<span class="badge badge-danger">Penuh</span>' : ''}
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">`;
 
-            // Loop setiap 6 item untuk membuat box baru
-            for (let i = 0; i < bantexList.length; i += MAX_BANTEX_PER_BOX) {
-                // Slice array untuk mendapatkan 6 item (atau sisa)
-                let chunk = bantexList.slice(i, i + MAX_BANTEX_PER_BOX);
+            chunk.forEach((item, idx) => {
+                let realIdx = i + idx;
                 
-                html += `
-                <div class="card bg-light border mb-3">
-                    <div class="card-body p-3">
-                        <h5 class="text-primary font-weight-bold mb-3"><i class="fas fa-box mr-2"></i> Box ${currentBoxIndex}</h5>
-                        <div class="row">`;
+                let docList = item.dokumen.map(d => 
+                    `<li class="small text-muted">${d.name} <span class="text-secondary font-weight-bold">(${d.period})</span></li>`
+                ).join("");
 
-                // Loop bantex di dalam box ini
-                chunk.forEach((bantex, idx) => {
-                    let realIdx = i + idx; // Index asli di array global
-                    let docCount = bantex.dokumen.length;
-                    
-                    html += `
-                        <div class="col-md-4 mb-3">
-                            <div class="card shadow-sm border-left-primary h-100">
-                                <div class="card-body p-2">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="font-weight-bold mb-1 text-truncate" title="${bantex.nama}">${bantex.nama}</h6>
-                                        <button type="button" class="btn btn-xs btn-link text-danger" onclick="deleteBantex(${realIdx})"><i class="fas fa-times"></i></button>
-                                    </div>
-                                    <small class="text-muted"><i class="fas fa-file-alt"></i> ${docCount} Dokumen</small>
-                                    
-                                    <input type="hidden" name="box[${currentBoxIndex}][bantex][${idx}][nama]" value="${bantex.nama}">
-                                    ${generateHiddenDocs(bantex.dokumen, currentBoxIndex, idx)}
-                                </div>
-                            </div>
-                        </div>`;
-                });
-
-                html += `   </div>
+                htmlBox += `
+                <div class="col-md-6 mb-2">
+                    <div class="card h-100 shadow-sm border-0 bantex-item bg-white">
+                        <div class="card-body p-2 position-relative">
+                            <button class="btn btn-xs text-danger position-absolute" style="top:5px; right:5px;" onclick="removeBantex(${realIdx})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <h6 class="font-weight-bold text-dark mb-1" style="font-size:14px;">
+                                Bantex ${idx + 1}: ${item.nama_bantex}
+                            </h6>
+                            <ul class="pl-3 mb-0" style="list-style-type: disc;">
+                                ${docList}
+                            </ul>
                         </div>
-                    </div>`;
-                
-                currentBoxIndex++;
-            }
-
-            container.html(html);
-            $('#count-bantex').text(bantexList.length);
-            $('#count-box').text(currentBoxIndex - 1);
-        }
-
-        // Helper untuk generate input hidden dokumen
-        function generateHiddenDocs(docs, boxId, bantexId) {
-            let inputs = '';
-            docs.forEach((doc, docId) => {
-                inputs += `<input type="hidden" name="box[${boxId}][bantex][${bantexId}][dokumen][${docId}][nama]" value="${doc.nama}">`;
-                inputs += `<input type="hidden" name="box[${boxId}][bantex][${bantexId}][dokumen][${docId}][periode]" value="${doc.periode}">`;
+                    </div>
+                </div>`;
             });
-            return inputs;
-        }
 
-        // Hapus Bantex dari list
-        function deleteBantex(index) {
-            if(confirm("Hapus bantex ini?")) {
-                bantexList.splice(index, 1);
-                renderBoxes();
-            }
+            htmlBox += `</div></div></div>`;
+            container.append(htmlBox);
+            boxCounter++;
         }
+    }
 
-        function resetForm() {
-            if(confirm("Reset semua data input?")) {
-                bantexList = [];
-                renderBoxes();
-                return true;
-            }
-            return false;
+    function removeBantex(index) {
+        if(confirm("Hapus bantex ini?")) {
+            bantexList.splice(index, 1);
+            renderBoxList();
         }
-    </script>
+    }
+
+    // --- 3. SUBMIT & KONFIRMASI ---
+
+    function handlePreSubmit() {
+        let div = $('#divisi').val();
+        let loc = $('#lokasi_arsip').val();
+
+        if(!div) { alert("Pilih Divisi!"); return; }
+        if(!loc) { alert("Pilih Lokasi Arsip!"); return; }
+        if(bantexList.length === 0) { alert("Minimal 1 Bantex diperlukan!"); return; }
+
+        $('#confDivisi').text(div);
+        $('#confLokasi').text(loc);
+        $('#confTotalBantex').text(bantexList.length);
+        $('#confCountBantex').text(bantexList.length);
+        $('#confCountBox').text(Math.ceil(bantexList.length / MAX_PER_BOX));
+
+        let htmlDocs = '';
+        bantexList.forEach((b, idx) => {
+            let listD = b.dokumen.map(d => `<li>${d.name} <span class="text-muted">(${d.period})</span></li>`).join("");
+            
+            htmlDocs += `
+            <div class="alert alert-primary bg-white border border-primary p-2 mb-2 rounded shadow-sm">
+                <strong class="text-primary d-block mb-1">Bantex ${idx+1}: ${b.nama_bantex}</strong>
+                <ul class="mb-0 pl-3 small text-dark">
+                    ${listD}
+                </ul>
+            </div>`;
+        });
+        $('#confDocList').html(htmlDocs);
+
+        $('#modalConfirm').modal('show');
+    }
+
+    function submitFinal() {
+        let postData = {
+            divisi: $('#divisi').val(),
+            lokasi: $('#lokasi_arsip').val(),
+            data_bantex: JSON.stringify(bantexList)
+        };
+
+        $.ajax({
+            url: 'modules/barang-masuk/proses_simpan.php', 
+            type: 'POST',
+            data: postData,
+            success: function(res) {
+                alert("Sukses! Data berhasil disimpan.");
+                window.location.href = "?module=barang_masuk";
+            },
+            error: function() {
+                alert("Gagal menyimpan data.");
+            }
+        });
+    }
+</script>
 <?php } ?>

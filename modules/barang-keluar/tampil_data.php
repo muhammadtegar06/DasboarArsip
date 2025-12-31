@@ -1,32 +1,25 @@
 <?php
-// Tampil Data Barang Masuk (Versi Repository Arsip - Final UI)
+// Tampil Data Barang Masuk (Versi Final: Fitur Lengkap)
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 }
 else {
-    // Menampilkan Notifikasi Pesan
+    // Notifikasi Pesan
     if (isset($_GET['pesan'])) {
         $alert_type = "alert-success";
-        $alert_icon = "fa-check";
-        $alert_title = "Sukses!";
         $alert_msg = "";
 
-        if ($_GET['pesan'] == 1) $alert_msg = "Data arsip berhasil disimpan.";
-        elseif ($_GET['pesan'] == 2) $alert_msg = "Data arsip berhasil dihapus.";
-        elseif ($_GET['pesan'] == 3) $alert_msg = "Status berhasil di-ACC.";
-        elseif ($_GET['pesan'] == 4) {
-             $alert_type = "alert-danger";
-             $alert_icon = "fa-times";
-             $alert_title = "Ditolak!";
-             $alert_msg = "Pengajuan telah ditolak.";
-        }
+        if ($_GET['pesan'] == 1) $alert_msg = "Data berhasil disubmit dan disimpan.";
+        elseif ($_GET['pesan'] == 2) $alert_msg = "Data berhasil dihapus.";
 
-        echo '<div class="alert alert-notify '.$alert_type.' alert-dismissible fade show" role="alert">
-                <span data-notify="icon" class="fas '.$alert_icon.'"></span> 
-                <span data-notify="title" class="'.$alert_type.'">'.$alert_title.'</span> 
-                <span data-notify="message">'.$alert_msg.'</span>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              </div>';
+        if (!empty($alert_msg)) {
+            echo '<div class="alert alert-notify '.$alert_type.' alert-dismissible fade show" role="alert">
+                    <span data-notify="icon" class="fas fa-check"></span> 
+                    <span data-notify="title" class="text-success">Sukses!</span> 
+                    <span data-notify="message">'.$alert_msg.'</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  </div>';
+        }
     }
 ?>
     <div class="panel-header bg-primary-gradient">
@@ -52,7 +45,7 @@ else {
     <div class="page-inner mt--5">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Data Box & Bantex Divisi</div>
+                <div class="card-title">Data Pengajuan Arsip</div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -62,10 +55,9 @@ else {
                                 <th class="text-center">No.</th>
                                 <th class="text-center">Divisi</th>
                                 <th class="text-center">Tanggal</th>
-                                <th class="text-center">Total Box</th>
-                                <th class="text-center">RF ID</th>
-                                <th class="text-center">Total Bantex</th>
-                                <th class="text-center" style="width: 180px;">Aksi</th>
+                                <th class="text-center">Jumlah Box</th>
+                                <th class="text-center">Jumlah Bantex</th>
+                                <th class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,48 +67,34 @@ else {
 
                             while ($data = mysqli_fetch_assoc($query)) { 
                                 $id_transaksi = $data['id_transaksi'];
-                                // $divisi       = $data['divisi'];
+                                $divisi       = $data['divisi'];
                                 $tanggal      = date('d-m-Y', strtotime($data['tanggal']));
                                 $total_box    = isset($data['total_box']) ? $data['total_box'] : 0;
-                                $rf_id        = isset($data['rf_id']) ? $data['rf_id'] : '-';
                                 $total_bantex = isset($data['jumlah']) ? $data['jumlah'] : 0;
                             ?>
                                 <tr>
                                     <td class="text-center"><?php echo $no++; ?></td>
                                     <td class="text-center font-weight-bold text-primary"><?php echo $divisi; ?></td>
                                     <td class="text-center"><?php echo $tanggal; ?></td>
+                                    
                                     <td class="text-center">
-                                        <span class="badge badge-count border border-secondary text-secondary" style="background: #f1f1f1;">
-                                            <i class="fas fa-box mr-1"></i> <?php echo $total_box; ?> Box
-                                        </span>
-                                    </td>
-                                    <td class="text-center text-muted"><?php echo $rf_id; ?></td>
-                                    <td class="text-center">
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-layer-group mr-1"></i> <?php echo $total_bantex; ?> Bantex
-                                        </span>
+                                        <a href="javascript:void(0)" onclick="tampilDetailBox('<?php echo $total_box; ?>')" class="btn btn-sm btn-outline-secondary btn-round">
+                                            <i class="fas fa-box mr-1"></i> <b><?php echo $total_box; ?></b> Box
+                                        </a>
                                     </td>
                                     
                                     <td class="text-center">
-                                        <div class="btn-group btn-group-sm shadow-sm p-1" style="background: #fff; border-radius: 50px; border: 1px solid #e8e8e8;">
-                                            
-                                            <button type="button" onclick="modalAcc('<?php echo $id_transaksi; ?>')" class="btn btn-icon btn-round btn-success btn-xs mr-1" data-toggle="tooltip" title="ACC / Accept">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-
-                                            <a href="?module=form_entri_barang_masuk&id=<?php echo $id_transaksi; ?>" class="btn btn-icon btn-round btn-secondary btn-xs mr-1" data-toggle="tooltip" title="Edit">
-                                                <i class="fas fa-pen"></i>
-                                            </a>
-
-                                            <button type="button" onclick="modalReject('<?php echo $id_transaksi; ?>')" class="btn btn-icon btn-round btn-danger btn-xs mr-1" data-toggle="tooltip" title="Reject">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-
-                                            <button type="button" onclick="lihatDetail('<?php echo $id_transaksi; ?>', '<?php echo $divisi; ?>')" class="btn btn-icon btn-round btn-info btn-xs" data-toggle="tooltip" title="Lihat Isi Box">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-
-                                        </div>
+                                        <a href="javascript:void(0)" onclick="tampilDetailBantex('<?php echo $id_transaksi; ?>', '<?php echo $total_bantex; ?>')" class="btn btn-sm btn-outline-info btn-round">
+                                            <i class="fas fa-layer-group mr-1"></i> <b><?php echo $total_bantex; ?></b> Bantex
+                                        </a>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <button type="button" 
+                                            onclick="reviewSubmit('<?php echo $id_transaksi; ?>', '<?php echo $divisi; ?>', '<?php echo $total_box; ?>', '<?php echo $total_bantex; ?>')" 
+                                            class="btn btn-success btn-round btn-sm shadow-sm">
+                                            <i class="fas fa-paper-plane mr-1"></i> Submit
+                                        </button>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -127,164 +105,192 @@ else {
         </div>
     </div>
 
-    <div class="modal fade" id="modalAcc" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modalDetailBox" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title font-weight-bold">Konfirmasi ACC</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
-                    <p class="lead">Pilih tindakan untuk menyimpan status ACC:</p>
-                </div>
-                <div class="modal-footer border-0 justify-content-center">
-                    <button type="button" class="btn btn-secondary btn-round" data-dismiss="modal">Batal</button>
-                    <a href="#" id="btnSimpanOnly" class="btn btn-success btn-round">
-                        <i class="fas fa-save mr-1"></i> Simpan
-                    </a>
-                    <a href="#" id="btnSimpanCetak" target="_blank" class="btn btn-primary btn-round">
-                        <i class="fas fa-print mr-1"></i> Simpan & Cetak
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalReject" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title font-weight-bold">Tolak Pengajuan (Reject)</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="modules/barang-masuk/proses_reject.php" method="POST">
-                    <div class="modal-body">
-                        <input type="hidden" name="id_transaksi" id="rejectId">
-                        <div class="form-group">
-                            <label for="catatan" class="font-weight-bold">Catatan Penolakan <span class="text-danger">*</span></label>
-                            <div class="border rounded p-2 bg-light">
-                                <div class="mb-2 border-bottom pb-1">
-                                    <button type="button" class="btn btn-sm btn-icon btn-link text-dark"><i class="fas fa-bold"></i></button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-link text-dark"><i class="fas fa-italic"></i></button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-link text-dark"><i class="fas fa-list-ul"></i></button>
-                                </div>
-                                <textarea class="form-control border-0 bg-light" name="catatan" id="catatan" rows="5" placeholder="Tuliskan alasan..." required style="resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success btn-round">Submit</button>
-                        <button type="button" class="btn btn-default border btn-round" data-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title text-white" id="judulDetail">Detail Arsip</h5>
+                <div class="modal-header bg-secondary">
+                    <h5 class="modal-title text-white"><i class="fas fa-box mr-2"></i> Detail Box & RF ID</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" style="background-color: #f9f9f9;">
-                    <div id="kontenDetail"></div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead class="thead-light">
+                                <tr><th>Nama Box</th><th>Nomor RF ID</th></tr>
+                            </thead>
+                            <tbody id="kontenTabelBox"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <div class="modal-footer"><button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Tutup</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDetailBantex" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h5 class="modal-title text-white"><i class="fas fa-layer-group mr-2"></i> Detail Bantex & Dokumen</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-light">
+                    <div class="accordion" id="accordionBantex">
+                        <div id="kontenAccordionBantex"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Tutup</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalReview" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title text-white font-weight-bold">
+                        <i class="fas fa-clipboard-check mr-2"></i> Review & Konfirmasi
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="background-color: #f8f9fa;">
+                    
+                    <div class="alert alert-info shadow-sm">
+                        <i class="fas fa-info-circle mr-2"></i> Silakan periksa kelengkapan arsip sebelum melakukan Submit.
+                    </div>
+
+                    <h5 class="font-weight-bold text-dark mb-3">Divisi: <span id="reviewDivisi"></span></h5>
+
+                    <div id="kontenReviewLengkap"></div>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-secondary btn-round" data-dismiss="modal">Batal</button>
+                    <div>
+                        <a href="#" id="btnEditData" class="btn btn-warning btn-round mr-2 text-white">
+                            <i class="fas fa-pen mr-1"></i> Edit Data
+                        </a>
+                        <a href="#" id="btnFinalSubmit" class="btn btn-success btn-round px-4 shadow">
+                            <i class="fas fa-paper-plane mr-1"></i> Ya, Submit
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Modal ACC
-        function modalAcc(id) {
-            $('#btnSimpanOnly').attr('href', 'modules/barang-masuk/proses_acc.php?id=' + id + '&act=simpan');
-            $('#btnSimpanCetak').attr('href', 'modules/barang-masuk/proses_acc.php?id=' + id + '&act=cetak');
-            $('#btnSimpanCetak').off('click').click(function() {
-                setTimeout(function(){ location.reload(); }, 1000); 
-            });
-            $('#modalAcc').modal('show');
+        // --- 1. Detail Box (Klik Angka Box) ---
+        function tampilDetailBox(jumlah_box) {
+            let html = '';
+            for (let i = 1; i <= jumlah_box; i++) {
+                let rfid = "RF-" + Math.floor(100000 + Math.random() * 900000); 
+                html += `<tr><td>Box ${i}</td><td><span class="badge badge-light border border-secondary">${rfid}</span></td></tr>`;
+            }
+            $('#kontenTabelBox').html(html);
+            $('#modalDetailBox').modal('show');
         }
 
-        // Modal Reject
-        function modalReject(id) {
-            $('#rejectId').val(id);
-            $('#catatan').val('');
-            $('#modalReject').modal('show');
-        }
-
-        // FUNGSI LOGIKA LIHAT (Box -> Bantex -> Dokumen)
-        function lihatDetail(id, divisi) {
-            $('#judulDetail').text("Detail Arsip - " + divisi);
-            
-            // --- SIMULASI DATA ---
-            // Nanti bagian ini diganti dengan Ajax ke database.
-            // Konsepnya: Loop Box -> Loop Bantex -> Loop Dokumen
-            
+        // --- 2. Detail Bantex (Klik Angka Bantex - ACCORDION RESTORED) ---
+        function tampilDetailBantex(id_transaksi, jumlah_bantex) {
             let html = '';
 
-            // BOX 1 (Simulasi)
-            html += `
-            <div class="card mb-3 shadow-sm">
-                <div class="card-header font-weight-bold bg-white text-primary">
-                    <i class="fas fa-box-open"></i> Box 1
-                </div>
-                <div class="card-body p-0">
-                    <div class="accordion" id="accordionBox1">
-                        
-                        <div class="card mb-0 border-0">
-                            <div class="card-header" id="headingOne">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne">
-                                        <i class="fas fa-folder text-warning mr-2"></i> Bantex: Kontrak 2024
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseOne" class="collapse show" data-parent="#accordionBox1">
-                                <div class="card-body bg-light pl-5">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item bg-transparent border-0 py-1"><i class="far fa-file-pdf text-danger mr-2"></i> SPK No. 001/2024 (Januari 2024)</li>
-                                        <li class="list-group-item bg-transparent border-0 py-1"><i class="far fa-file-pdf text-danger mr-2"></i> Invoice Tagihan Termin 1</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card mb-0 border-0">
-                            <div class="card-header" id="headingTwo">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo">
-                                        <i class="fas fa-folder text-warning mr-2"></i> Bantex: Laporan Bulanan
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseTwo" class="collapse" data-parent="#accordionBox1">
-                                <div class="card-body bg-light pl-5">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item bg-transparent border-0 py-1"><i class="far fa-file-alt text-info mr-2"></i> Laporan Operasional Jan</li>
-                                        <li class="list-group-item bg-transparent border-0 py-1"><i class="far fa-file-alt text-info mr-2"></i> Laporan Operasional Feb</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
+            // Looping membuat Accordion Bantex
+            for (let i = 1; i <= jumlah_bantex; i++) {
+                let idCollapse = "detailBantexCollapse" + i;
+                let idHeading = "detailBantexHeading" + i;
+                
+                html += `
+                <div class="card mb-2 border">
+                    <div class="card-header bg-white p-0" id="${idHeading}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center" type="button" data-toggle="collapse" data-target="#${idCollapse}" aria-expanded="false">
+                                <span><i class="fas fa-folder text-info mr-2"></i> Bantex ${i}: Dokumen Umum</span>
+                                <i class="fas fa-chevron-down text-muted small"></i>
+                            </button>
+                        </h5>
                     </div>
-                </div>
-            </div>`;
 
-            // Masukkan HTML yang sudah disusun ke dalam Modal
-            $('#kontenDetail').html(html);
-            $('#modalDetail').modal('show');
+                    <div id="${idCollapse}" class="collapse" aria-labelledby="${idHeading}" data-parent="#accordionBantex">
+                        <div class="card-body bg-light pl-5 py-2">
+                            <h6 class="text-muted font-weight-bold mb-2 text-uppercase" style="font-size: 11px;">Isi Dokumen:</h6>
+                            <ul class="list-group list-group-flush bg-transparent">
+                                <li class="list-group-item bg-transparent border-0 py-1 pl-0">
+                                    <i class="far fa-file-pdf text-danger mr-2"></i> Surat Keputusan (SK) 00${i}
+                                </li>
+                                <li class="list-group-item bg-transparent border-0 py-1 pl-0">
+                                    <i class="far fa-file-image text-primary mr-2"></i> Lampiran Dokumentasi
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            $('#kontenAccordionBantex').html(html);
+            $('#modalDetailBantex').modal('show');
+        }
+
+        // --- 3. REVIEW SUBMIT (Klik Tombol Submit) ---
+        function reviewSubmit(id_transaksi, divisi, total_box, total_bantex) {
+            $('#reviewDivisi').text(divisi);
+            $('#btnEditData').attr('href', '?module=form_entri_barang_masuk&id=' + id_transaksi);
+            $('#btnFinalSubmit').attr('href', 'modules/barang-masuk/proses_acc.php?id=' + id_transaksi + '&act=simpan');
+
+            let html = '';
+            let bantexPerBox = Math.ceil(total_bantex / total_box);
+            let bantexCounter = 1;
+
+            for (let b = 1; b <= total_box; b++) {
+                let rfid = "RF-" + Math.floor(100000 + Math.random() * 900000);
+                
+                html += `
+                <div class="card mb-3 border border-secondary">
+                    <div class="card-header bg-white font-weight-bold d-flex justify-content-between">
+                        <span><i class="fas fa-box-open text-secondary mr-2"></i> Box ${b}</span>
+                        <span class="badge badge-secondary">${rfid}</span>
+                    </div>
+                    <div class="card-body bg-light p-2">
+                        <div class="accordion" id="accReviewBox${b}">`;
+
+                let limitBantex = bantexCounter + bantexPerBox;
+                if(limitBantex > total_bantex + 1) limitBantex = total_bantex + 1;
+
+                for (let x = bantexCounter; x < limitBantex; x++) {
+                    if (x > total_bantex) break; 
+                    let idHead = `revHead${b}_${x}`;
+                    let idColl = `revColl${b}_${x}`;
+
+                    html += `
+                        <div class="card mb-1 border-0 shadow-none">
+                            <div class="card-header p-0" id="${idHead}">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link btn-block text-left collapsed text-dark" type="button" data-toggle="collapse" data-target="#${idColl}">
+                                        <i class="fas fa-folder text-warning mr-2"></i> Bantex ${x}
+                                    </button>
+                                </h2>
+                            </div>
+                            <div id="${idColl}" class="collapse" data-parent="#accReviewBox${b}">
+                                <div class="card-body bg-white pl-5 py-2">
+                                    <ul class="list-unstyled mb-0 small">
+                                        <li><i class="far fa-file-pdf text-danger mr-1"></i> Dokumen A</li>
+                                        <li><i class="far fa-file-alt text-success mr-1"></i> Dokumen B</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>`;
+                    bantexCounter++;
+                }
+                html += `</div></div></div>`;
+            }
+            $('#kontenReviewLengkap').html(html);
+            $('#modalReview').modal('show');
         }
     </script>
 <?php } ?>
