@@ -55,7 +55,7 @@ function tanggal_indo($tanggal)
 
 	// variabel pecahkan 1 = bulan
 	// variabel pecahkan 2 = tahun
-	return $explode[2] . ' ' . $bulan[(int)$explode[1]] . ' ' . $explode[0];
+	return $explode[2] . ' ' . $bulan[(int) $explode[1]] . ' ' . $explode[0];
 }
 
 // format nama bulan indonesia
@@ -78,5 +78,5 @@ function nama_bulan_indo($tanggal)
 	$explode = explode('-', $tanggal);
 
 	// variabel pecahkan 0 = bulan
-	return $bulan[(int)$explode[0]];
+	return $bulan[(int) $explode[0]];
 }

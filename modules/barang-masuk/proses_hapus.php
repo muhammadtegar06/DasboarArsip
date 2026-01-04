@@ -19,7 +19,7 @@ else {
 
         // sql statement untuk delete data dari tabel "tbl_barang_masuk" berdasarkan "id_transaksi"
         $delete = mysqli_query($mysqli, "DELETE FROM tbl_barang_masuk WHERE id_transaksi='$id_transaksi'")
-                                        or die('Ada kesalahan pada query delete : ' . mysqli_error($mysqli));
+            or die('Ada kesalahan pada query delete : ' . mysqli_error($mysqli));
         // cek query
         // jika proses delete berhasil
         if ($delete) {

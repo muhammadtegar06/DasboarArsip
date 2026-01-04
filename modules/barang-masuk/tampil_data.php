@@ -2,9 +2,8 @@
 // Tampil Data Barang Masuk (Versi Simulasi Local Storage + 10 Dummy Data)
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
-}
-else {
-?>
+} else {
+    ?>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-45">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
@@ -45,7 +44,7 @@ else {
                             </tr>
                         </thead>
                         <tbody id="tabelBody">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -53,7 +52,7 @@ else {
     </div>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             initDummyData(); // Buat 10 data contoh jika kosong
             renderTable();   // Tampilkan tabel
         });
@@ -61,10 +60,10 @@ else {
         // 1. BUAT 10 DATA CONTOH (DUMMY) JIKA LOCAL STORAGE KOSONG
         function initDummyData() {
             let existingData = localStorage.getItem('simulasi_db_arsip');
-            
+
             // Hanya buat data baru jika localStorage kosong
             if (!existingData || JSON.parse(existingData).length === 0) {
-                
+
                 let dummyData = [
                     {
                         divisi: "DTPI - Divisi Satuan Pengawasan Intern",
@@ -182,9 +181,9 @@ else {
             } else {
                 // Loop data
                 dataArsip.forEach((item, index) => {
-                    
+
                     let statusHtml = '';
-                    
+
                     // --- LOGIKA TOMBOL SUBMIT VS HISTORI ---
                     if (item.status_submit === true) {
                         statusHtml = `
@@ -234,12 +233,12 @@ else {
         // 3. FUNGSI KLIK SUBMIT (REAL TIME)
         function prosesSubmit(index) {
             let dataArsip = JSON.parse(localStorage.getItem('simulasi_db_arsip')) || [];
-            
+
             // Ambil Waktu Sekarang
             let now = new Date();
-            let timeString = now.toLocaleString('id-ID', { 
-                day: '2-digit', month: 'short', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            let timeString = now.toLocaleString('id-ID', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
             });
 
             // Update Data
@@ -262,17 +261,17 @@ else {
                 buttons: true,
                 dangerMode: true,
             })
-            .then((willDelete) => {
-                if (willDelete) {
-                    let dataArsip = JSON.parse(localStorage.getItem('simulasi_db_arsip')) || [];
-                    dataArsip.splice(index, 1);
-                    localStorage.setItem('simulasi_db_arsip', JSON.stringify(dataArsip));
-                    renderTable();
-                    swal("Data berhasil dihapus!", { icon: "success", });
-                }
-            });
+                .then((willDelete) => {
+                    if (willDelete) {
+                        let dataArsip = JSON.parse(localStorage.getItem('simulasi_db_arsip')) || [];
+                        dataArsip.splice(index, 1);
+                        localStorage.setItem('simulasi_db_arsip', JSON.stringify(dataArsip));
+                        renderTable();
+                        swal("Data berhasil dihapus!", { icon: "success", });
+                    }
+                });
         }
     </script>
-    
+
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <?php } ?>

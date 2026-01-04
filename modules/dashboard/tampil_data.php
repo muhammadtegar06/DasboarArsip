@@ -2,16 +2,24 @@
 // mencegah direct access file PHP
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
-}
-else {
-    // --- 1. LOGIKA MENANGKAP INPUT FILTER (Hanya untuk Sticky Form) ---
+} else {
+    // --- 1. LOGIKA MENANGKAP INPUT FILTER ---
     $nama_bulan = [
-        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
-        '05' => 'Mei',     '06' => 'Juni',     '07' => 'Juli',  '08' => 'Agustus',
-        '09' => 'September','10' => 'Oktober',  '11' => 'November','12' => 'Desember'
+        '01' => 'Januari',
+        '02' => 'Februari',
+        '03' => 'Maret',
+        '04' => 'April',
+        '05' => 'Mei',
+        '06' => 'Juni',
+        '07' => 'Juli',
+        '08' => 'Agustus',
+        '09' => 'September',
+        '10' => 'Oktober',
+        '11' => 'November',
+        '12' => 'Desember'
     ];
 
-    // Kita tetap menangkap input agar dropdown tidak reset saat diklik
+    // menangkap input agar dropdown tidak reset saat diklik
     if (isset($_POST['filter'])) {
         $bulan_pilih = $_POST['bulan'];
         $tahun_pilih = $_POST['tahun'];
@@ -19,7 +27,7 @@ else {
         $bulan_pilih = "";
         $tahun_pilih = "";
     }
-?>
+    ?>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-5">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
@@ -29,11 +37,11 @@ else {
             </div>
         </div>
     </div>
-    
+
     <div class="page-inner mt--5">
-        
+
         <div class="row row-card-no-pd mt--2">
-            
+
             <div class="col-sm-6 col-md-3">
                 <div class="card card-stats card-round">
                     <div class="card-body ">
@@ -76,7 +84,8 @@ else {
                                     $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_masuk") or die('Error: ' . mysqli_error($mysqli));
                                     $jumlah_barang_masuk = mysqli_num_rows($query);
                                     ?>
-                                    <h4 class="card-title"><?php echo number_format($jumlah_barang_masuk, 0, '', '.'); ?></h4>
+                                    <h4 class="card-title"><?php echo number_format($jumlah_barang_masuk, 0, '', '.'); ?>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -127,7 +136,8 @@ else {
                                     $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_keluar") or die('Error: ' . mysqli_error($mysqli));
                                     $jumlah_barang_keluar = mysqli_num_rows($query);
                                     ?>
-                                    <h4 class="card-title"><?php echo number_format($jumlah_barang_keluar, 0, '', '.'); ?></h4>
+                                    <h4 class="card-title"><?php echo number_format($jumlah_barang_keluar, 0, '', '.'); ?>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -144,13 +154,14 @@ else {
                     <div class="card-title">
                         <i class="fas fa-info-circle mr-2"></i> Stok Batas Minimum
                     </div>
-                    
+
                     <form action="?module=dashboard" method="post" class="form-inline mt-2 mt-lg-0">
                         <div class="form-group mr-2 mb-0">
                             <select name="bulan" class="form-control form-control-sm">
                                 <option value="">- Bulan -</option>
-                                <?php foreach($nama_bulan as $key => $val): ?>
-                                    <option value="<?= $key ?>" <?= ($key == $bulan_pilih) ? 'selected' : '' ?>><?= $val ?></option>
+                                <?php foreach ($nama_bulan as $key => $val): ?>
+                                    <option value="<?= $key ?>" <?= ($key == $bulan_pilih) ? 'selected' : '' ?>><?= $val ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -166,7 +177,8 @@ else {
                                 ?>
                             </select>
                         </div>
-                        <button type="submit" name="filter" class="btn btn-primary btn-sm btn-round mr-1" title="Filter Data">
+                        <button type="submit" name="filter" class="btn btn-primary btn-sm btn-round mr-1"
+                            title="Filter Data">
                             <i class="fas fa-filter"></i>
                         </button>
                         <a href="?module=dashboard" class="btn btn-default btn-sm btn-round" title="Reset Filter">
@@ -175,7 +187,7 @@ else {
                     </form>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
@@ -203,7 +215,8 @@ else {
                                     <td width="80" class="text-center"><?php echo $data['id_barang']; ?></td>
                                     <td width="200"><?php echo $data['nama_barang']; ?></td>
                                     <td width="150"><?php echo $data['nama_jenis']; ?></td>
-                                    <td width="70" class="text-right"><span class="badge badge-warning"><?php echo $data['stok']; ?></span></td>
+                                    <td width="70" class="text-right"><span
+                                            class="badge badge-warning"><?php echo $data['stok']; ?></span></td>
                                     <td width="70"><?php echo $data['nama_satuan']; ?></td>
                                 </tr>
                             <?php } ?>
@@ -231,20 +244,20 @@ else {
                                 ['user' => 'System', 'aksi' => 'Peringatan: Stok <b>Cat Tembok</b> menipis', 'waktu' => 'Kemarin', 'color' => 'danger']
                             ];
                             foreach ($dummy_logs as $log) {
-                            ?>
-                            <li class="feed-item feed-item-<?php echo $log['color']; ?>">
-                                <time class="date" datetime="9-25"><?php echo $log['waktu']; ?></time>
-                                <span class="text">
-                                    <strong><?php echo $log['user']; ?></strong> <br>
-                                    <?php echo $log['aksi']; ?>
-                                </span>
-                            </li>
+                                ?>
+                                <li class="feed-item feed-item-<?php echo $log['color']; ?>">
+                                    <time class="date" datetime="9-25"><?php echo $log['waktu']; ?></time>
+                                    <span class="text">
+                                        <strong><?php echo $log['user']; ?></strong> <br>
+                                        <?php echo $log['aksi']; ?>
+                                    </span>
+                                </li>
                             <?php } ?>
                         </ol>
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </div>
 <?php } ?>
