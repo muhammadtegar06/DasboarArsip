@@ -34,7 +34,8 @@ else { ?>
                 <div class="card-title">Entri Data Dokument</div>
             </div>
             <!-- form entri data -->
-            <form action="modules/barang/proses_simpan.php" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form action="modules/barang/proses_simpan.php" method="post" enctype="multipart/form-data"
+                class="needs-validation" novalidate>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-7">
@@ -43,7 +44,7 @@ else { ?>
                                 // membuat "id_barang"
                                 // sql statement untuk menampilkan 4 digit terakhir dari "id_barang" pada tabel "tbl_barang"
                                 $query = mysqli_query($mysqli, "SELECT RIGHT(id_barang,4) as nomor FROM tbl_barang ORDER BY id_barang DESC LIMIT 1")
-                                                                or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+                                    or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
                                 // ambil jumlah baris data hasil query
                                 $rows = mysqli_num_rows($query);
 
@@ -66,7 +67,8 @@ else { ?>
                                 ?>
                                 <label>ID Dokuemnt <span class="text-danger">*</span></label>
                                 <!-- tampilkan "id_barang" -->
-                                <input type="text" name="id_barang" class="form-control" value="<?php echo $id_barang; ?>" readonly>
+                                <input type="text" name="id_barang" class="form-control" value="<?php echo $id_barang; ?>"
+                                    readonly>
                             </div>
 
                             <div class="form-group">
@@ -82,7 +84,7 @@ else { ?>
                                     <?php
                                     // sql statement untuk menampilkan data dari tabel "tbl_jenis"
                                     $query_jenis = mysqli_query($mysqli, "SELECT * FROM tbl_jenis ORDER BY nama_jenis ASC")
-                                                                          or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+                                        or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
                                     // ambil data hasil query
                                     while ($data_jenis = mysqli_fetch_assoc($query_jenis)) {
                                         // tampilkan data
@@ -95,7 +97,8 @@ else { ?>
 
                             <div class="form-group">
                                 <label>Stok Minimum <span class="text-danger">*</span></label>
-                                <input type="text" name="stok_minimum" class="form-control" autocomplete="off" onKeyPress="return goodchars(event,'0123456789',this)" required>
+                                <input type="text" name="stok_minimum" class="form-control" autocomplete="off"
+                                    onKeyPress="return goodchars(event,'0123456789',this)" required>
                                 <div class="invalid-feedback">Stok minimum tidak boleh kosong.</div>
                             </div>
 
@@ -106,7 +109,7 @@ else { ?>
                                     <?php
                                     // sql statement untuk menampilkan data dari tabel "tbl_satuan"
                                     $query_satuan = mysqli_query($mysqli, "SELECT * FROM tbl_satuan ORDER BY nama_satuan ASC")
-                                                                           or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+                                        or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
                                     // ambil data hasil query
                                     while ($data_satuan = mysqli_fetch_assoc($query_satuan)) {
                                         // tampilkan data
@@ -120,10 +123,12 @@ else { ?>
                         <div class="col-md-5 ml-auto">
                             <div class="form-group">
                                 <label>Foto Barang</label>
-                                <input type="file" accept=".jpg, .jpeg, .png" id="foto" name="foto" class="form-control" autocomplete="off">
+                                <input type="file" accept=".jpg, .jpeg, .png" id="foto" name="foto" class="form-control"
+                                    autocomplete="off">
                                 <div class="card mt-3 mb-3">
                                     <div class="card-body text-center">
-                                        <img style="max-height:200px" src="images/no_image.png" class="img-fluid foto-preview" alt="Foto Barang">
+                                        <img style="max-height:200px" src="images/no_image.png"
+                                            class="img-fluid foto-preview" alt="Foto Barang">
                                     </div>
                                 </div>
                                 <small class="form-text text-secondary">
@@ -146,9 +151,9 @@ else { ?>
     </div>
 
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             // validasi file dan preview file sebelum diunggah
-            $('#foto').change(function() {
+            $('#foto').change(function () {
                 // mengambil value dari file
                 var filePath = $('#foto').val();
                 var fileSize = $('#foto')[0].files[0].size;
@@ -184,7 +189,7 @@ else { ?>
                     if (fileInput.files && fileInput.files[0]) {
                         var reader = new FileReader();
 
-                        reader.onload = function(e) {
+                        reader.onload = function (e) {
                             // preview file
                             $('.foto-preview').attr('src', e.target.result);
                         };

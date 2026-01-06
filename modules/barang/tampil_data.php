@@ -59,18 +59,18 @@ else {
                     </div>';
         }
     }
-?>
+    ?>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-45">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
                 <div class="page-header text-white">
                     <!-- judul halaman -->
-                    <h4 class="page-title text-white"><i class="fas fa-clone mr-2"></i> Barang</h4>
+                    <h4 class="page-title text-white"><i class="fas fa-clone mr-2"></i>Data Dokumen</h4>
                     <!-- breadcrumbs -->
                     <ul class="breadcrumbs">
                         <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
                         <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                        <li class="nav-item"><a href="?module=barang" class="text-white">Barang</a></li>
+                        <li class="nav-item"><a href="?module=barang" class="text-white">Dokumen</a></li>
                         <li class="separator"><i class="flaticon-right-arrow"></i></li>
                         <li class="nav-item"><a>Data</a></li>
                     </ul>
@@ -113,7 +113,7 @@ else {
                             $query = mysqli_query($mysqli, "SELECT a.id_barang, a.nama_barang, a.stok, a.satuan, b.nama_satuan
                                                             FROM tbl_barang as a INNER JOIN tbl_satuan as b ON a.satuan=b.id_satuan 
                                                             ORDER BY a.id_barang DESC")
-                                                            or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+                                or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
                             // ambil data hasil query
                             while ($data = mysqli_fetch_assoc($query)) { ?>
                                 <!-- tampilkan data -->

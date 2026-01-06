@@ -71,7 +71,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         tanggal: "2025-12-30",
                         total_box: 2,
                         total_bantex: 12,
-                        status_submit: false,
+                        status_submit: true,
                         history_time: null,
                         detail_bantex: []
                     },
@@ -92,7 +92,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         total_box: 3,
                         total_bantex: 15,
                         status_submit: true,
-                        history_time: "28 Des 2025 09:15:22",
+                        history_time: "",
                         detail_bantex: []
                     },
                     {
@@ -101,7 +101,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         tanggal: "2025-12-28",
                         total_box: 1,
                         total_bantex: 3,
-                        status_submit: false,
+                        status_submit: true,
                         history_time: null,
                         detail_bantex: []
                     },

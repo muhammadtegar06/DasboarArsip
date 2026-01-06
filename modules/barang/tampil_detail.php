@@ -17,17 +17,17 @@ else {
                                         FROM tbl_barang as a INNER JOIN tbl_jenis as b INNER JOIN tbl_satuan as c 
                                         ON a.jenis=b.id_jenis AND a.satuan=c.id_satuan 
                                         WHERE a.id_barang='$id_barang'")
-                                        or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+            or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
         // ambil data hasil query
         $data = mysqli_fetch_assoc($query);
     }
-?>
+    ?>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-45">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
                 <div class="page-header text-white">
                     <!-- judul halaman -->
-                    <h4 class="page-title text-white"><i class="fas fa-clone mr-2"></i> Barang</h4>
+                    <h4 class="page-title text-white"><i class="fas fa-clone mr-2"></i>Data Dokumen</h4>
                     <!-- breadcrumbs -->
                     <ul class="breadcrumbs">
                         <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
@@ -101,12 +101,13 @@ else {
                         if (is_null($data['foto'])) { ?>
                             <!-- tampilkan foto default -->
                             <img style="max-height:375px" src="images/no_image.png" class="img-fluid" alt="Foto Barang">
-                        <?php
+                            <?php
                         }
                         // jika data "foto" ada di database
                         else { ?>
                             <!-- tampilkan foto barang dari database -->
-                            <img style="max-height:375px" src="images/<?php echo $data['foto']; ?>" class="img-fluid" alt="Foto Barang">
+                            <img style="max-height:375px" src="images/<?php echo $data['foto']; ?>" class="img-fluid"
+                                alt="Foto Barang">
                         <?php } ?>
                     </div>
                 </div>
