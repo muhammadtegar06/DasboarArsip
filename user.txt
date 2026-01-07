@@ -9,3 +9,11 @@ Password 	: 123
 Hak Akses 	: Kepala Gudang
 Username 	: kepala gudang
 Password 	: 123
+
+
+
+1 Mau nambah page
+> perhatikan content.php
+> modules nya kemana (inclusion)
+> main itu wadah dari modules
+> pakai select to sigle

@@ -1,41 +1,63 @@
 <?php
-// Tampil Data Barang Masuk (Versi Final: Fitur Lengkap)
+// Tampil Data Barang Masuk (Mode: Data Dummy & Input Dokumen)
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 }
 else {
-    // Notifikasi Pesan
-    if (isset($_GET['pesan'])) {
-        $alert_type = "alert-success";
-        $alert_msg = "";
-
-        if ($_GET['pesan'] == 1) $alert_msg = "Data berhasil disubmit dan disimpan.";
-        elseif ($_GET['pesan'] == 2) $alert_msg = "Data berhasil dihapus.";
-
-        if (!empty($alert_msg)) {
-            echo '<div class="alert alert-notify '.$alert_type.' alert-dismissible fade show" role="alert">
-                    <span data-notify="icon" class="fas fa-check"></span> 
-                    <span data-notify="title" class="text-success">Sukses!</span> 
-                    <span data-notify="message">'.$alert_msg.'</span>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  </div>';
-        }
-    }
+    // --- 1. MEMBUAT DATA DUMMY ---
+    // Kita buat array manual untuk menggantikan Database sementara
+    $data_dummy = [
+        [
+            'id_transaksi' => 2025001,
+            'divisi'       => 'DTIS - Divisi Teknologi Informasi',
+            'tanggal'      => '2025-12-30',
+            'total_box'    => 5,
+            'jumlah'       => 30, // Total Bantex
+            'status'       => 'Diterima' // Status Simulasi
+        ],
+        [
+            'id_transaksi' => 2025002,
+            'divisi'       => 'DSDM - Divisi Sumber Daya Manusia',
+            'tanggal'      => '2025-12-28',
+            'total_box'    => 2,
+            'jumlah'       => 12,
+            'status'       => 'Pending'
+        ],
+        [
+            'id_transaksi' => 2025003,
+            'divisi'       => 'DHKM - Divisi Hukum & Legal',
+            'tanggal'      => '2025-12-25',
+            'total_box'    => 10,
+            'jumlah'       => 60,
+            'status'       => 'Diterima'
+        ],
+        [
+            'id_transaksi' => 2025004,
+            'divisi'       => 'DKEU - Divisi Keuangan',
+            'tanggal'      => '2025-12-20',
+            'total_box'    => 3,
+            'jumlah'       => 18,
+            'status'       => 'Ditolak' // Contoh status Ditolak
+        ],
+        [
+            'id_transaksi' => 2025005,
+            'divisi'       => 'DPSR - Divisi PSR dan Plasma',
+            'tanggal'      => '2025-12-15',
+            'total_box'    => 1,
+            'jumlah'       => 6,
+            'status'       => 'Diterima'
+        ]
+    ];
 ?>
     <div class="panel-header bg-primary-gradient">
         <div class="page-inner py-4">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
                 <div class="page-header text-white">
                     <h4 class="page-title text-white"><i class="fas fa-archive mr-2"></i> Repository Arsip</h4>
-                    <ul class="breadcrumbs">
-                        <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
-                        <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                        <li class="nav-item"><a>Data Box</a></li>
-                    </ul>
                 </div>
                 <div class="ml-md-auto py-2 py-md-0">
                     <a href="?module=form_entri_barang_masuk" class="btn btn-secondary btn-round">
-                        <span class="btn-label"><i class="fa fa-plus mr-2"></i></span> Input Arsip Baru
+                        <span class="btn-label"><i class="fa fa-plus mr-2"></i></span> Pengajuan Baru
                     </a>
                 </div>
             </div>
@@ -43,254 +65,222 @@ else {
     </div>
 
     <div class="page-inner mt--5">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-header">
-                <div class="card-title">Data Pengajuan Arsip</div>
+                <div class="card-title font-weight-bold">Daftar Box & Bantex (Mode Preview)</div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="basic-datatables" class="display table table-hover">
+                    <table id="basic-datatables" class="display table table-hover align-middle">
                         <thead class="bg-light">
                             <tr>
                                 <th class="text-center">No.</th>
-                                <th class="text-center">Divisi</th>
-                                <th class="text-center">Tanggal</th>
-                                <th class="text-center">Jumlah Box</th>
-                                <th class="text-center">Jumlah Bantex</th>
-                                <th class="text-center">Action</th>
+                                <th>Informasi Divisi & Tanggal</th>
+                                <th class="text-center">Volume Arsip</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Aksi / Input Dokumen</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $no = 1;
-                            $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_masuk ORDER BY id_transaksi DESC");
-
-                            while ($data = mysqli_fetch_assoc($query)) { 
+                            
+                            // --- 2. LOOPING DATA DUMMY ---
+                            // Menggunakan foreach pada array $data_dummy, bukan mysqli_fetch_assoc
+                            foreach ($data_dummy as $data) { 
                                 $id_transaksi = $data['id_transaksi'];
                                 $divisi       = $data['divisi'];
-                                $tanggal      = date('d-m-Y', strtotime($data['tanggal']));
-                                $total_box    = isset($data['total_box']) ? $data['total_box'] : 0;
-                                $total_bantex = isset($data['jumlah']) ? $data['jumlah'] : 0;
+                                $tanggal      = date('d M Y', strtotime($data['tanggal']));
+                                $total_box    = $data['total_box'];
+                                $total_bantex = $data['jumlah'];
+                                $status       = $data['status']; // Ambil status dari dummy
                             ?>
                                 <tr>
                                     <td class="text-center"><?php echo $no++; ?></td>
-                                    <td class="text-center font-weight-bold text-primary"><?php echo $divisi; ?></td>
-                                    <td class="text-center"><?php echo $tanggal; ?></td>
                                     
-                                    <td class="text-center">
-                                        <a href="javascript:void(0)" onclick="tampilDetailBox('<?php echo $total_box; ?>')" class="btn btn-sm btn-outline-secondary btn-round">
-                                            <i class="fas fa-box mr-1"></i> <b><?php echo $total_box; ?></b> Box
-                                        </a>
+                                    <td>
+                                        <div class="font-weight-bold text-dark" style="font-size: 14px;"><?php echo $divisi; ?></div>
+                                        <div class="small text-muted mt-1">
+                                            <i class="far fa-calendar-alt mr-1"></i> Diajukan: <?php echo $tanggal; ?>
+                                        </div>
                                     </td>
                                     
                                     <td class="text-center">
-                                        <a href="javascript:void(0)" onclick="tampilDetailBantex('<?php echo $id_transaksi; ?>', '<?php echo $total_bantex; ?>')" class="btn btn-sm btn-outline-info btn-round">
-                                            <i class="fas fa-layer-group mr-1"></i> <b><?php echo $total_bantex; ?></b> Bantex
-                                        </a>
+                                        <h5 class="mb-0 font-weight-bold text-dark"><?php echo $total_box; ?> Box</h5>
+                                        <small class="text-muted">(Total <?php echo $total_bantex; ?> Bantex)</small>
                                     </td>
                                     
                                     <td class="text-center">
-                                        <button type="button" 
-                                            onclick="reviewSubmit('<?php echo $id_transaksi; ?>', '<?php echo $divisi; ?>', '<?php echo $total_box; ?>', '<?php echo $total_bantex; ?>')" 
-                                            class="btn btn-success btn-round btn-sm shadow-sm">
-                                            <i class="fas fa-paper-plane mr-1"></i> Submit
-                                        </button>
+                                        <?php if($status == 'Diterima') { ?>
+                                            <span class="badge badge-success shadow-sm px-3 py-2">
+                                                <i class="fas fa-check-circle mr-1"></i> Diterima
+                                            </span>
+                                        <?php } elseif($status == 'Pending') { ?>
+                                            <span class="badge badge-warning text-white shadow-sm px-3 py-2">
+                                                <i class="fas fa-clock mr-1"></i> Pending
+                                            </span>
+                                        <?php } else { ?>
+                                            <span class="badge badge-danger shadow-sm px-3 py-2">
+                                                <i class="fas fa-times-circle mr-1"></i> Ditolak
+                                            </span>
+                                        <?php } ?>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <?php if($status == 'Diterima') { ?>
+                                            <button type="button" 
+                                                onclick="bukaModalInputDokumen('<?php echo $id_transaksi; ?>', '<?php echo $divisi; ?>', <?php echo $total_bantex; ?>)" 
+                                                class="btn btn-primary btn-round btn-sm shadow font-weight-bold">
+                                                <i class="fas fa-file-import mr-2"></i> Input Dokumen
+                                            </button>
+                                        <?php } elseif ($status == 'Pending') { ?>
+                                            <button type="button" class="btn btn-link text-muted btn-sm" style="cursor: default; text-decoration: none;">
+                                                <i class="fas fa-lock mr-1"></i> Menunggu ACC
+                                            </button>
+                                        <?php } else { ?>
+                                             <button type="button" class="btn btn-link text-danger btn-sm" style="cursor: default; text-decoration: none;">
+                                                <i class="fas fa-ban mr-1"></i> Ditolak
+                                            </button>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php } ?>
                         </tbody>
                     </table>
                 </div>
+                <div class="mt-3 small text-muted font-italic">
+                    * Data di atas adalah data dummy statis untuk keperluan demonstrasi UI.
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalDetailBox" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-secondary">
-                    <h5 class="modal-title text-white"><i class="fas fa-box mr-2"></i> Detail Box & RF ID</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped mb-0">
-                            <thead class="thead-light">
-                                <tr><th>Nama Box</th><th>Nomor RF ID</th></tr>
-                            </thead>
-                            <tbody id="kontenTabelBox"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer"><button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Tutup</button></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalDetailBantex" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h5 class="modal-title text-white"><i class="fas fa-layer-group mr-2"></i> Detail Bantex & Dokumen</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body bg-light">
-                    <div class="accordion" id="accordionBantex">
-                        <div id="kontenAccordionBantex"></div>
-                    </div>
-                </div>
-                <div class="modal-footer"><button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Tutup</button></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalReview" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modalInputDokumen" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-success">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary">
                     <h5 class="modal-title text-white font-weight-bold">
-                        <i class="fas fa-clipboard-check mr-2"></i> Review & Konfirmasi
+                        <i class="fas fa-folder-open mr-2"></i> Input Dokumen Arsip
                     </h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" style="background-color: #f8f9fa;">
+                <div class="modal-body bg-light">
                     
-                    <div class="alert alert-info shadow-sm">
-                        <i class="fas fa-info-circle mr-2"></i> Silakan periksa kelengkapan arsip sebelum melakukan Submit.
+                    <div class="bg-white p-3 rounded shadow-sm border mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-8 border-right">
+                                <small class="text-muted text-uppercase font-weight-bold" style="font-size:10px;">Divisi Pengaju</small>
+                                <h5 class="text-dark font-weight-bold mb-0" id="inputModalDivisi">-</h5>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <small class="text-muted text-uppercase font-weight-bold" style="font-size:10px;">ID Transaksi</small>
+                                <h5 class="text-primary font-weight-bold mb-0" id="inputModalID">-</h5>
+                            </div>
+                        </div>
                     </div>
 
-                    <h5 class="font-weight-bold text-dark mb-3">Divisi: <span id="reviewDivisi"></span></h5>
+                    <form action="#" method="POST" enctype="multipart/form-data" onsubmit="alert('Simulasi: Data dokumen berhasil disimpan!'); return false;">
+                        <input type="hidden" name="id_transaksi" id="formIdTransaksi">
+                        
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body">
+                                <h6 class="font-weight-bold border-bottom pb-2 mb-3 text-secondary">
+                                    <i class="fas fa-edit mr-2"></i> Detail Dokumen
+                                </h6>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label font-weight-bold">Lokasi Bantex <span class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control select2-modal" name="nomor_bantex" id="selectBantex" required style="width:100%">
+                                            <option value="">-- Pilih Nomor Bantex --</option>
+                                            </select>
+                                        <small class="text-muted">Pilih bantex fisik tempat dokumen disimpan.</small>
+                                    </div>
+                                </div>
 
-                    <div id="kontenReviewLengkap"></div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label font-weight-bold">Judul Dokumen <span class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="nama_dokumen" placeholder="Contoh: Perjanjian Kerjasama PT. Maju Mundur" required>
+                                    </div>
+                                </div>
 
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-secondary btn-round" data-dismiss="modal">Batal</button>
-                    <div>
-                        <a href="#" id="btnEditData" class="btn btn-warning btn-round mr-2 text-white">
-                            <i class="fas fa-pen mr-1"></i> Edit Data
-                        </a>
-                        <a href="#" id="btnFinalSubmit" class="btn btn-success btn-round px-4 shadow">
-                            <i class="fas fa-paper-plane mr-1"></i> Ya, Submit
-                        </a>
-                    </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label class="font-weight-bold">Nomor Dokumen</label>
+                                        <input type="text" class="form-control" name="no_dokumen" placeholder="Contoh: 001/SPK/XII/2025">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="font-weight-bold">Tahun Arsip</label>
+                                        <select class="form-control" name="tahun_dokumen">
+                                            <?php 
+                                            $thn_skrg = date('Y');
+                                            for($t = $thn_skrg; $t >= $thn_skrg - 10; $t--){
+                                                echo "<option value='$t'>$t</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Scan File <span class="text-muted small">(PDF/JPG, Max 2MB)</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile" name="file_dokumen">
+                                        <label class="custom-file-label" for="customFile">Pilih file...</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="button" class="btn btn-secondary btn-round mr-2" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary btn-round px-4 font-weight-bold shadow">
+                                <i class="fas fa-save mr-2"></i> Simpan
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. Detail Box (Klik Angka Box) ---
-        function tampilDetailBox(jumlah_box) {
-            let html = '';
-            for (let i = 1; i <= jumlah_box; i++) {
-                let rfid = "RF-" + Math.floor(100000 + Math.random() * 900000); 
-                html += `<tr><td>Box ${i}</td><td><span class="badge badge-light border border-secondary">${rfid}</span></td></tr>`;
+        $(document).ready(function() {
+            // Custom file input label change
+            $('.custom-file-input').on('change', function() {
+                let fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').addClass("selected").html(fileName);
+            });
+        });
+
+        // FUNGSI MEMBUKA MODAL INPUT DOKUMEN
+        function bukaModalInputDokumen(id, divisi, totalBantex) {
+            // 1. Isi Data Header
+            $('#inputModalDivisi').text(divisi);
+            $('#inputModalID').text("#TRANS-" + id);
+            $('#formIdTransaksi').val(id);
+
+            // 2. Generate Dropdown Bantex (Sesuai Jumlah di Data Dummy)
+            let options = '<option value="">-- Pilih Bantex (1 - '+ totalBantex +') --</option>';
+            
+            // Logika: Estimasi 1 Box = 6 Bantex (hanya visualisasi)
+            // Kita loop sesuai total_bantex yang dilempar dari data dummy
+            for (let i = 1; i <= totalBantex; i++) {
+                // Tentukan dia ada di box ke berapa
+                let boxKe = Math.ceil(i / 6); 
+                options += `<option value="${i}">Bantex Ke-${i} (Box ${boxKe})</option>`;
             }
-            $('#kontenTabelBox').html(html);
-            $('#modalDetailBox').modal('show');
-        }
+            
+            $('#selectBantex').html(options);
 
-        // --- 2. Detail Bantex (Klik Angka Bantex - ACCORDION RESTORED) ---
-        function tampilDetailBantex(id_transaksi, jumlah_bantex) {
-            let html = '';
-
-            // Looping membuat Accordion Bantex
-            for (let i = 1; i <= jumlah_bantex; i++) {
-                let idCollapse = "detailBantexCollapse" + i;
-                let idHeading = "detailBantexHeading" + i;
-                
-                html += `
-                <div class="card mb-2 border">
-                    <div class="card-header bg-white p-0" id="${idHeading}">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center" type="button" data-toggle="collapse" data-target="#${idCollapse}" aria-expanded="false">
-                                <span><i class="fas fa-folder text-info mr-2"></i> Bantex ${i}: Dokumen Umum</span>
-                                <i class="fas fa-chevron-down text-muted small"></i>
-                            </button>
-                        </h5>
-                    </div>
-
-                    <div id="${idCollapse}" class="collapse" aria-labelledby="${idHeading}" data-parent="#accordionBantex">
-                        <div class="card-body bg-light pl-5 py-2">
-                            <h6 class="text-muted font-weight-bold mb-2 text-uppercase" style="font-size: 11px;">Isi Dokumen:</h6>
-                            <ul class="list-group list-group-flush bg-transparent">
-                                <li class="list-group-item bg-transparent border-0 py-1 pl-0">
-                                    <i class="far fa-file-pdf text-danger mr-2"></i> Surat Keputusan (SK) 00${i}
-                                </li>
-                                <li class="list-group-item bg-transparent border-0 py-1 pl-0">
-                                    <i class="far fa-file-image text-primary mr-2"></i> Lampiran Dokumentasi
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>`;
-            }
-
-            $('#kontenAccordionBantex').html(html);
-            $('#modalDetailBantex').modal('show');
-        }
-
-        // --- 3. REVIEW SUBMIT (Klik Tombol Submit) ---
-        function reviewSubmit(id_transaksi, divisi, total_box, total_bantex) {
-            $('#reviewDivisi').text(divisi);
-            $('#btnEditData').attr('href', '?module=form_entri_barang_masuk&id=' + id_transaksi);
-            $('#btnFinalSubmit').attr('href', 'modules/barang-masuk/proses_acc.php?id=' + id_transaksi + '&act=simpan');
-
-            let html = '';
-            let bantexPerBox = Math.ceil(total_bantex / total_box);
-            let bantexCounter = 1;
-
-            for (let b = 1; b <= total_box; b++) {
-                let rfid = "RF-" + Math.floor(100000 + Math.random() * 900000);
-                
-                html += `
-                <div class="card mb-3 border border-secondary">
-                    <div class="card-header bg-white font-weight-bold d-flex justify-content-between">
-                        <span><i class="fas fa-box-open text-secondary mr-2"></i> Box ${b}</span>
-                        <span class="badge badge-secondary">${rfid}</span>
-                    </div>
-                    <div class="card-body bg-light p-2">
-                        <div class="accordion" id="accReviewBox${b}">`;
-
-                let limitBantex = bantexCounter + bantexPerBox;
-                if(limitBantex > total_bantex + 1) limitBantex = total_bantex + 1;
-
-                for (let x = bantexCounter; x < limitBantex; x++) {
-                    if (x > total_bantex) break; 
-                    let idHead = `revHead${b}_${x}`;
-                    let idColl = `revColl${b}_${x}`;
-
-                    html += `
-                        <div class="card mb-1 border-0 shadow-none">
-                            <div class="card-header p-0" id="${idHead}">
-                                <h2 class="mb-0">
-                                    <button class="btn btn-link btn-block text-left collapsed text-dark" type="button" data-toggle="collapse" data-target="#${idColl}">
-                                        <i class="fas fa-folder text-warning mr-2"></i> Bantex ${x}
-                                    </button>
-                                </h2>
-                            </div>
-                            <div id="${idColl}" class="collapse" data-parent="#accReviewBox${b}">
-                                <div class="card-body bg-white pl-5 py-2">
-                                    <ul class="list-unstyled mb-0 small">
-                                        <li><i class="far fa-file-pdf text-danger mr-1"></i> Dokumen A</li>
-                                        <li><i class="far fa-file-alt text-success mr-1"></i> Dokumen B</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>`;
-                    bantexCounter++;
-                }
-                html += `</div></div></div>`;
-            }
-            $('#kontenReviewLengkap').html(html);
-            $('#modalReview').modal('show');
+            // 3. Buka Modal
+            $('#modalInputDokumen').modal('show');
         }
     </script>
+
 <?php } ?>

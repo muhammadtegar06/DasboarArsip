@@ -14,13 +14,13 @@ else {
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-4">
             <div class="page-header text-white">
-                <h4 class="page-title text-white"><i class="fas fa-file-import mr-2"></i> Laporan Box Masuk</h4>
+                <h4 class="page-title text-white"><i class="fas fa-file-import mr-2"></i>Pengajuan Box</h4>
                 <ul class="breadcrumbs">
                     <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
                     <li class="separator"><i class="flaticon-right-arrow"></i></li>
                     <li class="nav-item"><a>Laporan</a></li>
                     <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Box Masuk</a></li>
+                    <li class="nav-item"><a>Pengajuan Box</a></li>
                 </ul>
             </div>
         </div>

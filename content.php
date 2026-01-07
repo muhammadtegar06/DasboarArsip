@@ -122,8 +122,8 @@ else {
 		include "modules/password/form_ubah.php";
 	}
 	// jika module yang dipilih "tentang"
-	// elseif ($_GET['module'] == 'tentang') {
-	// 	// panggil file tampil data tentang
-	// 	include "modules/tentang/tampil_data.php";
-	// }
+	elseif ($_GET['module'] == 'tentang') {
+		// panggil file tampil data tentang
+		include "modules/tentang/tampil_data.php";
+	}
 }

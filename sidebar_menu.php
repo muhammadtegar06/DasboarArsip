@@ -223,7 +223,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Pengiriman Box</p>
+					<p>Pengiriman Data Box</p>
 				</a>
 			</li>
 			<?php
@@ -233,7 +233,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Pengiriman Box</p>
+					<p>Pengiriman Data Box</p>
 				</a>
 			</li>
 			<?php

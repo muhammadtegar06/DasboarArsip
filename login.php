@@ -44,7 +44,6 @@
 	<!-- CSS Files -->
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/css/atlantis.min.css">
-	<link rel="stylesheet" href="assets/css/theme-overrides.css">
 	<link rel="stylesheet" href="assets/css/login.css">
 </head>
 
