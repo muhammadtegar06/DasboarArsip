@@ -51,7 +51,7 @@ else {
 					<ul class="nav nav-collapse">
 						<li class="active">
 							<a href="?module=barang">
-								<span class="sub-item">Data Dokumen</span>
+								<span class="sub-item">Data Dokumen (all)</span>
 							</a>
 						</li>
 						<li>
@@ -89,7 +89,7 @@ else {
 					<ul class="nav nav-collapse">
 						<li>
 							<a href="?module=barang">
-								<span class="sub-item">Data Dokumen</span>
+								<span class="sub-item">Data Dokumen (all)</span>
 							</a>
 						</li>
 						<li class="active">
@@ -127,7 +127,7 @@ else {
 					<ul class="nav nav-collapse">
 						<li>
 							<a href="?module=barang">
-								<span class="sub-item">Data Dokumen</span>
+								<span class="sub-item">Data Dokumen (all)</span>
 							</a>
 						</li>
 						<li>
@@ -165,7 +165,7 @@ else {
 					<ul class="nav nav-collapse">
 						<li>
 							<a href="?module=barang">
-								<span class="sub-item">Data Dokumen</span>
+								<span class="sub-item">Data Dokumen (all)</span>
 							</a>
 						</li>
 						<li>
@@ -258,7 +258,7 @@ else {
 		}
 		// jika tidak dipilih, menu laporan stok tidak aktif
 		else { ?>
-			<li class="nav-section">
+			<!-- <li class="nav-section">
 				<span class="sidebar-mini-icon">
 					<i class="fa fa-ellipsis-h"></i>
 				</span>
@@ -270,7 +270,7 @@ else {
 					<i class="fas fa-file-signature"></i>
 					<p>Laporan Stok Box</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 
@@ -286,12 +286,12 @@ else {
 		}
 		// jika tidak dipilih, menu laporan barang masuk tidak aktif
 		else { ?>
-			<li class="nav-item">
+			<!-- <li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
 					<p>Laporan Pengajuan Box</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 
@@ -307,12 +307,12 @@ else {
 		}
 		// jika tidak dipilih, menu laporan barang keluar tidak aktif
 		else { ?>
-			<li class="nav-item">
+			<!-- <li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
 					<p>Laporan Box Keluar</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 

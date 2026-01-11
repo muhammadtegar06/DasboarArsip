@@ -3,34 +3,11 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 } else {
-    // Array Data Divisi
-    $divisi_list = [
-        "DSPN" => "Divisi Sekretariat Perusahaan",
-        "DTPI" => "Divisi Satuan Pengawasan Intern",
-        "DTAN" => "Divisi Tanaman",
-        "DTPL" => "Divisi Teknik & Pengolahan",
-        "DINF" => "Divisi Infrastruktur",
-        "DITN" => "Divisi Investasi Tanaman",
-        "DPSN" => "Divisi Pemasaran",
-        "DRPL" => "Divisi Rantai Pasok & Logistik",
-        "DPEN" => "Divisi Pengadaan",
-        "DSKP" => "Divisi Strategi Perusahaan & Pengendalian Kinerja Anak Perusahaan",
-        "DSMS" => "Divisi Sistem Manajemen & Sustainability",
-        "DRPH" => "Divisi Riset, Pengembangan Bisnis & Hilirisasi",
-        "DKSH" => "Divisi Keuangan Strategis dan Hubungan Investor",
-        "DPBA" => "Divisi Perbendaharaan & Anggaran",
-        "DAPN" => "Divisi Akuntansi & Perpajakan",
-        "DMRS" => "Divisi Manajemen Risiko",
-        "DPSB" => "Divisi Pengembangan SDM dan Budaya",
-        "DSDM" => "Divisi Operasional SDM",
-        "DHPU" => "Divisi HPS & Umum",
-        "DTIS" => "Divisi Teknologi Informasi",
-        "DHKT" => "Divisi Hubungan Kelembagaan dan TJSL",
-        "DHKM" => "Divisi Hukum",
-        "DPSR" => "Divisi PSR dan Plasma",
-        "DPMO" => "Project Management Office"
-    ];
-    ?>
+    // PENTING: Panggil koneksi database di sini untuk mengisi dropdown
+    // Sesuaikan path jika error
+    // require_once "config/database.php"; 
+    // (Asumsi: config sudah dipanggil di file induk/main.php yang me-load file ini)
+?>
 
     <div class="panel-header bg-primary-gradient">
         <div class="page-inner py-4">
@@ -53,9 +30,14 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             <label class="font-weight-bold">Divisi <span class="text-danger">*</span></label>
                             <select id="divisi" class="form-control select2" style="width:100%">
                                 <option value="">-- Pilih Divisi --</option>
-                                <?php foreach ($divisi_list as $kode => $nama): ?>
-                                    <option value="<?= $kode ?>"><?= $kode ?> - <?= $nama ?></option>
-                                <?php endforeach; ?>
+                                <?php 
+                                // UPDATE: Mengambil data Divisi langsung dari Database
+                                $query_divisi = mysqli_query($mysqli, "SELECT * FROM tbl_divisi ORDER BY nama_divisi ASC");
+                                while ($div = mysqli_fetch_assoc($query_divisi)) {
+                                    // Value menggunakan singkatan agar sesuai logika backend
+                                    echo '<option value="'.$div['singkatan_divisi'].'">'.$div['singkatan_divisi'].' - '.$div['nama_divisi'].'</option>';
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -120,72 +102,56 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 
     <script>
         $(document).ready(function () {
-            // Inisialisasi Select2 untuk Divisi
             $('.select2').select2();
         });
 
-        // Fungsi Hitung Otomatis
         function hitungBantex() {
-            // Ambil nilai jumlah box
             let box = document.getElementById('jumlah_box').value;
-            
-            // Konversi ke integer, default 0 jika kosong
             box = parseInt(box) || 0;
-            
-            // Rumus: 1 Box = 6 Bantex
             let totalBantex = box * 6;
-            
-            // Update field Bantex
             document.getElementById('jumlah_bantex').value = totalBantex;
         }
 
-        // Fungsi Submit Data
         function submitSimpel() {
-            // Ambil Value
             let divisi = $('#divisi').val();
-            let lokasi = $('#lokasi_arsip').val(); // Akan otomatis "Head Office ( HO )"
+            let lokasi = $('#lokasi_arsip').val();
             let box = $('#jumlah_box').val();
             let bantex = $('#jumlah_bantex').val();
 
-            // Validasi Sederhana
-            if (divisi === "") {
-                alert("Harap pilih Divisi!");
-                return;
-            }
-            // Validasi lokasi sebenarnya tidak perlu lagi karena sudah default selected, tapi dijaga untuk keamanan
-            if (lokasi.trim() === "") {
-                alert("Harap pilih Lokasi Arsip!");
-                return;
-            }
-            if (box == 0 || box === "") {
-                alert("Harap pilih Jumlah Box!");
-                return;
-            }
+            if (divisi === "") { alert("Harap pilih Divisi!"); return; }
+            if (box == 0 || box === "") { alert("Harap pilih Jumlah Box!"); return; }
 
-            // Konfirmasi User
-            let konfirmasi = confirm(`Apakah data sudah benar?\n\nDivisi: ${divisi}\nLokasi: ${lokasi}\nJumlah: ${box} Box (${bantex} Bantex)`);
-            
-            if (konfirmasi) {
-                // AJAX Request ke backend
-                $.ajax({
-                    url: 'modules/barang-masuk/proses_simpan.php',
-                    type: 'POST',
-                    data: {
-                        divisi: divisi,
-                        lokasi: lokasi,
-                        jumlah_box: box,
-                        jumlah_bantex: bantex
-                    },
-                    success: function (res) {
-                        // Sesuaikan handling response dengan backend kamu
-                        alert("Data berhasil disimpan!");
+            // Loading state (biar user ga klik berkali-kali)
+            let btn = $('button[onclick="submitSimpel()"]');
+            let originalText = btn.html();
+            btn.attr('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+
+            $.ajax({
+                url: 'modules/barang-masuk/proses_simpan.php',
+                type: 'POST',
+                data: {
+                    divisi: divisi,
+                    lokasi: lokasi,
+                    jumlah_box: box,
+                    jumlah_bantex: bantex
+                },
+                dataType: 'json', // Memberitahu jQuery bahwa respon server adalah JSON
+                success: function (res) {
+                    if (res.status === 'success') {
+                        // Gunakan SweetAlert jika ada, atau alert biasa
+                        alert(res.message); 
                         window.location.href = "?module=barang_masuk";
-                    },
-                    error: function () {
-                        alert("Terjadi kesalahan saat menyimpan data.");
+                    } else {
+                        alert("Gagal: " + res.message);
+                        btn.attr('disabled', false).html(originalText);
                     }
-                });
-            }
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr.responseText); // Cek console browser F12 jika error
+                    alert("Terjadi kesalahan sistem. Cek Console.");
+                    btn.attr('disabled', false).html(originalText);
+                }
+            });
         }
     </script>
 

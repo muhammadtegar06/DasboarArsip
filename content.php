@@ -126,4 +126,11 @@ else {
 		// panggil file tampil data tentang
 		include "modules/tentang/tampil_data.php";
 	}
+
+	// ---------------------PENAMBAHAN -------------------- //
+	// jika module yang dipilih "form_input_dokumen"
+	elseif ($_GET['module'] == 'form_input_dokumen') {
+		// panggil file tampil data tentang
+		include "modules/barang-keluar/form_entri.php";
+	}
 }

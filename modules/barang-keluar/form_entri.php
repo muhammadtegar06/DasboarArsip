@@ -22,17 +22,21 @@ $divisi_list = [
 ];
 
 // 2. HELPER FUNCTIONS (Ditaruh di atas agar aman)
-function getMonthOptions() {
+function getMonthOptions()
+{
     $months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     $opts = '<option value="">- Bulan -</option>';
-    foreach ($months as $m) $opts .= "<option value='$m'>$m</option>";
+    foreach ($months as $m)
+        $opts .= "<option value='$m'>$m</option>";
     return $opts;
 }
 
-function getYearOptions() {
+function getYearOptions()
+{
     $curr = date('Y');
     $opts = '<option value="">- Tahun -</option>';
-    for ($i = $curr; $i >= $curr - 5; $i--) $opts .= "<option value='$i'>$i</option>";
+    for ($i = $curr; $i >= $curr - 5; $i--)
+        $opts .= "<option value='$i'>$i</option>";
     return $opts;
 }
 
@@ -43,8 +47,8 @@ $total_bantex_url = isset($_GET['total_bantex']) ? $_GET['total_bantex'] : 0;
 
 // Cari kode divisi berdasarkan nama (jika ada match)
 $kode_divisi_selected = "";
-foreach($divisi_list as $kd => $nm) {
-    if(strpos($nama_divisi_url, $kd) !== false) {
+foreach ($divisi_list as $kd => $nm) {
+    if (strpos($nama_divisi_url, $kd) !== false) {
         $kode_divisi_selected = $kd;
         break;
     }
@@ -53,57 +57,263 @@ foreach($divisi_list as $kd => $nm) {
 
 <style>
     /* General Layout */
-    .page-inner { padding-top: 25px; background: #f9fbfd; }
-    .card { border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 12px; }
-    .card-header { background: #fff; border-bottom: 1px solid #f1f1f1; border-radius: 12px 12px 0 0 !important; padding: 20px 25px; }
-    
+    .page-inner {
+        padding-top: 25px;
+        background: #f9fbfd;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+    }
+
+    .card-header {
+        background: #fff;
+        border-bottom: 1px solid #f1f1f1;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 20px 25px;
+    }
+
     /* Typography */
-    .repo-title { font-size: 24px; font-weight: 800; color: #2c3e50; margin-bottom: 5px; }
-    .repo-subtitle { color: #7f8c8d; font-size: 14px; }
-    
+    .repo-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .repo-subtitle {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
     /* Stats Badges */
-    .stat-badge { font-size: 13px; font-weight: 600; padding: 8px 15px; border-radius: 30px; margin-left: 10px; }
-    .stat-badge.blue { background: #e3f2fd; color: #1565c0; }
-    .stat-badge.green { background: #e8f5e9; color: #2e7d32; }
+    .stat-badge {
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 15px;
+        border-radius: 30px;
+        margin-left: 10px;
+    }
+
+    .stat-badge.blue {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .stat-badge.green {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
 
     /* Box Container */
-    .box-wrapper { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 20px; position: relative; }
-    .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .box-title { font-weight: 700; color: #4e73df; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .box-badge { background: #fff; border: 1px solid #4e73df; color: #4e73df; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
-    
+    .box-wrapper {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .box-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .box-title {
+        font-weight: 700;
+        color: #4e73df;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .box-badge {
+        background: #fff;
+        border: 1px solid #4e73df;
+        color: #4e73df;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
     /* Bantex Card */
-    .bantex-item { background: #fff; border-left: 4px solid #3498db; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border-radius: 4px; margin-bottom: 10px; transition: transform 0.2s; position: relative; }
-    .bantex-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .bantex-content { padding: 15px; }
-    .bantex-name { font-weight: 700; color: #2c3e50; font-size: 14px; margin-bottom: 8px; }
-    .doc-list-item { font-size: 12px; color: #666; padding: 2px 0; display: flex; align-items: center; }
-    .doc-list-item i { margin-right: 8px; color: #bdc3c7; }
-    .btn-delete-bantex { position: absolute; top: 10px; right: 10px; color: #e74c3c; cursor: pointer; opacity: 0.5; transition: 0.2s; z-index: 10; }
-    .btn-delete-bantex:hover { opacity: 1; transform: scale(1.1); }
+    .bantex-item {
+        background: #fff;
+        border-left: 4px solid #3498db;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        border-radius: 4px;
+        margin-bottom: 10px;
+        transition: transform 0.2s;
+        position: relative;
+    }
+
+    .bantex-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .bantex-content {
+        padding: 15px;
+    }
+
+    .bantex-name {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .doc-list-item {
+        font-size: 12px;
+        color: #666;
+        padding: 2px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .doc-list-item i {
+        margin-right: 8px;
+        color: #bdc3c7;
+    }
+
+    .btn-delete-bantex {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: #e74c3c;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: 0.2s;
+        z-index: 10;
+    }
+
+    .btn-delete-bantex:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
 
     /* Inline Form Area */
-    .inline-form-area { background: #fff; border: 2px dashed #d1d3e2; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none; }
-    .form-section-title { font-size: 15px; font-weight: 700; color: #5a5c69; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .inline-form-area {
+        background: #fff;
+        border: 2px dashed #d1d3e2;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .form-section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #5a5c69;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
 
     /* Buttons */
-    .btn-xl { padding: 12px 20px; font-size: 16px; font-weight: 700; border-radius: 8px; }
-    .btn-add-bantex { border: 2px dashed #4e73df; color: #4e73df; background: #f4f7fe; font-weight: 700; width: 100%; padding: 15px; border-radius: 10px; transition: 0.3s; cursor: pointer; }
-    .btn-add-bantex:hover { background: #4e73df; color: #fff; border-color: #4e73df; }
+    .btn-xl {
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 8px;
+    }
+
+    .btn-add-bantex {
+        border: 2px dashed #4e73df;
+        color: #4e73df;
+        background: #f4f7fe;
+        font-weight: 700;
+        width: 100%;
+        padding: 15px;
+        border-radius: 10px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .btn-add-bantex:hover {
+        background: #4e73df;
+        color: #fff;
+        border-color: #4e73df;
+    }
 
     /* Modal Styles */
-    .modal-header-custom { border-bottom: 1px solid #f0f0f0; padding: 20px 25px; }
-    .modal-title-custom { font-weight: 700; color: #2c3e50; font-size: 18px; }
-    .info-label { font-size: 10px; font-weight: 700; color: #8898aa; text-transform: uppercase; margin-bottom: 4px; }
-    .info-value { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 15px; }
-    
-    .modal-bantex-card { background-color: #f4f8fb; border: 1px solid #dbeafe; border-left: 4px solid #4e73df; border-radius: 6px; padding: 12px 15px; margin-bottom: 10px; }
-    .modal-bantex-title { color: #2e59d9; font-weight: 700; font-size: 14px; margin-bottom: 5px; }
-    
-    .summary-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; margin-top: 20px; text-align: center; }
-    .summary-label { font-size: 11px; font-weight: 700; color: #15803d; text-transform: uppercase; }
-    .summary-number { font-size: 28px; font-weight: 800; color: #16a34a; line-height: 1.2; }
-    .summary-note { font-size: 11px; color: #16a34a; margin-top: 5px; }
+    .modal-header-custom {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 20px 25px;
+    }
+
+    .modal-title-custom {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 18px;
+    }
+
+    .info-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #8898aa;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .modal-bantex-card {
+        background-color: #f4f8fb;
+        border: 1px solid #dbeafe;
+        border-left: 4px solid #4e73df;
+        border-radius: 6px;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+    }
+
+    .modal-bantex-title {
+        color: #2e59d9;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .summary-box {
+        background-color: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .summary-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #15803d;
+        text-transform: uppercase;
+    }
+
+    .summary-number {
+        font-size: 28px;
+        font-weight: 800;
+        color: #16a34a;
+        line-height: 1.2;
+    }
+
+    .summary-note {
+        font-size: 11px;
+        color: #16a34a;
+        margin-top: 5px;
+    }
 </style>
 
 <div class="panel-header bg-primary-gradient">
@@ -135,10 +345,11 @@ foreach($divisi_list as $kd => $nm) {
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="font-weight-bold">Divisi Pengaju <span class="text-danger">*</span></label>
+                                <label class="font-weight-bold">Divisi Pengaju <span
+                                        class="text-danger">*</span></label>
                                 <select id="divisi" class="form-control select2" style="width:100%">
                                     <option value="">-- Pilih Divisi --</option>
-                                    <?php foreach($divisi_list as $kode => $nama): ?>
+                                    <?php foreach ($divisi_list as $kode => $nama): ?>
                                         <?php $selected = ($kode == $kode_divisi_selected) ? 'selected' : ''; ?>
                                         <option value="<?= $kode ?>" <?= $selected ?>><?= $kode ?> - <?= $nama ?></option>
                                     <?php endforeach; ?>
@@ -164,8 +375,10 @@ foreach($divisi_list as $kd => $nm) {
                             <i class="fas fa-layer-group text-primary mr-2"></i>Bantex & Dokumen
                         </h4>
                         <div>
-                            <span class="stat-badge blue"><i class="fas fa-folder mr-1"></i> <span id="countBantex">0</span> Bantex</span>
-                            <span class="stat-badge green"><i class="fas fa-box mr-1"></i> <span id="countBox">0</span> Box</span>
+                            <span class="stat-badge blue"><i class="fas fa-folder mr-1"></i> <span
+                                    id="countBantex">0</span> Bantex</span>
+                            <span class="stat-badge green"><i class="fas fa-box mr-1"></i> <span id="countBox">0</span>
+                                Box</span>
                         </div>
                     </div>
 
@@ -184,27 +397,32 @@ foreach($divisi_list as $kd => $nm) {
                     <div id="inlineForm" class="inline-form-area shadow-sm">
                         <div class="d-flex justify-content-between align-items-center form-section-title">
                             <span><i class="fas fa-edit mr-2"></i>Form Bantex Baru</span>
-                            <button type="button" class="btn btn-sm btn-icon btn-light" onclick="toggleForm(false)"><i class="fas fa-times"></i></button>
+                            <button type="button" class="btn btn-sm btn-icon btn-light" onclick="toggleForm(false)"><i
+                                    class="fas fa-times"></i></button>
                         </div>
 
                         <div class="form-group px-0">
-                            <label class="font-weight-bold small text-uppercase">Nama / Label Bantex <span class="text-danger">*</span></label>
-                            <input type="text" id="inputNamaBantex" class="form-control" placeholder="Contoh: Arsip Kontrak 2024 (Jan-Jun)">
+                            <label class="font-weight-bold small text-uppercase">Nama / Label Bantex <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="inputNamaBantex" class="form-control"
+                                placeholder="Contoh: Arsip Kontrak 2024 (Jan-Jun)">
                         </div>
 
                         <div class="bg-light p-3 rounded border mb-3">
-                            <label class="font-weight-bold small text-uppercase mb-3 d-block">Daftar Dokumen di dalam Bantex <span class="text-danger">*</span></label>
-                            
+                            <label class="font-weight-bold small text-uppercase mb-3 d-block">Daftar Dokumen di dalam
+                                Bantex <span class="text-danger">*</span></label>
+
                             <div id="docRows">
-                                </div>
-                            
+                            </div>
+
                             <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addDocRow()">
                                 <i class="fas fa-plus mr-1"></i> Tambah Baris Dokumen
                             </button>
                         </div>
 
                         <div class="text-right">
-                            <button type="button" class="btn btn-secondary mr-2" onclick="toggleForm(false)">Batal</button>
+                            <button type="button" class="btn btn-secondary mr-2"
+                                onclick="toggleForm(false)">Batal</button>
                             <button type="button" class="btn btn-success px-4 font-weight-bold" onclick="saveBantex()">
                                 <i class="fas fa-check mr-2"></i> Simpan Bantex
                             </button>
@@ -213,7 +431,8 @@ foreach($divisi_list as $kd => $nm) {
 
                     <div class="row mt-5">
                         <div class="col-md-4 mb-2">
-                            <button type="button" onclick="validateAndSubmit()" class="btn btn-success btn-xl btn-block shadow">
+                            <button type="button" onclick="validateAndSubmit()"
+                                class="btn btn-success btn-xl btn-block shadow">
                                 <i class="fas fa-paper-plane mr-2"></i> Submit Arsip
                             </button>
                         </div>
@@ -223,7 +442,8 @@ foreach($divisi_list as $kd => $nm) {
                             </button>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <a href="?module=barang_masuk" class="btn btn-info btn-xl btn-block" style="background-color: #36b9cc; border-color: #36b9cc;">
+                            <a href="?module=barang_masuk" class="btn btn-info btn-xl btn-block"
+                                style="background-color: #36b9cc; border-color: #36b9cc;">
                                 Lihat Data
                             </a>
                         </div>
@@ -233,7 +453,8 @@ foreach($divisi_list as $kd => $nm) {
                 <div class="card-footer bg-light border-top">
                     <div class="d-flex align-items-center text-muted">
                         <i class="fas fa-info-circle fa-lg mr-3 text-info"></i>
-                        <small><strong>Informasi Sistem:</strong> Sistem akan otomatis mengelompokkan setiap <strong>6 Bantex</strong> menjadi <strong>1 Box</strong>.</small>
+                        <small><strong>Informasi Sistem:</strong> Sistem akan otomatis mengelompokkan setiap <strong>6
+                                Bantex</strong> menjadi <strong>1 Box</strong>.</small>
                     </div>
                 </div>
             </div>
@@ -272,7 +493,7 @@ foreach($divisi_list as $kd => $nm) {
 
                 <h6 class="font-weight-bold text-dark mb-3">Daftar Dokumen</h6>
                 <div id="modalDocList" style="max-height: 250px; overflow-y: auto;">
-                    </div>
+                </div>
 
                 <div class="summary-box">
                     <div class="row">
@@ -290,10 +511,13 @@ foreach($divisi_list as $kd => $nm) {
             </div>
 
             <div class="modal-footer border-top-0 pt-0 pb-4 px-4 justify-content-between">
-                <button type="button" class="btn btn-secondary btn-round font-weight-bold" style="background-color: #e2e8f0; color: #475569; border:none;" data-dismiss="modal">
+                <button type="button" class="btn btn-secondary btn-round font-weight-bold"
+                    style="background-color: #e2e8f0; color: #475569; border:none;" data-dismiss="modal">
                     Kembali Edit
                 </button>
-                <button type="button" onclick="finalSubmit()" class="btn btn-success btn-round px-4 font-weight-bold shadow" style="background-color: #10b981; border:none;">
+                <button type="button" onclick="finalSubmit()"
+                    class="btn btn-success btn-round px-4 font-weight-bold shadow"
+                    style="background-color: #10b981; border:none;">
                     Konfirmasi & Submit
                 </button>
             </div>
@@ -306,14 +530,14 @@ foreach($divisi_list as $kd => $nm) {
     let bantexList = [];
     const MAX_PER_BOX = 6;
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.select2').select2({ theme: "bootstrap" });
         addDocRow(); // Tambah row dokumen pertama saat load
     });
 
     // --- 1. HANDLE UI ---
     function toggleForm(show) {
-        if(show) {
+        if (show) {
             $('#btnShowAdd').hide();
             $('#inlineForm').slideDown();
             // Reset Inputs
@@ -356,19 +580,19 @@ foreach($divisi_list as $kd => $nm) {
     // --- 2. LOGIC DATA ---
     function saveBantex() {
         let nama = $('#inputNamaBantex').val();
-        if(!nama) { swal("Error", "Nama Bantex harus diisi!", "error"); return; }
+        if (!nama) { swal("Error", "Nama Bantex harus diisi!", "error"); return; }
 
         let docs = [];
-        $('.doc-row').each(function() {
+        $('.doc-row').each(function () {
             let name = $(this).find('.doc-name').val();
             let month = $(this).find('.doc-month').val();
             let year = $(this).find('.doc-year').val();
-            if(name && month && year) {
+            if (name && month && year) {
                 docs.push({ name: name, period: `${month} ${year}` });
             }
         });
 
-        if(docs.length === 0) { swal("Error", "Minimal isi 1 dokumen lengkap!", "error"); return; }
+        if (docs.length === 0) { swal("Error", "Minimal isi 1 dokumen lengkap!", "error"); return; }
 
         // Add to State
         bantexList.push({ nama_bantex: nama, dokumen: docs });
@@ -395,7 +619,7 @@ foreach($divisi_list as $kd => $nm) {
         let container = $('#mainContainer');
         container.empty();
 
-        if(bantexList.length === 0) {
+        if (bantexList.length === 0) {
             container.html(`
                 <div id="emptyState" class="text-center py-5 border rounded bg-light mb-3">
                     <i class="fas fa-box-open fa-4x text-muted mb-3 opacity-50"></i>
@@ -416,13 +640,13 @@ foreach($divisi_list as $kd => $nm) {
 
         // Render Boxes
         let boxCounter = 1;
-        for(let i=0; i<totalBantex; i+=MAX_PER_BOX) {
-            let chunk = bantexList.slice(i, i+MAX_PER_BOX);
-            
+        for (let i = 0; i < totalBantex; i += MAX_PER_BOX) {
+            let chunk = bantexList.slice(i, i + MAX_PER_BOX);
+
             let bantexCards = '';
             chunk.forEach((b, idx) => {
                 let globalIdx = i + idx;
-                let docItems = b.dokumen.map(d => 
+                let docItems = b.dokumen.map(d =>
                     `<div class="doc-list-item"><i class="far fa-file-alt"></i> ${d.name} <span class="text-muted ml-1">(${d.period})</span></div>`
                 ).join('');
 
@@ -442,13 +666,13 @@ foreach($divisi_list as $kd => $nm) {
             <div class="box-wrapper">
                 <div class="box-header">
                     <div class="box-title"><i class="fas fa-box-open mr-2"></i> BOX ${boxCounter}</div>
-                    ${chunk.length === 6 ? '<span class="badge badge-danger">BOX PENUH</span>' : '<span class="box-badge">'+chunk.length+'/6 BANTEX</span>'}
+                    ${chunk.length === 6 ? '<span class="badge badge-danger">BOX PENUH</span>' : '<span class="box-badge">' + chunk.length + '/6 BANTEX</span>'}
                 </div>
                 <div class="row">
                     ${bantexCards}
                 </div>
             </div>`;
-            
+
             container.append(boxHtml);
             boxCounter++;
         }
@@ -461,7 +685,7 @@ foreach($divisi_list as $kd => $nm) {
             buttons: true,
             dangerMode: true,
         }).then((willReset) => {
-            if(willReset) {
+            if (willReset) {
                 bantexList = [];
                 $('#divisi').val('').trigger('change');
                 renderList();
@@ -474,8 +698,8 @@ foreach($divisi_list as $kd => $nm) {
         let div = $('#divisi').val();
         let lok = $('#lokasi_arsip').val();
 
-        if(!div) { swal("Info", "Mohon pilih Divisi terlebih dahulu.", "warning"); return; }
-        if(bantexList.length === 0) { swal("Info", "Data masih kosong. Tambahkan minimal 1 Bantex.", "warning"); return; }
+        if (!div) { swal("Info", "Mohon pilih Divisi terlebih dahulu.", "warning"); return; }
+        if (bantexList.length === 0) { swal("Info", "Data masih kosong. Tambahkan minimal 1 Bantex.", "warning"); return; }
 
         // Populate Modal
         $('#viewDivisi').text(div);
@@ -489,7 +713,7 @@ foreach($divisi_list as $kd => $nm) {
             let docs = b.dokumen.map(d => `<li>${d.name} <span style="color:#888">(${d.period})</span></li>`).join('');
             htmlList += `
             <div class="modal-bantex-card">
-                <div class="modal-bantex-title">Bantex ${i+1}: ${b.nama_bantex}</div>
+                <div class="modal-bantex-title">Bantex ${i + 1}: ${b.nama_bantex}</div>
                 <ul class="pl-3 mb-0 small text-dark" style="list-style-type: disc;">${docs}</ul>
             </div>`;
         });
@@ -516,7 +740,7 @@ foreach($divisi_list as $kd => $nm) {
         localStorage.setItem('simulasi_db_arsip', JSON.stringify(db));
 
         $('#modalKonfirmasi').modal('hide');
-        
+
         swal({
             title: "Sukses!",
             text: "Data berhasil disubmit dan disimpan (Simulasi).",
