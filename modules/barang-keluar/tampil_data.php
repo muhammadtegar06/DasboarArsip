@@ -1,19 +1,18 @@
 <?php
-// Tampil Data Barang Masuk (Mode: Data Dummy & Input Dokumen)
+// Tampil Data Barang Masuk (Mode: Data Dummy & Link ke Form Entri)
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 }
 else {
-    // --- 1. MEMBUAT DATA DUMMY ---
-    // Kita buat array manual untuk menggantikan Database sementara
+    // --- 1. MEMBUAT DATA DUMMY (Simulasi) ---
     $data_dummy = [
         [
             'id_transaksi' => 2025001,
             'divisi'       => 'DTIS - Divisi Teknologi Informasi',
             'tanggal'      => '2025-12-30',
             'total_box'    => 5,
-            'jumlah'       => 30, // Total Bantex
-            'status'       => 'Diterima' // Status Simulasi
+            'jumlah'       => 30, 
+            'status'       => 'Diterima' 
         ],
         [
             'id_transaksi' => 2025002,
@@ -37,7 +36,7 @@ else {
             'tanggal'      => '2025-12-20',
             'total_box'    => 3,
             'jumlah'       => 18,
-            'status'       => 'Ditolak' // Contoh status Ditolak
+            'status'       => 'Ditolak' 
         ],
         [
             'id_transaksi' => 2025005,
@@ -84,16 +83,14 @@ else {
                         <tbody>
                             <?php
                             $no = 1;
-                            
-                            // --- 2. LOOPING DATA DUMMY ---
-                            // Menggunakan foreach pada array $data_dummy, bukan mysqli_fetch_assoc
+                            // Loop Data Dummy
                             foreach ($data_dummy as $data) { 
                                 $id_transaksi = $data['id_transaksi'];
                                 $divisi       = $data['divisi'];
                                 $tanggal      = date('d M Y', strtotime($data['tanggal']));
                                 $total_box    = $data['total_box'];
                                 $total_bantex = $data['jumlah'];
-                                $status       = $data['status']; // Ambil status dari dummy
+                                $status       = $data['status']; 
                             ?>
                                 <tr>
                                     <td class="text-center"><?php echo $no++; ?></td>
@@ -128,11 +125,13 @@ else {
                                     
                                     <td class="text-center">
                                         <?php if($status == 'Diterima') { ?>
-                                            <button type="button" 
-                                                onclick="bukaModalInputDokumen('<?php echo $id_transaksi; ?>', '<?php echo $divisi; ?>', <?php echo $total_bantex; ?>)" 
-                                                class="btn btn-primary btn-round btn-sm shadow font-weight-bold">
+                                            
+                                            <a href="?module=form_entri&id=<?= $id_transaksi ?>&divisi=<?= urlencode($divisi) ?>&total_bantex=<?= $total_bantex ?>" 
+                                               class="btn btn-primary btn-round btn-sm shadow font-weight-bold"
+                                               data-toggle="tooltip" title="Klik untuk input dokumen">
                                                 <i class="fas fa-file-import mr-2"></i> Input Dokumen
-                                            </button>
+                                            </a>
+
                                         <?php } elseif ($status == 'Pending') { ?>
                                             <button type="button" class="btn btn-link text-muted btn-sm" style="cursor: default; text-decoration: none;">
                                                 <i class="fas fa-lock mr-1"></i> Menunggu ACC
@@ -148,139 +147,7 @@ else {
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 small text-muted font-italic">
-                    * Data di atas adalah data dummy statis untuk keperluan demonstrasi UI.
-                </div>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="modalInputDokumen" tabindex="-1" role="dialog" data-backdrop="static">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title text-white font-weight-bold">
-                        <i class="fas fa-folder-open mr-2"></i> Input Dokumen Arsip
-                    </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body bg-light">
-                    
-                    <div class="bg-white p-3 rounded shadow-sm border mb-3">
-                        <div class="row align-items-center">
-                            <div class="col-md-8 border-right">
-                                <small class="text-muted text-uppercase font-weight-bold" style="font-size:10px;">Divisi Pengaju</small>
-                                <h5 class="text-dark font-weight-bold mb-0" id="inputModalDivisi">-</h5>
-                            </div>
-                            <div class="col-md-4 text-right">
-                                <small class="text-muted text-uppercase font-weight-bold" style="font-size:10px;">ID Transaksi</small>
-                                <h5 class="text-primary font-weight-bold mb-0" id="inputModalID">-</h5>
-                            </div>
-                        </div>
-                    </div>
-
-                    <form action="#" method="POST" enctype="multipart/form-data" onsubmit="alert('Simulasi: Data dokumen berhasil disimpan!'); return false;">
-                        <input type="hidden" name="id_transaksi" id="formIdTransaksi">
-                        
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body">
-                                <h6 class="font-weight-bold border-bottom pb-2 mb-3 text-secondary">
-                                    <i class="fas fa-edit mr-2"></i> Detail Dokumen
-                                </h6>
-                                
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label font-weight-bold">Lokasi Bantex <span class="text-danger">*</span></label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control select2-modal" name="nomor_bantex" id="selectBantex" required style="width:100%">
-                                            <option value="">-- Pilih Nomor Bantex --</option>
-                                            </select>
-                                        <small class="text-muted">Pilih bantex fisik tempat dokumen disimpan.</small>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label font-weight-bold">Judul Dokumen <span class="text-danger">*</span></label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="nama_dokumen" placeholder="Contoh: Perjanjian Kerjasama PT. Maju Mundur" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label class="font-weight-bold">Nomor Dokumen</label>
-                                        <input type="text" class="form-control" name="no_dokumen" placeholder="Contoh: 001/SPK/XII/2025">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label class="font-weight-bold">Tahun Arsip</label>
-                                        <select class="form-control" name="tahun_dokumen">
-                                            <?php 
-                                            $thn_skrg = date('Y');
-                                            for($t = $thn_skrg; $t >= $thn_skrg - 10; $t--){
-                                                echo "<option value='$t'>$t</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="font-weight-bold">Scan File <span class="text-muted small">(PDF/JPG, Max 2MB)</span></label>
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="customFile" name="file_dokumen">
-                                        <label class="custom-file-label" for="customFile">Pilih file...</label>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="text-right mt-4">
-                            <button type="button" class="btn btn-secondary btn-round mr-2" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary btn-round px-4 font-weight-bold shadow">
-                                <i class="fas fa-save mr-2"></i> Simpan
-                            </button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $(document).ready(function() {
-            // Custom file input label change
-            $('.custom-file-input').on('change', function() {
-                let fileName = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').addClass("selected").html(fileName);
-            });
-        });
-
-        // FUNGSI MEMBUKA MODAL INPUT DOKUMEN
-        function bukaModalInputDokumen(id, divisi, totalBantex) {
-            // 1. Isi Data Header
-            $('#inputModalDivisi').text(divisi);
-            $('#inputModalID').text("#TRANS-" + id);
-            $('#formIdTransaksi').val(id);
-
-            // 2. Generate Dropdown Bantex (Sesuai Jumlah di Data Dummy)
-            let options = '<option value="">-- Pilih Bantex (1 - '+ totalBantex +') --</option>';
-            
-            // Logika: Estimasi 1 Box = 6 Bantex (hanya visualisasi)
-            // Kita loop sesuai total_bantex yang dilempar dari data dummy
-            for (let i = 1; i <= totalBantex; i++) {
-                // Tentukan dia ada di box ke berapa
-                let boxKe = Math.ceil(i / 6); 
-                options += `<option value="${i}">Bantex Ke-${i} (Box ${boxKe})</option>`;
-            }
-            
-            $('#selectBantex').html(options);
-
-            // 3. Buka Modal
-            $('#modalInputDokumen').modal('show');
-        }
-    </script>
-
 <?php } ?>

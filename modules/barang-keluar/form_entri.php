@@ -1,213 +1,533 @@
 <?php
-// mencegah direct access file PHP agar file PHP tidak bisa diakses secara langsung dari browser dan hanya dapat dijalankan ketika di include oleh file lain
-// jika file diakses secara langsung
+// Mencegah direct access
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
-    // alihkan ke halaman error 404
     header('location: 404.html');
 }
-// jika file di include oleh file lain, tampilkan isi file
-else { ?>
-    <!-- menampilkan pesan kesalahan -->
-    <div id="pesan"></div>
 
-    <div class="panel-header bg-secondary-gradient">
-        <div class="page-inner py-4">
-            <div class="page-header text-white">
-                <!-- judul halaman -->
-                <h4 class="page-title text-white"><i class="fas fa-sign-out-alt mr-2"></i> Barang Keluar</h4>
-                <!-- breadcrumbs -->
-                <ul class="breadcrumbs">
-                    <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
-                    <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a href="?module=barang_keluar" class="text-white">Barang Keluar</a></li>
-                    <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Entri</a></li>
-                </ul>
+// 1. DATA DIVISI (Simulasi)
+$divisi_list = [
+    "DSPN" => "Divisi Sekretariat Perusahaan",
+    "DTPI" => "Divisi Satuan Pengawasan Intern",
+    "DTAN" => "Divisi Tanaman",
+    "DTPL" => "Divisi Teknik & Pengolahan",
+    "DINF" => "Divisi Infrastruktur",
+    "DITN" => "Divisi Investasi Tanaman",
+    "DPSN" => "Divisi Pemasaran",
+    "DRPL" => "Divisi Rantai Pasok & Logistik",
+    "DPEN" => "Divisi Pengadaan",
+    "DHKM" => "Divisi Hukum",
+    "DSDM" => "Divisi Operasional SDM",
+    "DTIS" => "Divisi Teknologi Informasi",
+    "DKEU" => "Divisi Keuangan"
+];
+
+// 2. HELPER FUNCTIONS (Ditaruh di atas agar aman)
+function getMonthOptions() {
+    $months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    $opts = '<option value="">- Bulan -</option>';
+    foreach ($months as $m) $opts .= "<option value='$m'>$m</option>";
+    return $opts;
+}
+
+function getYearOptions() {
+    $curr = date('Y');
+    $opts = '<option value="">- Tahun -</option>';
+    for ($i = $curr; $i >= $curr - 5; $i--) $opts .= "<option value='$i'>$i</option>";
+    return $opts;
+}
+
+// 3. MENANGKAP DATA DARI URL
+$id_transaksi = isset($_GET['id']) ? $_GET['id'] : '-';
+$nama_divisi_url = isset($_GET['divisi']) ? urldecode($_GET['divisi']) : '';
+$total_bantex_url = isset($_GET['total_bantex']) ? $_GET['total_bantex'] : 0;
+
+// Cari kode divisi berdasarkan nama (jika ada match)
+$kode_divisi_selected = "";
+foreach($divisi_list as $kd => $nm) {
+    if(strpos($nama_divisi_url, $kd) !== false) {
+        $kode_divisi_selected = $kd;
+        break;
+    }
+}
+?>
+
+<style>
+    /* General Layout */
+    .page-inner { padding-top: 25px; background: #f9fbfd; }
+    .card { border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 12px; }
+    .card-header { background: #fff; border-bottom: 1px solid #f1f1f1; border-radius: 12px 12px 0 0 !important; padding: 20px 25px; }
+    
+    /* Typography */
+    .repo-title { font-size: 24px; font-weight: 800; color: #2c3e50; margin-bottom: 5px; }
+    .repo-subtitle { color: #7f8c8d; font-size: 14px; }
+    
+    /* Stats Badges */
+    .stat-badge { font-size: 13px; font-weight: 600; padding: 8px 15px; border-radius: 30px; margin-left: 10px; }
+    .stat-badge.blue { background: #e3f2fd; color: #1565c0; }
+    .stat-badge.green { background: #e8f5e9; color: #2e7d32; }
+
+    /* Box Container */
+    .box-wrapper { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 20px; position: relative; }
+    .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .box-title { font-weight: 700; color: #4e73df; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .box-badge { background: #fff; border: 1px solid #4e73df; color: #4e73df; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    
+    /* Bantex Card */
+    .bantex-item { background: #fff; border-left: 4px solid #3498db; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border-radius: 4px; margin-bottom: 10px; transition: transform 0.2s; position: relative; }
+    .bantex-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .bantex-content { padding: 15px; }
+    .bantex-name { font-weight: 700; color: #2c3e50; font-size: 14px; margin-bottom: 8px; }
+    .doc-list-item { font-size: 12px; color: #666; padding: 2px 0; display: flex; align-items: center; }
+    .doc-list-item i { margin-right: 8px; color: #bdc3c7; }
+    .btn-delete-bantex { position: absolute; top: 10px; right: 10px; color: #e74c3c; cursor: pointer; opacity: 0.5; transition: 0.2s; z-index: 10; }
+    .btn-delete-bantex:hover { opacity: 1; transform: scale(1.1); }
+
+    /* Inline Form Area */
+    .inline-form-area { background: #fff; border: 2px dashed #d1d3e2; border-radius: 10px; padding: 25px; margin-bottom: 20px; display: none; }
+    .form-section-title { font-size: 15px; font-weight: 700; color: #5a5c69; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+    /* Buttons */
+    .btn-xl { padding: 12px 20px; font-size: 16px; font-weight: 700; border-radius: 8px; }
+    .btn-add-bantex { border: 2px dashed #4e73df; color: #4e73df; background: #f4f7fe; font-weight: 700; width: 100%; padding: 15px; border-radius: 10px; transition: 0.3s; cursor: pointer; }
+    .btn-add-bantex:hover { background: #4e73df; color: #fff; border-color: #4e73df; }
+
+    /* Modal Styles */
+    .modal-header-custom { border-bottom: 1px solid #f0f0f0; padding: 20px 25px; }
+    .modal-title-custom { font-weight: 700; color: #2c3e50; font-size: 18px; }
+    .info-label { font-size: 10px; font-weight: 700; color: #8898aa; text-transform: uppercase; margin-bottom: 4px; }
+    .info-value { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 15px; }
+    
+    .modal-bantex-card { background-color: #f4f8fb; border: 1px solid #dbeafe; border-left: 4px solid #4e73df; border-radius: 6px; padding: 12px 15px; margin-bottom: 10px; }
+    .modal-bantex-title { color: #2e59d9; font-weight: 700; font-size: 14px; margin-bottom: 5px; }
+    
+    .summary-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; margin-top: 20px; text-align: center; }
+    .summary-label { font-size: 11px; font-weight: 700; color: #15803d; text-transform: uppercase; }
+    .summary-number { font-size: 28px; font-weight: 800; color: #16a34a; line-height: 1.2; }
+    .summary-note { font-size: 11px; color: #16a34a; margin-top: 5px; }
+</style>
+
+<div class="panel-header bg-primary-gradient">
+    <div class="page-inner py-4">
+        <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
+            <div>
+                <h2 class="text-white pb-2 fw-bold">Repository Arsip</h2>
+                <h5 class="text-white op-7 mb-2">Formulir Digitalisasi Arsip Divisi</h5>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="page-inner mt--5">
-        <div class="card">
-            <div class="card-header">
-                <!-- judul form -->
-                <div class="card-title">Entri Data Barang Keluar</div>
-            </div>
-            <!-- form entri data -->
-            <form action="modules/barang-keluar/proses_simpan.php" method="post" class="needs-validation" novalidate>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <div class="form-group">
-                                <?php
-                                // membuat "id_transaksi"
-                                // sql statement untuk menampilkan 7 digit terakhir dari "id_transaksi" pada tabel "tbl_barang_keluar"
-                                $query = mysqli_query($mysqli, "SELECT RIGHT(id_transaksi,7) as nomor FROM tbl_barang_keluar ORDER BY id_transaksi DESC LIMIT 1")
-                                    or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
-                                // ambil jumlah baris data hasil query
-                                $rows = mysqli_num_rows($query);
-
-                                // cek hasil query
-                                // jika "id_transaksi" sudah ada
-                                if ($rows <> 0) {
-                                    // ambil data hasil query
-                                    $data = mysqli_fetch_assoc($query);
-                                    // nomor urut "id_transaksi" yang terakhir + 1
-                                    $nomor_urut = $data['nomor'] + 1;
-                                }
-                                // jika "id_transaksi" belum ada
-                                else {
-                                    // nomor urut "id_transaksi" = 1
-                                    $nomor_urut = 1;
-                                }
-
-                                // menambahkan karakter "TK-" diawal dan karakter "0" disebelah kiri nomor urut
-                                $id_transaksi = "TK-" . str_pad($nomor_urut, 7, "0", STR_PAD_LEFT);
-                                ?>
-                                <label>ID Transaksi <span class="text-danger">*</span></label>
-                                <!-- tampilkan "id_transaksi" -->
-                                <input type="text" name="id_transaksi" class="form-control"
-                                    value="<?php echo $id_transaksi; ?>" readonly>
-                            </div>
-                        </div>
-
-                        <div class="col-md-5 ml-auto">
-                            <div class="form-group">
-                                <label>Tanggal <span class="text-danger">*</span></label>
-                                <input type="text" name="tanggal" class="form-control date-picker" autocomplete="off"
-                                    value="<?php echo date("d-m-Y"); ?>" required>
-                                <div class="invalid-feedback">Tanggal tidak boleh kosong.</div>
-                            </div>
-                        </div>
+<div class="page-inner mt--5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="repo-title">Entri Data Baru</div>
+                        <div class="repo-subtitle">ID Transaksi: <b>#TRANS-<?= $id_transaksi ?></b></div>
                     </div>
+                    <div class="d-none d-md-block">
+                        <i class="fas fa-file-invoice fa-3x text-light-gray opacity-25" style="color: #e3e6f0;"></i>
+                    </div>
+                </div>
 
-                    <hr class="mt-3 mb-4">
-
-                    <div class="row">
-                        <div class="col-md-7">
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label>Barang <span class="text-danger">*</span></label>
-                                <select id="data_barang" name="barang" class="form-control select2-single"
-                                    autocomplete="off" required>
-                                    <option selected disabled value="">-- Pilih --</option>
-                                    <?php
-                                    // sql statement untuk menampilkan data dari tabel "tbl_barang"
-                                    $query_barang = mysqli_query($mysqli, "SELECT id_barang, nama_barang FROM tbl_barang ORDER BY id_barang ASC")
-                                        or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
-                                    // ambil data hasil query
-                                    while ($data_barang = mysqli_fetch_assoc($query_barang)) {
-                                        // tampilkan data
-                                        echo "<option value='$data_barang[id_barang]'>$data_barang[id_barang] - $data_barang[nama_barang]</option>";
-                                    }
-                                    ?>
+                                <label class="font-weight-bold">Divisi Pengaju <span class="text-danger">*</span></label>
+                                <select id="divisi" class="form-control select2" style="width:100%">
+                                    <option value="">-- Pilih Divisi --</option>
+                                    <?php foreach($divisi_list as $kode => $nama): ?>
+                                        <?php $selected = ($kode == $kode_divisi_selected) ? 'selected' : ''; ?>
+                                        <option value="<?= $kode ?>" <?= $selected ?>><?= $kode ?> - <?= $nama ?></option>
+                                    <?php endforeach; ?>
                                 </select>
-                                <div class="invalid-feedback">Barang tidak boleh kosong.</div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Stok <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" id="data_stok" name="stok" class="form-control" readonly>
-                                    <div id="data_satuan" class="input-group-append"></div>
-                                </div>
                             </div>
                         </div>
-
-                        <div class="col-md-5 ml-auto">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label>Jumlah Keluar <span class="text-danger">*</span></label>
-                                <input type="text" id="jumlah" name="jumlah" class="form-control" autocomplete="off"
-                                    onKeyPress="return goodchars(event,'0123456789',this)" required>
-                                <div class="invalid-feedback">Jumlah keluar tidak boleh kosong.</div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Sisa Stok <span class="text-danger">*</span></label>
-                                <input type="text" id="sisa" name="sisa" class="form-control" readonly>
+                                <label class="font-weight-bold">Lokasi Arsip <span class="text-danger">*</span></label>
+                                <select id="lokasi_arsip" class="form-control">
+                                    <option value="HO" selected>Head Office (HO)</option>
+                                    <option value="Gudang">Gudang Arsip Pusat</option>
+                                    <option value="Pabrik">Kantor Pabrik</option>
+                                </select>
                             </div>
                         </div>
                     </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="font-weight-bold text-dark mb-0">
+                            <i class="fas fa-layer-group text-primary mr-2"></i>Bantex & Dokumen
+                        </h4>
+                        <div>
+                            <span class="stat-badge blue"><i class="fas fa-folder mr-1"></i> <span id="countBantex">0</span> Bantex</span>
+                            <span class="stat-badge green"><i class="fas fa-box mr-1"></i> <span id="countBox">0</span> Box</span>
+                        </div>
+                    </div>
+
+                    <div id="mainContainer">
+                        <div id="emptyState" class="text-center py-5 border rounded bg-light mb-3">
+                            <i class="fas fa-box-open fa-4x text-muted mb-3 opacity-50"></i>
+                            <h5 class="text-muted font-weight-bold">Belum ada bantex ditambahkan</h5>
+                            <p class="text-muted small">Klik tombol di bawah untuk mulai mengisi arsip</p>
+                        </div>
+                    </div>
+
+                    <button type="button" id="btnShowAdd" class="btn-add-bantex mb-4" onclick="toggleForm(true)">
+                        <i class="fas fa-plus-circle mr-2"></i> Tambah Bantex Baru
+                    </button>
+
+                    <div id="inlineForm" class="inline-form-area shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center form-section-title">
+                            <span><i class="fas fa-edit mr-2"></i>Form Bantex Baru</span>
+                            <button type="button" class="btn btn-sm btn-icon btn-light" onclick="toggleForm(false)"><i class="fas fa-times"></i></button>
+                        </div>
+
+                        <div class="form-group px-0">
+                            <label class="font-weight-bold small text-uppercase">Nama / Label Bantex <span class="text-danger">*</span></label>
+                            <input type="text" id="inputNamaBantex" class="form-control" placeholder="Contoh: Arsip Kontrak 2024 (Jan-Jun)">
+                        </div>
+
+                        <div class="bg-light p-3 rounded border mb-3">
+                            <label class="font-weight-bold small text-uppercase mb-3 d-block">Daftar Dokumen di dalam Bantex <span class="text-danger">*</span></label>
+                            
+                            <div id="docRows">
+                                </div>
+                            
+                            <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addDocRow()">
+                                <i class="fas fa-plus mr-1"></i> Tambah Baris Dokumen
+                            </button>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="button" class="btn btn-secondary mr-2" onclick="toggleForm(false)">Batal</button>
+                            <button type="button" class="btn btn-success px-4 font-weight-bold" onclick="saveBantex()">
+                                <i class="fas fa-check mr-2"></i> Simpan Bantex
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-4 mb-2">
+                            <button type="button" onclick="validateAndSubmit()" class="btn btn-success btn-xl btn-block shadow">
+                                <i class="fas fa-paper-plane mr-2"></i> Submit Arsip
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button type="button" onclick="resetForm()" class="btn btn-secondary btn-xl btn-block">
+                                <i class="fas fa-sync-alt mr-2"></i> Reset
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="?module=barang_masuk" class="btn btn-info btn-xl btn-block" style="background-color: #36b9cc; border-color: #36b9cc;">
+                                Lihat Data
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
-                <div class="card-action">
-                    <!-- button simpan data -->
-                    <input type="submit" name="simpan" value="Simpan" class="btn btn-secondary btn-round pl-4 pr-4 mr-2">
-                    <!-- button kembali ke halaman tampil data -->
-                    <a href="?module=barang_keluar" class="btn btn-default btn-round pl-4 pr-4">Batal</a>
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex align-items-center text-muted">
+                        <i class="fas fa-info-circle fa-lg mr-3 text-info"></i>
+                        <small><strong>Informasi Sistem:</strong> Sistem akan otomatis mengelompokkan setiap <strong>6 Bantex</strong> menjadi <strong>1 Box</strong>.</small>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
+</div>
 
-    <script type="text/javascript">
-        $(document).ready(function () {
-            // Menampilkan data barang dari select box ke textfield
-            $('#data_barang').change(function () {
-                // mengambil value dari "id_barang"
-                var id_barang = $('#data_barang').val();
+<div class="modal fade" id="modalKonfirmasi" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header modal-header-custom">
+                <h5 class="modal-title-custom">Konfirmasi Data Surat Masuk</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
-                $.ajax({
-                    type: "GET",                                    // mengirim data dengan method GET 
-                    url: "modules/barang-keluar/get_barang.php",    // proses get data berdasarkan "id_barang"
-                    data: { id_barang: id_barang },                   // data yang dikirim
-                    dataType: "JSON",                               // tipe data JSON
-                    success: function (result) {                     // ketika proses get data selesai
-                        // tampilkan data
-                        $('#data_stok').val(result.stok);
-                        $('#data_satuan').html('<span class="input-group-text">' + result.nama_satuan + '</span>');
-                        // set focus
-                        $('#jumlah').focus();
-                    }
-                });
-            });
+            <div class="modal-body p-4">
+                <div class="bg-white rounded mb-3">
+                    <h6 class="font-weight-bold text-dark mb-3">Informasi Pengajuan</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-label">DIVISI</div>
+                            <div class="info-value" id="viewDivisi">-</div>
+                            <div class="info-label">TANGGAL PENGAJUAN</div>
+                            <div class="info-value" id="viewTanggal"><?= date('Y-m-d') ?></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">LOKASI ARSIP</div>
+                            <div class="info-value" id="viewLokasi">-</div>
+                            <div class="info-label">TOTAL BANTEX</div>
+                            <div class="info-value"><span id="viewTotalBantex">0</span> Bantex</div>
+                        </div>
+                    </div>
+                </div>
 
-            // menghitung sisa stok
-            $('#jumlah').keyup(function () {
-                // mengambil data dari form entri
-                var stok = $('#data_stok').val();
-                var jumlah = $('#jumlah').val();
+                <h6 class="font-weight-bold text-dark mb-3">Daftar Dokumen</h6>
+                <div id="modalDocList" style="max-height: 250px; overflow-y: auto;">
+                    </div>
 
-                // mengecek input data
-                // jika data barang belum diisi
-                if (stok == "") {
-                    // tampilkan pesan info
-                    $('#pesan').html('<div class="alert alert-notify alert-info alert-dismissible fade show" role="alert"><span data-notify="icon" class="fas fa-info"></span><span data-notify="title" class="text-info">Info!</span> <span data-notify="message">Silahkan isi data barang terlebih dahulu.</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-                    // reset input "jumlah"
-                    $('#jumlah').val('');
-                    // sisa stok kosong
-                    var sisa_stok = "";
-                }
-                // jika "jumlah" belum diisi
-                else if (jumlah == "") {
-                    // sisa stok kosong
-                    var sisa_stok = "";
-                }
-                // jika "jumlah" diisi 0
-                else if (jumlah == 0) {
-                    // tampilkan pesan peringatan
-                    $('#pesan').html('<div class="alert alert-notify alert-warning alert-dismissible fade show" role="alert"><span data-notify="icon" class="fas fa-exclamation"></span><span data-notify="title" class="text-warning">Peringatan!</span> <span data-notify="message">Jumlah keluar tidak boleh 0 (nol).</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-                    // reset input "jumlah"
-                    $('#jumlah').val('');
-                    // sisa stok kosong
-                    var sisa_stok = "";
-                }
-                // jika "jumlah" lebih dari "stok"
-                else if (eval(jumlah) > eval(stok)) {
-                    // tampilkan pesan peringatan
-                    $('#pesan').html('<div class="alert alert-notify alert-warning alert-dismissible fade show" role="alert"><span data-notify="icon" class="fas fa-exclamation"></span><span data-notify="title" class="text-warning">Peringatan!</span> <span data-notify="message">Stok tidak memenuhi, kurangi jumlah keluar.</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-                    // reset input "jumlah"
-                    $('#jumlah').val('');
-                    // sisa stok kosong
-                    var sisa_stok = "";
-                }
-                // jika "jumlah" sudah diisi
-                else {
-                    // hitung sisa stok
-                    var sisa_stok = eval(stok) - eval(jumlah);
-                }
+                <div class="summary-box">
+                    <div class="row">
+                        <div class="col-6 border-right border-success">
+                            <div class="summary-label">TOTAL BANTEX</div>
+                            <div class="summary-number" id="sumBantex">0</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="summary-label">TOTAL BOX</div>
+                            <div class="summary-number" id="sumBox">0</div>
+                        </div>
+                    </div>
+                    <div class="summary-note">(6 Bantex = 1 Box)</div>
+                </div>
+            </div>
 
-                // tampilkan sisa stok
-                $('#sisa').val(sisa_stok);
-            });
+            <div class="modal-footer border-top-0 pt-0 pb-4 px-4 justify-content-between">
+                <button type="button" class="btn btn-secondary btn-round font-weight-bold" style="background-color: #e2e8f0; color: #475569; border:none;" data-dismiss="modal">
+                    Kembali Edit
+                </button>
+                <button type="button" onclick="finalSubmit()" class="btn btn-success btn-round px-4 font-weight-bold shadow" style="background-color: #10b981; border:none;">
+                    Konfirmasi & Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State Management
+    let bantexList = [];
+    const MAX_PER_BOX = 6;
+
+    $(document).ready(function() {
+        $('.select2').select2({ theme: "bootstrap" });
+        addDocRow(); // Tambah row dokumen pertama saat load
+    });
+
+    // --- 1. HANDLE UI ---
+    function toggleForm(show) {
+        if(show) {
+            $('#btnShowAdd').hide();
+            $('#inlineForm').slideDown();
+            // Reset Inputs
+            $('#inputNamaBantex').val('');
+            $('#docRows').empty();
+            addDocRow(); // Reset ke 1 baris
+        } else {
+            $('#inlineForm').slideUp();
+            $('#btnShowAdd').fadeIn();
+        }
+    }
+
+    function createDocRowHtml() {
+        // Generate HTML untuk baris dokumen (dropdown bulan/tahun dari PHP tidak bisa direct, kita buat hardcode JS atau ambil dr helper PHP)
+        // Solusi: Kita pakai string template JS dengan options yang di-echo PHP sebelumnya
+        let mOpts = `<?= getMonthOptions() ?>`;
+        let yOpts = `<?= getYearOptions() ?>`;
+
+        return `
+        <div class="row no-gutters mb-2 align-items-center doc-row">
+            <div class="col-md-6 pr-2">
+                <input type="text" class="form-control form-control-sm doc-name" placeholder="Nama Dokumen">
+            </div>
+            <div class="col-md-2 px-1">
+                <select class="form-control form-control-sm doc-month">${mOpts}</select>
+            </div>
+            <div class="col-md-2 pl-1">
+                <select class="form-control form-control-sm doc-year">${yOpts}</select>
+            </div>
+            <div class="col-md-2 text-center">
+                <button type="button" class="btn btn-sm btn-link text-danger" onclick="$(this).closest('.doc-row').remove()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>`;
+    }
+
+    function addDocRow() {
+        $('#docRows').append(createDocRowHtml());
+    }
+
+    // --- 2. LOGIC DATA ---
+    function saveBantex() {
+        let nama = $('#inputNamaBantex').val();
+        if(!nama) { swal("Error", "Nama Bantex harus diisi!", "error"); return; }
+
+        let docs = [];
+        $('.doc-row').each(function() {
+            let name = $(this).find('.doc-name').val();
+            let month = $(this).find('.doc-month').val();
+            let year = $(this).find('.doc-year').val();
+            if(name && month && year) {
+                docs.push({ name: name, period: `${month} ${year}` });
+            }
         });
-    </script>
-<?php } ?>
+
+        if(docs.length === 0) { swal("Error", "Minimal isi 1 dokumen lengkap!", "error"); return; }
+
+        // Add to State
+        bantexList.push({ nama_bantex: nama, dokumen: docs });
+        renderList();
+        toggleForm(false);
+    }
+
+    function deleteBantex(index) {
+        swal({
+            title: "Hapus Bantex?",
+            text: "Bantex ini akan dihapus dari daftar.",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                bantexList.splice(index, 1);
+                renderList();
+            }
+        });
+    }
+
+    function renderList() {
+        let container = $('#mainContainer');
+        container.empty();
+
+        if(bantexList.length === 0) {
+            container.html(`
+                <div id="emptyState" class="text-center py-5 border rounded bg-light mb-3">
+                    <i class="fas fa-box-open fa-4x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-muted font-weight-bold">Belum ada bantex ditambahkan</h5>
+                    <p class="text-muted small">Klik tombol di bawah untuk mulai mengisi arsip</p>
+                </div>
+            `);
+            $('#countBantex').text(0);
+            $('#countBox').text(0);
+            return;
+        }
+
+        // Calculate
+        let totalBantex = bantexList.length;
+        let totalBox = Math.ceil(totalBantex / MAX_PER_BOX);
+        $('#countBantex').text(totalBantex);
+        $('#countBox').text(totalBox);
+
+        // Render Boxes
+        let boxCounter = 1;
+        for(let i=0; i<totalBantex; i+=MAX_PER_BOX) {
+            let chunk = bantexList.slice(i, i+MAX_PER_BOX);
+            
+            let bantexCards = '';
+            chunk.forEach((b, idx) => {
+                let globalIdx = i + idx;
+                let docItems = b.dokumen.map(d => 
+                    `<div class="doc-list-item"><i class="far fa-file-alt"></i> ${d.name} <span class="text-muted ml-1">(${d.period})</span></div>`
+                ).join('');
+
+                bantexCards += `
+                <div class="col-md-6">
+                    <div class="bantex-item">
+                        <div class="bantex-content">
+                            <div class="btn-delete-bantex" onclick="deleteBantex(${globalIdx})"><i class="fas fa-times-circle"></i></div>
+                            <div class="bantex-name">${b.nama_bantex}</div>
+                            ${docItems}
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            let boxHtml = `
+            <div class="box-wrapper">
+                <div class="box-header">
+                    <div class="box-title"><i class="fas fa-box-open mr-2"></i> BOX ${boxCounter}</div>
+                    ${chunk.length === 6 ? '<span class="badge badge-danger">BOX PENUH</span>' : '<span class="box-badge">'+chunk.length+'/6 BANTEX</span>'}
+                </div>
+                <div class="row">
+                    ${bantexCards}
+                </div>
+            </div>`;
+            
+            container.append(boxHtml);
+            boxCounter++;
+        }
+    }
+
+    function resetForm() {
+        swal({
+            title: "Reset Formulir?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willReset) => {
+            if(willReset) {
+                bantexList = [];
+                $('#divisi').val('').trigger('change');
+                renderList();
+            }
+        });
+    }
+
+    // --- 3. SUBMIT & CONFIRMATION ---
+    function validateAndSubmit() {
+        let div = $('#divisi').val();
+        let lok = $('#lokasi_arsip').val();
+
+        if(!div) { swal("Info", "Mohon pilih Divisi terlebih dahulu.", "warning"); return; }
+        if(bantexList.length === 0) { swal("Info", "Data masih kosong. Tambahkan minimal 1 Bantex.", "warning"); return; }
+
+        // Populate Modal
+        $('#viewDivisi').text(div);
+        $('#viewLokasi').text(lok);
+        $('#viewTotalBantex').text(bantexList.length);
+        $('#sumBantex').text(bantexList.length);
+        $('#sumBox').text(Math.ceil(bantexList.length / MAX_PER_BOX));
+
+        let htmlList = '';
+        bantexList.forEach((b, i) => {
+            let docs = b.dokumen.map(d => `<li>${d.name} <span style="color:#888">(${d.period})</span></li>`).join('');
+            htmlList += `
+            <div class="modal-bantex-card">
+                <div class="modal-bantex-title">Bantex ${i+1}: ${b.nama_bantex}</div>
+                <ul class="pl-3 mb-0 small text-dark" style="list-style-type: disc;">${docs}</ul>
+            </div>`;
+        });
+        $('#modalDocList').html(htmlList);
+
+        $('#modalKonfirmasi').modal('show');
+    }
+
+    function finalSubmit() {
+        // Simulasi Simpan ke LocalStorage
+        let dataToSave = {
+            divisi: $('#divisi option:selected').text(), // Simpan nama lengkap
+            lokasi: $('#lokasi_arsip').val(),
+            tanggal: new Date().toISOString().slice(0, 10),
+            total_box: Math.ceil(bantexList.length / MAX_PER_BOX),
+            total_bantex: bantexList.length,
+            status_submit: false,
+            history_time: null,
+            detail_bantex: bantexList
+        };
+
+        let db = JSON.parse(localStorage.getItem('simulasi_db_arsip')) || [];
+        db.push(dataToSave);
+        localStorage.setItem('simulasi_db_arsip', JSON.stringify(db));
+
+        $('#modalKonfirmasi').modal('hide');
+        
+        swal({
+            title: "Sukses!",
+            text: "Data berhasil disubmit dan disimpan (Simulasi).",
+            icon: "success",
+            buttons: {
+                confirm: { text: "OK", className: "btn btn-success" }
+            }
+        }).then(() => {
+            window.location.href = "?module=barang-keluar"; // Redirect ke Tampil Data
+        });
+    }
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
