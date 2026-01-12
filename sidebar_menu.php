@@ -59,11 +59,11 @@ else {
 								<span class="sub-item">Jenis Dokumen</span>
 							</a>
 						</li>
-						<li>
+						<!--<li>
 							<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</div>
 			</li>
@@ -97,11 +97,11 @@ else {
 								<span class="sub-item">Jenis Dokumen</span>
 							</a>
 						</li>
-						<li>
+						<!--<li>
 							<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</div>
 			</li>
@@ -135,11 +135,11 @@ else {
 								<span class="sub-item">Jenis Dokumen</span>
 							</a>
 						</li>
-						<li class="active">
+						<!--<li class="active">
 							<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</div>
 			</li>
@@ -173,11 +173,11 @@ else {
 								<span class="sub-item">Jenis Dokumen</span>
 							</a>
 						</li>
-						<li>
+						<!--<li>
 							<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</div>
 			</li>
@@ -258,7 +258,7 @@ else {
 		}
 		// jika tidak dipilih, menu laporan stok tidak aktif
 		else { ?>
-			<!-- <li class="nav-section">
+			<li class="nav-section">
 				<span class="sidebar-mini-icon">
 					<i class="fa fa-ellipsis-h"></i>
 				</span>
@@ -270,7 +270,7 @@ else {
 					<i class="fas fa-file-signature"></i>
 					<p>Laporan Stok Box</p>
 				</a>
-			</li> -->
+			</li>
 			<?php
 		}
 
@@ -297,22 +297,22 @@ else {
 
 		// jika menu laporan barang keluar dipilih, menu laporan barang keluar aktif
 		if ($_GET['module'] == 'laporan_barang_keluar') { ?>
-			<li class="nav-item active">
+			<!--<li class="nav-item active">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
 					<p>Laporan Box Keluar</p>
 				</a>
-			</li>
+			</li>-->
 			<?php
 		}
 		// jika tidak dipilih, menu laporan barang keluar tidak aktif
 		else { ?>
-			<!-- <li class="nav-item">
+			<!--<li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
 					<p>Laporan Box Keluar</p>
 				</a>
-			</li> -->
+			</li>-->
 			<?php
 		}
 

@@ -1,209 +1,349 @@
 <?php
-// Mencegah direct access file PHP
+// Tampil Data: ELEGANT LANDING PAGE (Big Search, No Actions)
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
-}
-else {
-    // Daftar Divisi (Array)
-    $daftar_divisi = [
-        "DSPN" => "Divisi Sekretariat Perusahaan",
-        "DTPI" => "Divisi Satuan Pengawasan Intern",
-        "DTAN" => "Divisi Tanaman",
-        "DTPL" => "Divisi Teknik & Pengolahan",
-        "DINF" => "Divisi Infrastruktur",
-        "DITN" => "Divisi Investasi Tanaman",
-        "DPSN" => "Divisi Pemasaran",
-        "DRPL" => "Divisi Rantai Pasok & Logistik",
-        "DPEN" => "Divisi Pengadaan",
-        "DSKP" => "Divisi Strategi Perusahaan & Pengendalian Kinerja Anak Perusahaan",
-        "DSMS" => "Divisi Sistem Manajemen & Sustainability",
-        "DRPH" => "Divisi Riset, Pengembangan Bisnis & Hilirisasi",
-        "DKSH" => "Divisi Keuangan Strategis dan Hubungan Investor",
-        "DPBA" => "Divisi Perbendaharaan & Anggaran",
-        "DAPN" => "Divisi Akuntansi & Perpajakan",
-        "DMRS" => "Divisi Manajemen Risiko",
-        "DPSB" => "Divisi Pengembangan SDM dan Budaya",
-        "DSDM" => "Divisi Operasional SDM",
-        "DHPU" => "Divisi HPS & Umum",
-        "DTIS" => "Divisi Teknologi Informasi",
-        "DHKT" => "Divisi Hubungan Kelembagaan dan TJSL",
-        "DHKM" => "Divisi Hukum",
-        "DPSR" => "Divisi PSR dan Plasma",
-        "DPMO" => "Project Management Office"
+} else {
+    // --- 1. DATA DUMMY ---
+    $data_laporan = [
+        [
+            'kode_divisi' => 'DSPN',
+            'divisi_nama' => 'Sekretariat Perusahaan', 
+            'no_kotak'    => 'DSPN-001',
+            'jml_bantex'  => 2,
+            'jml_box'     => 1,
+            'dokumen'     => [
+                ['nama' => 'SK Direksi Pengangkatan Pejabat', 'tahun' => '2024'],
+                ['nama' => 'Risalah Rapat Rencana Kerja', 'tahun' => '2024'],
+            ]
+        ],
+        [
+            'kode_divisi' => 'DTIS',
+            'divisi_nama' => 'Teknologi Informasi',
+            'no_kotak'    => 'DTIS-005-A',
+            'jml_bantex'  => 5,
+            'jml_box'     => 1,
+            'dokumen'     => [
+                ['nama' => 'Kontrak Maintenance Jaringan FO', 'tahun' => '2025'],
+                ['nama' => 'Topologi Network HO', 'tahun' => '2024'],
+                ['nama' => 'Lisensi Software Microsoft', 'tahun' => '2024'],
+            ]
+        ],
+        [
+            'kode_divisi' => 'DHPU',
+            'divisi_nama' => 'HPS & Umum',
+            'no_kotak'    => 'DHPU-102',
+            'jml_bantex'  => 3,
+            'jml_box'     => 2,
+            'dokumen'     => [
+                ['nama' => 'Perjanjian Sewa Gedung Lt.8', 'tahun' => '2023'],
+            ]
+        ]
     ];
+
+    // --- 2. LOGIKA FILTER ---
+    $selected_divisi = isset($_GET['filter_divisi']) ? $_GET['filter_divisi'] : '';
+    $data_tampil = [];
+    
+    // Hitung statistik sederhana untuk pemanis
+    $total_dokumen = 0;
+    $total_box = 0;
+
+    if($selected_divisi != '') {
+        foreach($data_laporan as $row) {
+            if($row['kode_divisi'] == $selected_divisi) {
+                $data_tampil[] = $row;
+                $total_dokumen += count($row['dokumen']);
+                $total_box += $row['jml_box'];
+            }
+        }
+    } else {
+        $data_tampil = $data_laporan;
+        foreach($data_laporan as $r) {
+            $total_dokumen += count($r['dokumen']);
+            $total_box += $r['jml_box'];
+        }
+    }
 ?>
-    <div class="panel-header bg-secondary-gradient">
-        <div class="page-inner py-4">
-            <div class="page-header text-white">
-                <h4 class="page-title text-white"><i class="fas fa-file-alt mr-2"></i> Laporan Arsip Per Divisi</h4>
-                <ul class="breadcrumbs">
-                    <li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
-                    <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Laporan</a></li>
-                    <li class="separator"><i class="flaticon-right-arrow"></i></li>
-                    <li class="nav-item"><a>Per Divisi</a></li>
-                </ul>
-            </div>
-        </div>
+
+    <style>
+        /* --- STYLE ELEGANT --- */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); /* Indigo Theme */
+            --bg-body: #f3f4f6;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body { background-color: var(--bg-body); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+        /* 1. HERO SECTION (Big Search Background) */
+        .hero-section {
+            background: var(--primary-gradient);
+            padding: 60px 20px 80px; /* Padding bawah besar untuk overlap */
+            border-radius: 0 0 30px 30px;
+            color: white;
+            text-align: center;
+            position: relative;
+            margin-bottom: -50px; /* Overlap effect */
+        }
+        .hero-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .hero-subtitle { font-size: 1.1rem; opacity: 0.9; font-weight: 300; max-width: 600px; margin: 0 auto; }
+
+        /* 2. FLOATING SEARCH CARD */
+        .search-card-container {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            position: relative;
+            z-index: 10;
+        }
+        .search-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Input Besar */
+        .form-select-lg-custom {
+            flex-grow: 1;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .form-select-lg-custom:hover, .form-select-lg-custom:focus {
+            border-color: #4f46e5;
+            background-color: white;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-search-lg {
+            background-color: #111827; /* Hitam Elegant */
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex; align-items: center;
+        }
+        .btn-search-lg:hover { transform: translateY(-2px); background-color: #000; }
+
+        /* 3. CONTENT AREA */
+        .content-wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px 50px; }
+
+        /* Toolbar (Export/Print) */
+        .toolbar-clean {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .stat-badge {
+            background: white; padding: 8px 16px; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-dark);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-right: 10px;
+        }
+        .stat-badge i { color: #4f46e5; margin-right: 5px; }
+
+        /* TABLE DESIGN */
+        .card-table {
+            background: white; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f3f4f6;
+        }
+        .table-elegant { width: 100%; border-collapse: collapse; }
+        .table-elegant thead { background-color: #f9fafb; border-bottom: 2px solid #f3f4f6; }
+        .table-elegant th {
+            padding: 20px; text-align: left; font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted); font-weight: 700;
+        }
+        .table-elegant td {
+            padding: 20px; border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem; color: var(--text-dark); vertical-align: middle;
+        }
+        .table-elegant tr:last-child td { border-bottom: none; }
+        .table-elegant tr:hover { background-color: #fcfcfc; }
+
+        /* Typography di Tabel */
+        .cell-title { font-weight: 600; display: block; color: #111827; }
+        .cell-subtitle { font-size: 0.85rem; color: #9ca3af; margin-top: 3px; display: block; }
+        .rfid-tag {
+            background: #eef2ff; color: #4f46e5; padding: 5px 10px;
+            border-radius: 6px; font-family: monospace; font-size: 0.9rem; letter-spacing: 0.5px;
+        }
+        .number-circle {
+            width: 30px; height: 30px; background: #f3f4f6; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #6b7280; font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-card { flex-direction: column; padding: 20px; }
+            .form-select-lg-custom, .btn-search-lg { width: 100%; }
+            .hero-title { font-size: 1.8rem; }
+        }
+    </style>
+
+    <div class="hero-section">
+        <h1 class="hero-title">Arsip Digital Repository</h1>
+        <p class="hero-subtitle">Sistem pencarian dan monitoring lokasi dokumen fisik secara realtime, akurat, dan terstruktur.</p>
     </div>
 
-    <?php
-    // --- KONDISI 1: FORM FILTER BELUM DISUBMIT ---
-    if (!isset($_POST['tampil'])) { ?>
-        <div class="page-inner mt--5">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Filter Divisi</div>
+    <div class="search-card-container">
+        <form action="" method="GET">
+            <input type="hidden" name="module" value="<?php echo isset($_GET['module']) ? $_GET['module'] : ''; ?>">
+            <div class="search-card">
+                <div style="flex-grow: 1;">
+                    <label class="d-block text-muted small font-weight-bold mb-2 ml-1" style="text-align:left;">PILIH DIVISI UNTUK DITAMPILKAN</label>
+                    <select name="filter_divisi" class="form-select-lg-custom w-100">
+                        <option value="">-- Tampilkan Semua Arsip --</option>
+                        <?php foreach($data_laporan as $d): ?>
+                            <option value="<?php echo $d['kode_divisi']; ?>" <?php echo ($selected_divisi == $d['kode_divisi']) ? 'selected' : ''; ?>>
+                                <?php echo $d['kode_divisi']; ?> - <?php echo $d['divisi_nama']; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-                <div class="card-body">
-                    <form action="?module=laporan_stok" method="post" class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label>Pilih Divisi <span class="text-danger">*</span></label>
-                                    <select name="divisi" class="form-control select2-single" required>
-                                        <option value="">-- Silahkan Pilih --</option>
-                                        <?php foreach($daftar_divisi as $kode => $nama): ?>
-                                            <option value="<?= $kode ?>"><?= $kode ?> - <?= $nama ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <div class="invalid-feedback">Divisi harus dipilih.</div>
-                                </div>
-                            </div>
+                <div style="align-self: flex-end;">
+                     <button type="submit" class="btn-search-lg">
+                        <i class="fas fa-search mr-2"></i> Cari Data
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-                            <div class="col-lg-3">
-                                <div class="form-group pt-3">
-                                    <input type="submit" name="tampil" value="Tampilkan" class="btn btn-secondary btn-round btn-block mt-4">
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="content-wrapper">
+        
+        <div class="toolbar-clean">
+            <div class="d-flex flex-wrap align-items-center">
+                <div class="stat-badge"><i class="fas fa-file-alt"></i> <?php echo $total_dokumen; ?> Dokumen</div>
+                <div class="stat-badge"><i class="fas fa-box"></i> <?php echo $total_box; ?> Box Fisik</div>
+            </div>
+            
+            <div class="btn-group">
+                 <button onclick="window.print()" class="btn btn-outline-dark btn-round btn-sm font-weight-bold mr-2">
+                    <i class="fas fa-print mr-1"></i> Cetak
+                </button>
+                <button onclick="exportExcel('tabelArsipElegant')" class="btn btn-success btn-round btn-sm font-weight-bold">
+                    <i class="fas fa-file-excel mr-1"></i> Export Excel
+                </button>
             </div>
         </div>
-    <?php
-    }
-    // --- KONDISI 2: FORM SUDAH DISUBMIT (TAMPIL DATA) ---
-    else {
-        $divisi_pilih = $_POST['divisi'];
-        // Mengambil nama lengkap divisi dari array berdasarkan kode yang dipilih
-        $nama_divisi_lengkap = isset($daftar_divisi[$divisi_pilih]) ? $daftar_divisi[$divisi_pilih] : $divisi_pilih;
-    ?>
-        <div class="page-inner mt--5">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Filter Divisi</div>
-                </div>
-                <div class="card-body">
-                    <form action="?module=laporan_stok" method="post">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label>Pilih Divisi <span class="text-danger">*</span></label>
-                                    <select name="divisi" class="form-control select2" required>
-                                        <option value="">-- Silahkan Pilih --</option>
-                                        <?php foreach($daftar_divisi as $kode => $nama): ?>
-                                            <option value="<?= $kode ?>" <?= ($kode == $divisi_pilih) ? 'selected' : '' ?>>
-                                                <?= $kode ?> - <?= $nama ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
 
-                            <div class="col-lg-2">
-                                <div class="form-group pt-3">
-                                    <input type="submit" name="tampil" value="Tampilkan" class="btn btn-secondary btn-round btn-block mt-4">
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 pr-0">
-                                <div class="form-group pt-3">
-                                    <a href="modules/laporan-stok/cetak.php?divisi=<?= $divisi_pilih ?>" target="_blank" class="btn btn-warning btn-round btn-block mt-4">
-                                        <span class="btn-label"><i class="fa fa-print mr-2"></i></span> Cetak
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 pl-0">
-                                <div class="form-group pt-3">
-                                    <a href="modules/laporan-stok/export.php?divisi=<?= $divisi_pilih ?>" target="_blank" class="btn btn-success btn-round btn-block mt-4">
-                                        <span class="btn-label"><i class="fa fa-file-excel mr-2"></i></span> Export
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-list-alt mr-2"></i> Data Arsip: <strong><?= $divisi_pilih ?></strong>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">No.</th>
-                                    <th class="text-center">ID Transaksi</th>
-                                    <th class="text-center">Tanggal</th>
-                                    <th class="text-center">Divisi</th>
-                                    <th class="text-center">Total Box</th>
-                                    <th class="text-center">Total Bantex</th>
-                                    <th class="text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $no = 1;
-                                // Query ke tabel tbl_barang_masuk berdasarkan DIVISI
-                                // Pastikan kolom 'divisi' ada di tbl_barang_masuk
-                                $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_masuk 
-                                                                WHERE divisi = '$divisi_pilih' 
-                                                                ORDER BY tanggal DESC, id_transaksi DESC")
-                                                                or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+        <div class="card-table">
+            <div class="table-responsive">
+                <table class="table-elegant" id="tabelArsipElegant">
+                    <thead>
+                        <tr>
+                            <th width="5%" class="text-center">No</th>
+                            <th width="25%">Divisi & Unit</th>
+                            <th width="15%">RF ID (Kode Box)</th>
+                            <th width="30%">Nama Dokumen</th>
+                            <th width="12%" class="text-center">Jml Bantex</th>
+                            <th width="12%" class="text-center">Jml Box</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(empty($data_tampil)): ?>
+                            <tr><td colspan="6" class="text-center py-5 text-muted font-italic">Silakan pilih divisi di atas untuk melihat data.</td></tr>
+                        <?php else: 
+                            $no = 1;
+                            foreach($data_tampil as $row) { 
+                                // Loop Dokumen
+                                foreach($row['dokumen'] as $index => $doc) {
+                                    $isFirst = ($index === 0); // Cek baris pertama grup
+                        ?>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="number-circle mx-auto"><?php echo $no++; ?></div>
+                                </td>
                                 
-                                while ($data = mysqli_fetch_assoc($query)) { 
-                                    // Handling data kosong jika kolom belum terisi penuh
-                                    $t_box = isset($data['total_box']) ? $data['total_box'] : 0;
-                                    $t_bantex = isset($data['jumlah']) ? $data['jumlah'] : 0;
-                                    $status = isset($data['status']) ? $data['status'] : '-';
-                                ?>
-                                    <tr>
-                                        <td width="50" class="text-center"><?= $no++; ?></td>
-                                        <td width="100" class="text-center"><?= $data['id_transaksi']; ?></td>
-                                        <td width="100" class="text-center"><?= date('d-m-Y', strtotime($data['tanggal'])); ?></td>
-                                        <td width="200"><?= $data['divisi']; ?></td>
-                                        <td width="100" class="text-center">
-                                            <span class="badge badge-count"><?= $t_box ?> Box</span>
-                                        </td>
-                                        <td width="100" class="text-center">
-                                            <?= number_format($t_bantex, 0, '', '.'); ?>
-                                        </td>
-                                        <td width="100" class="text-center">
-                                            <?php
-                                            if ($status == 'ACC') {
-                                                echo '<span class="badge badge-success">ACC</span>';
-                                            } elseif ($status == 'Reject') {
-                                                echo '<span class="badge badge-danger">Reject</span>';
-                                            } else {
-                                                echo '<span class="badge badge-warning">Waiting</span>';
-                                            }
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                <td>
+                                    <?php if($isFirst): ?>
+                                        <span class="cell-title"><?php echo $row['divisi_nama']; ?></span>
+                                        <span class="cell-subtitle">Kode: <?php echo $row['kode_divisi']; ?></span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <?php if($isFirst): ?>
+                                        <span class="rfid-tag"><i class="fas fa-wifi mr-1"></i> <?php echo $row['no_kotak']; ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="far fa-file-alt text-muted mr-3"></i>
+                                        <div>
+                                            <span class="text-dark font-weight-bold"><?php echo $doc['nama']; ?></span>
+                                            <span class="d-block small text-muted">Tahun Arsip: <?php echo $doc['tahun']; ?></span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <?php if($isFirst): ?>
+                                        <span class="font-weight-bold text-dark" style="font-size: 1.1rem;"><?php echo $row['jml_bantex']; ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                
+                                <td class="text-center">
+                                    <?php if($isFirst): ?>
+                                        <span class="font-weight-bold text-dark" style="font-size: 1.1rem;"><?php echo $row['jml_box']; ?></span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php 
+                                } // End Foreach Dokumen
+                                
+                                // Spacer Row (Opsional: Memberi jarak antar Divisi agar tidak terlalu padat)
+                                echo '<tr><td colspan="6" style="padding:0; height:8px; background:#f9fafb; border:none;"></td></tr>';
+                            } 
+                        endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
-<?php
+
+        <div class="text-center mt-4 text-muted small">
+            &copy; 2025 Sistem Manajemen Arsip Terpadu
+        </div>
+
+    </div>
+
+    <script>
+    function exportExcel(tableID){
+        var downloadLink;
+        var dataType = 'application/vnd.ms-excel';
+        var tableSelect = document.getElementById(tableID);
+        var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+        
+        var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><style>table, th, td {border: 1px solid #000; font-family: Arial;}</style></head><body>';
+        var footer = '</body></html>';
+        var finalHTML = header + tableSelect.outerHTML + footer;
+
+        downloadLink = document.createElement("a");
+        document.body.appendChild(downloadLink);
+
+        if(navigator.msSaveOrOpenBlob){
+            var blob = new Blob(['\ufeff', finalHTML], { type: dataType });
+            navigator.msSaveOrOpenBlob( blob, 'Laporan_Arsip.xls');
+        }else{
+            downloadLink.href = 'data:' + dataType + ', ' + encodeURIComponent(finalHTML);
+            downloadLink.download = 'Laporan_Arsip.xls';
+            downloadLink.click();
+        }
     }
-}
-?>
+    </script>
+
+<?php } ?>

@@ -152,7 +152,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             <div class="card-header">
                 <div class="d-flex align-items-center justify-content-between flex-wrap">
                     <div class="card-title">
-                        <i class="fas fa-info-circle mr-2"></i> Stok Batas Minimum
+                        <i class="fas fa-info-circle mr-2"></i> Riwayat Pengajuan
                     </div>
 
                     <form action="?module=dashboard" method="post" class="form-inline mt-2 mt-lg-0">
