@@ -32,46 +32,82 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         <thead class="bg-light">
                             <tr>
                                 <th class="text-center" width="5%">#</th>
-                                <th>Divisi & Tanggal</th>
+                                <th width="15%">ID Transaksi</th> <th>Divisi & Tanggal</th>
                                 <th class="text-center">Volume Arsip</th>
-                                <th width="20%">Status</th>
+                                <th width="15%">Status</th>
                                 <th class="text-center" width="15%">Aksi Approval</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            // Ambil Data Header (Pengajuan) + Hitung Jumlah Box
-                            $query = mysqli_query($mysqli, "
-                                SELECT 
-                                    p.id AS id_pengajuan,
-                                    p.tanggal_pengajuan,
-                                    p.status,
-                                    d.nama_divisi,
-                                    d.singkatan_divisi,
-                                    (SELECT COUNT(*) FROM tbl_box WHERE id_pengajuan = p.id) as total_box
-                                FROM tbl_pengajuan p
-                                INNER JOIN tbl_divisi d ON p.id_divisi = d.id
-                                ORDER BY p.id DESC
-                            ");
+                            // --- DATA DUMMY (PENGGANTI DATABASE SEMENTARA) ---
+                            $data_dummy = [
+                                [
+                                    'id' => 1,
+                                    'id_transaksi' => 'TRX-2026-001',
+                                    'divisi' => 'DAPN - Divisi Akuntansi & Perpajakan',
+                                    'tanggal' => '2026-01-13',
+                                    'total_box' => 1,
+                                    'status' => 'Disetujui'
+                                ],
+                                [
+                                    'id' => 2,
+                                    'id_transaksi' => 'TRX-2026-002',
+                                    'divisi' => 'DTI - Divisi Teknologi Informasi',
+                                    'tanggal' => '2026-01-13',
+                                    'total_box' => 3,
+                                    'status' => 'Pending'
+                                ],
+                                [
+                                    'id' => 3,
+                                    'id_transaksi' => 'TRX-2026-003',
+                                    'divisi' => 'DAPN - Divisi Akuntansi & Perpajakan',
+                                    'tanggal' => '2026-01-13',
+                                    'total_box' => 2,
+                                    'status' => 'Pending'
+                                ],
+                                [
+                                    'id' => 4,
+                                    'id_transaksi' => 'TRX-2026-004',
+                                    'divisi' => 'DPSR - Divisi PSR dan Plasma',
+                                    'tanggal' => '2026-01-12',
+                                    'total_box' => 1,
+                                    'status' => 'Disetujui'
+                                ],
+                                [
+                                    'id' => 5,
+                                    'id_transaksi' => 'TRX-2025-099',
+                                    'divisi' => 'DSMS - Divisi Sistem Manajemen',
+                                    'tanggal' => '2025-12-24',
+                                    'total_box' => 1,
+                                    'status' => 'Ditolak'
+                                ]
+                            ];
 
-                            if (mysqli_num_rows($query) == 0) {
-                                echo '<tr><td colspan="5" class="text-center py-5 text-muted">Belum ada pengajuan masuk.</td></tr>';
+                            if (empty($data_dummy)) {
+                                echo '<tr><td colspan="6" class="text-center py-5 text-muted">Belum ada pengajuan masuk.</td></tr>';
                             } else {
                                 $no = 1;
-                                while ($data = mysqli_fetch_assoc($query)) {
-                                    $id      = $data['id_pengajuan'];
-                                    $divisi  = $data['singkatan_divisi'] . " - " . $data['nama_divisi'];
-                                    $tanggal = date('d M Y', strtotime($data['tanggal_pengajuan']));
+                                foreach ($data_dummy as $data) {
+                                    $id       = $data['id'];
+                                    $id_trx   = $data['id_transaksi'];
+                                    $divisi   = $data['divisi'];
+                                    $tanggal  = date('d M Y', strtotime($data['tanggal']));
                                     
                                     // LOGIKA VOLUME
-                                    $box     = $data['total_box'];
-                                    $bantex  = $box * 6; // Rumus: 1 Box = 6 Bantex
-                                    
-                                    $status  = $data['status'];
+                                    $box      = $data['total_box'];
+                                    $bantex   = $box * 6; // Rumus: 1 Box = 6 Bantex
+                                    $status   = $data['status'];
                             ?>
                                     <tr>
                                         <td class="text-center text-muted"><?= $no++; ?></td>
                                         
+                                        <td>
+                                            <span class="badge badge-light border text-dark font-weight-bold" style="font-family: monospace; font-size: 13px;">
+                                                <?= $id_trx ?>
+                                            </span>
+                                        </td>
+
                                         <td>
                                             <div class="font-weight-bold text-dark"><?= $divisi ?></div>
                                             <div class="small text-muted"><i class="far fa-calendar-alt mr-1"></i> <?= $tanggal ?></div>
@@ -85,7 +121,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         <td>
                                             <?php if ($status == 'Pending') { ?>
                                                 <span class="badge badge-warning text-white"><i class="fas fa-clock mr-1"></i> Menunggu Approval</span>
-                                            <?php } elseif ($status == 'Diterima') { ?>
+                                            <?php } elseif ($status == 'Disetujui') { ?>
                                                 <span class="badge badge-success"><i class="fas fa-check mr-1"></i> Disetujui</span>
                                             <?php } else { ?>
                                                 <span class="badge badge-danger"><i class="fas fa-times mr-1"></i> Ditolak</span>
@@ -135,6 +171,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             })
             .then((willProses) => {
                 if (willProses) {
+                    // Redirect simulasi (karena dummy, ini tidak akan mengubah data asli)
                     window.location.href = "modules/barang-masuk/proses_approval.php?id=" + id + "&aksi=" + aksi;
                 }
             });
