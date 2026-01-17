@@ -9,55 +9,74 @@
 * WhatsApp    : +62-813-7778-3334
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="h-100">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta
+      name="description"
+      content="Sistem Informasi Persediaan Barang Gudang Material"
+    />
+    <meta name="author" content="Indra Styawantoro" />
 
-<head>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-	<meta name="description" content="Sistem Informasi Persediaan Barang Gudang Material" />
-	<meta name="author" content="Indra Styawantoro" />
+    <!-- Title -->
+    <title>Repository Arsip</title>
 
-	<!-- Title -->
-	<title>Repository Arsip</title>
+    <!-- Favicon icon -->
+    <link rel="icon" href="assets/img/favicon.png" type="image/x-icon" />
 
-	<!-- Favicon icon -->
-	<link rel="icon" href="assets/img/favicon.png" type="image/x-icon" />
+    <!-- Fonts and icons -->
+    <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+      WebFont.load({
+        google: { families: ["Lato:300,400,700,900"] },
+        custom: {
+          families: [
+            "Flaticon",
+            "Font Awesome 5 Solid",
+            "Font Awesome 5 Regular",
+            "Font Awesome 5 Brands",
+            "simple-line-icons",
+          ],
+          urls: ["assets/css/fonts.min.css"],
+        },
+        active: function () {
+          sessionStorage.fonts = true;
+        },
+      });
+    </script>
 
-	<!-- Fonts and icons -->
-	<script src="assets/js/plugin/webfont/webfont.min.js"></script>
-	<script>
-		WebFont.load({
-			google: { "families": ["Lato:300,400,700,900"] },
-			custom: { "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['assets/css/fonts.min.css'] },
-			active: function () {
-				sessionStorage.fonts = true;
-			}
-		});
-	</script>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/atlantis.min.css" />
+    <link rel="stylesheet" href="assets/css/error.css" />
+  </head>
 
-	<!-- CSS Files -->
-	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/css/atlantis.min.css">
-	<link rel="stylesheet" href="assets/css/error.css">
-</head>
+  <body class="d-flex flex-column h-100">
+    <div class="container-fluid flex-shrink-0">
+      <div class="text-center">
+        <div class="my-5 mx-auto">
+          <img
+            src="assets/img/403.svg"
+            alt="Error 403"
+            class="img-fluid error-img"
+          />
+        </div>
+        <!-- 403 Error Text -->
+        <p class="error-text mb-5">
+          Anda tidak memiliki izin untuk mengakses halaman ini dari server.
+        </p>
+        <!-- button kembali ke aplikasi -->
+        <a href="index.php" class="btn btn-primary btn-round">
+          <i class="fas fa-home mr-2"></i> Kembali ke Aplikasi
+        </a>
+      </div>
+    </div>
 
-<body class="d-flex flex-column h-100">
-	<div class="container-fluid flex-shrink-0">
-		<div class="text-center">
-			<div class="my-5 mx-auto">
-				<img src="assets/img/403.svg" alt="Error 403" class="img-fluid error-img">
-			</div>
-			<!-- 403 Error Text -->
-			<p class="error-text mb-5">Anda tidak memiliki izin untuk mengakses halaman ini dari server.</p>
-			<!-- button kembali ke aplikasi -->
-			<a href="index.php" class="btn btn-primary btn-round">
-				<i class="fas fa-home mr-2"></i> Kembali ke Aplikasi
-			</a>
-		</div>
-	</div>
-
-	<!-- Footer -->
-	</body>
-
+    <!-- Footer -->
+  </body>
 </html>

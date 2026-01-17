@@ -1,14 +1,3 @@
-<!-- Sistem Informasi Persediaan Barang Gudang Material
-********************************************************
-* Developer   : Indra Styawantoro
-* Company     : Pustaka Koding
-* Release     : Agustus 2021
-* Update      : -
-* Website     : pustakakoding.com
-* E-mail      : pustaka.koding@gmail.com
-* WhatsApp    : +62-813-7778-3334
--->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -35,7 +24,7 @@
 				"families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
 				urls: ['assets/css/fonts.min.css']
 			},
-			active: function() {
+			active: function () {
 				sessionStorage.fonts = true;
 			}
 		});
@@ -101,7 +90,8 @@
 			<form action="proses_login.php" method="post" class="needs-validation" novalidate>
 				<div class="form-group form-floating-label">
 					<div class="user-icon"><i class="fas fas fa-user"></i></div>
-					<input type="text" id="username" name="username" class="form-control input-border-bottom" autocomplete="off" required>
+					<input type="text" id="username" name="username" class="form-control input-border-bottom"
+						autocomplete="off" required>
 					<label for="username" class="placeholder">Username</label>
 					<div class="invalid-feedback">Username tidak boleh kosong.</div>
 				</div>
@@ -109,14 +99,16 @@
 				<div class="form-group form-floating-label">
 					<div class="user-icon"><i class="fas fa-lock"></i></div>
 					<div class="show-password"><i class="flaticon-interface"></i></div>
-					<input type="password" id="password" name="password" class="form-control input-border-bottom" autocomplete="off" required>
+					<input type="password" id="password" name="password" class="form-control input-border-bottom"
+						autocomplete="off" required>
 					<label for="password" class="placeholder">Password</label>
 					<div class="invalid-feedback">Password tidak boleh kosong.</div>
 				</div>
 
 				<div class="form-action mt-2">
 					<!-- button login -->
-					<input type="submit" name="login" value="LOGIN" class="btn btn-secondary btn-rounded btn-login btn-block">
+					<input type="submit" name="login" value="LOGIN"
+						class="btn btn-secondary btn-rounded btn-login btn-block">
 				</div>
 			</form>
 		</div>

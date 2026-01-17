@@ -1,13 +1,3 @@
-<!-- Sistem Informasi Persediaan Barang Gudang Material
-********************************************************
-* Developer   : Indra Styawantoro
-* Company     : Pustaka Koding
-* Release     : Agustus 2021
-* Update      : -
-* Website     : pustakakoding.com
-* E-mail      : pustaka.koding@gmail.com
-* WhatsApp    : +62-813-7778-3334
--->
 <?php
 session_start();      // mengaktifkan session
 
@@ -45,7 +35,7 @@ else { ?>
 					"families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
 					urls: ['assets/css/fonts.min.css']
 				},
-				active: function() {
+				active: function () {
 					sessionStorage.fonts = true;
 				}
 			});
@@ -77,7 +67,8 @@ else { ?>
 						</div>
 					</a>
 					<!-- Navbar Toggler -->
-					<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
+					<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse"
+						data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
 						<span class="navbar-toggler-icon">
 							<i class="icon-menu"></i>
 						</span>
@@ -97,16 +88,19 @@ else { ?>
 						<ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
 							<!-- data user login -->
 							<li class="nav-item dropdown hidden-caret">
-								<a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="javascript:void(0)" aria-expanded="false">
+								<a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="javascript:void(0)"
+									aria-expanded="false">
 									<div class="avatar-sm-top mt-1">
-										<img src="assets/img/avatar-1.png" alt="image profile" class="avatar-img rounded-circle">
+										<img src="assets/img/avatar-1.png" alt="image profile"
+											class="avatar-img rounded-circle">
 										<i class="fas fa-angle-down avatar-title"></i>
 									</div>
 								</a>
 								<ul class="dropdown-menu dropdown-user animated fadeIn">
 									<li>
 										<div class="user-box">
-											<div class="avatar-lg"><img src="assets/img/avatar-2.png" alt="image profile" class="avatar-img rounded"></div>
+											<div class="avatar-lg"><img src="assets/img/avatar-2.png" alt="image profile"
+													class="avatar-img rounded"></div>
 											<div class="u-text pt-1">
 												<h4><?php echo $_SESSION['nama_user']; ?></h4>
 												<p class="text-muted"><?php echo $_SESSION['hak_akses']; ?></p>
@@ -177,7 +171,8 @@ else { ?>
 		</div>
 
 		<!-- Modal Logout -->
-		<div class="modal fade" id="modalLogout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="modalLogout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+			aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
