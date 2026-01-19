@@ -133,4 +133,9 @@ else {
 		// panggil file tampil data tentang
 		include "modules/barang-keluar/form_entri.php";
 	}
+	// jika module yang dipilih "pengiriman_box"
+	elseif ($_GET['module'] == 'pengiriman_box') {
+		// panggil file tampil data tentang
+		include "modules/pengiriman_box/tampil_data.php";
+	}
 }

@@ -239,7 +239,7 @@ else {
 			<?php
 		}
 
-		// jika menu barang keluar (tampil data / form entri) dipilih, menu barang keluar aktif
+		// jika menu Pengiriman Data Box dipilih, menu Pengiriman Data Box aktif
 		if ($_GET['module'] == 'pengiriman_box' || $_GET['module'] == 'form_entri_barang_keluar') { ?>
 			<li class="nav-item active">
 				<a href="?module=pengiriman_box">
@@ -254,7 +254,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=pengiriman_box">
 					<i class='fas fa-tasks'></i>
-					<p>Pengisian Data Box</p>
+					<p>Pengiriman Data Box</p>
 				</a>
 			</li>
 			<?php
