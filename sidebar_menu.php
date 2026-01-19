@@ -223,7 +223,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
-					<p>Pengiriman Data Box</p>
+					<p>Pengisian Data Box</p>
 				</a>
 			</li>
 			<?php
@@ -233,7 +233,28 @@ else {
 			<li class="nav-item">
 				<a href="?module=barang_keluar">
 					<i class="fas fa-sign-out-alt"></i>
+					<p>Pengisian Data Box</p>
+				</a>
+			</li>
+			<?php
+		}
+
+		// jika menu barang keluar (tampil data / form entri) dipilih, menu barang keluar aktif
+		if ($_GET['module'] == 'pengiriman_box' || $_GET['module'] == 'form_entri_barang_keluar') { ?>
+			<li class="nav-item active">
+				<a href="?module=pengiriman_box">
+					<i class='fas fa-tasks'></i>
 					<p>Pengiriman Data Box</p>
+				</a>
+			</li>
+			<?php
+		}
+		// jika tidak dipilih, menu barang keluar tidak aktif
+		else { ?>
+			<li class="nav-item">
+				<a href="?module=pengiriman_box">
+					<i class='fas fa-tasks'></i>
+					<p>Pengisian Data Box</p>
 				</a>
 			</li>
 			<?php
