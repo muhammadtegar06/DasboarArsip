@@ -53,7 +53,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             </div>
                             <div class="col-7 col-stats">
                                 <div class="numbers">
-                                    <p class="card-category">Total Pengajuan Box</p>
+                                    <p class="card-category">Total Pengajuan Box Divisi</p>
                                     <?php
                                     // Query TOTAL MASTER
                                     $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang") or die('Error: ' . mysqli_error($mysqli));
@@ -78,7 +78,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             </div>
                             <div class="col-7 col-stats">
                                 <div class="numbers">
-                                    <p class="card-category">Total Box Diterima</p>
+                                    <p class="card-category">Total Box Diterima Divisi</p>
                                     <?php
                                     // Query TOTAL BARANG MASUK (Tanpa Filter)
                                     $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_masuk") or die('Error: ' . mysqli_error($mysqli));
@@ -104,7 +104,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             </div>
                             <div class="col-7 col-stats">
                                 <div class="numbers">
-                                    <p class="card-category">Total Bantex Diterima</p>
+                                    <p class="card-category">Total Bantex Diterima Divisi</p>
                                     <?php
                                     // Query TOTAL JUMLAH BANTEX (Tanpa Filter)
                                     $query = mysqli_query($mysqli, "SELECT SUM(jumlah) as total_bantex FROM tbl_barang_masuk") or die('Error: ' . mysqli_error($mysqli));
@@ -130,7 +130,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             </div>
                             <div class="col-7 col-stats">
                                 <div class="numbers">
-                                    <p class="card-category">Total Pengajuan Bantex</p>
+                                    <p class="card-category">Total Pengajuan Bantex Divisi</p>
                                     <?php
                                     // Query TOTAL BARANG KELUAR (Tanpa Filter)
                                     $query = mysqli_query($mysqli, "SELECT * FROM tbl_barang_keluar") or die('Error: ' . mysqli_error($mysqli));

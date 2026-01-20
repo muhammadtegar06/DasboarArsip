@@ -239,7 +239,7 @@ else {
 			<?php
 		}
 
-		// jika menu Pengiriman Data Box dipilih, menu Pengiriman Data Box aktif
+		// jika menu barang keluar (tampil data / form entri) dipilih, menu barang keluar aktif
 		if ($_GET['module'] == 'pengiriman_box' || $_GET['module'] == 'form_entri_barang_keluar') { ?>
 			<li class="nav-item active">
 				<a href="?module=pengiriman_box">
@@ -254,7 +254,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=pengiriman_box">
 					<i class='fas fa-tasks'></i>
-					<p>Pengiriman Data Box</p>
+					<p>Pengisian Data Box</p>
 				</a>
 			</li>
 			<?php
@@ -289,7 +289,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_stok">
 					<i class="fas fa-file-signature"></i>
-					<p>Laporan Stok Box</p>
+					<p>Laporan Stok Box Seluruhnya</p>
 				</a>
 			</li>
 			<?php
@@ -307,33 +307,33 @@ else {
 		}
 		// jika tidak dipilih, menu laporan barang masuk tidak aktif
 		else { ?>
-			<!-- <li class="nav-item">
+			<li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
 					<p>Laporan Pengajuan Box</p>
 				</a>
-			</li> -->
+			</li>
 			<?php
 		}
 
 		// jika menu laporan barang keluar dipilih, menu laporan barang keluar aktif
 		if ($_GET['module'] == 'laporan_barang_keluar') { ?>
-			<!--<li class="nav-item active">
+			<li class="nav-item active">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Box Keluar</p>
+					<p>Laporan Pengiriman Box</p>
 				</a>
-			</li>-->
+			</li>
 			<?php
 		}
 		// jika tidak dipilih, menu laporan barang keluar tidak aktif
 		else { ?>
-			<!--<li class="nav-item">
+			<li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
-					<p>Laporan Box Keluar</p>
+					<p>Laporan Pengiriman Box</p>
 				</a>
-			</li>-->
+			</li>
 			<?php
 		}
 

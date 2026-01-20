@@ -361,8 +361,6 @@ foreach ($divisi_list as $kd => $nm) {
                                 <label class="font-weight-bold">Lokasi Arsip <span class="text-danger">*</span></label>
                                 <select id="lokasi_arsip" class="form-control">
                                     <option value="HO" selected>Head Office (HO)</option>
-                                    <option value="Gudang">Gudang Arsip Pusat</option>
-                                    <option value="Pabrik">Kantor Pabrik</option>
                                 </select>
                             </div>
                         </div>

@@ -32,51 +32,53 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         <thead class="bg-light">
                             <tr>
                                 <th class="text-center" width="5%">#</th>
-                                <th width="15%">ID Transaksi</th> <th>Divisi & Tanggal</th>
+                                <th width="20%">ID Transaksi</th> 
+                                <th>Divisi & Tanggal</th>
                                 <th class="text-center">Volume Arsip</th>
-                                <th width="15%">Status</th>
+                                <th width="15%">Status Barang</th>
                                 <th class="text-center" width="15%">Aksi Approval</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            // --- DATA DUMMY (PENGGANTI DATABASE SEMENTARA) ---
+                            // --- DATA DUMMY UPDATE (FORMAT ID BARU) ---
+                            // Format: KODE-YYMMDD-NO (Cth: DAPN-260113-00001)
                             $data_dummy = [
                                 [
                                     'id' => 1,
-                                    'id_transaksi' => 'TRX-2026-001',
+                                    'id_transaksi' => 'DAPN-260113-00001', // Updated
                                     'divisi' => 'DAPN - Divisi Akuntansi & Perpajakan',
                                     'tanggal' => '2026-01-13',
                                     'total_box' => 1,
-                                    'status' => 'Disetujui'
+                                    'status' => 'Diterima' 
                                 ],
                                 [
                                     'id' => 2,
-                                    'id_transaksi' => 'TRX-2026-002',
-                                    'divisi' => 'DTI - Divisi Teknologi Informasi',
+                                    'id_transaksi' => 'DTIS-260113-00001', // Updated (DTI -> DTIS)
+                                    'divisi' => 'DTIS - Divisi Teknologi Informasi',
                                     'tanggal' => '2026-01-13',
                                     'total_box' => 3,
-                                    'status' => 'Pending'
+                                    'status' => 'Pending' 
                                 ],
                                 [
                                     'id' => 3,
-                                    'id_transaksi' => 'TRX-2026-003',
+                                    'id_transaksi' => 'DAPN-260113-00002', // Updated (Urutan ke-2 hari yg sama)
                                     'divisi' => 'DAPN - Divisi Akuntansi & Perpajakan',
                                     'tanggal' => '2026-01-13',
                                     'total_box' => 2,
-                                    'status' => 'Pending'
+                                    'status' => 'Pending' 
                                 ],
                                 [
                                     'id' => 4,
-                                    'id_transaksi' => 'TRX-2026-004',
+                                    'id_transaksi' => 'DPSR-260112-00001', // Updated (Tgl 12 Jan 26 -> 260112)
                                     'divisi' => 'DPSR - Divisi PSR dan Plasma',
                                     'tanggal' => '2026-01-12',
                                     'total_box' => 1,
-                                    'status' => 'Disetujui'
+                                    'status' => 'Diterima'
                                 ],
                                 [
                                     'id' => 5,
-                                    'id_transaksi' => 'TRX-2025-099',
+                                    'id_transaksi' => 'DSMS-251224-00001', // Updated (Tgl 24 Des 25 -> 251224)
                                     'divisi' => 'DSMS - Divisi Sistem Manajemen',
                                     'tanggal' => '2025-12-24',
                                     'total_box' => 1,
@@ -96,14 +98,14 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     
                                     // LOGIKA VOLUME
                                     $box      = $data['total_box'];
-                                    $bantex   = $box * 6; // Rumus: 1 Box = 6 Bantex
+                                    $bantex   = $box * 6; 
                                     $status   = $data['status'];
                             ?>
                                     <tr>
                                         <td class="text-center text-muted"><?= $no++; ?></td>
                                         
                                         <td>
-                                            <span class="badge badge-light border text-dark font-weight-bold" style="font-family: monospace; font-size: 13px;">
+                                            <span class="badge badge-light border text-dark font-weight-bold" style="font-family: monospace; font-size: 13px; letter-spacing: 0.5px;">
                                                 <?= $id_trx ?>
                                             </span>
                                         </td>
@@ -120,25 +122,33 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 
                                         <td>
                                             <?php if ($status == 'Pending') { ?>
-                                                <span class="badge badge-warning text-white"><i class="fas fa-clock mr-1"></i> Menunggu Approval</span>
-                                            <?php } elseif ($status == 'Disetujui') { ?>
-                                                <span class="badge badge-success"><i class="fas fa-check mr-1"></i> Disetujui</span>
+                                                <span class="badge badge-warning text-white shadow-sm" style="font-size: 11px;">
+                                                    <i class="fas fa-truck-loading mr-1"></i> Menunggu Box/Bantek
+                                                </span>
+                                            <?php } elseif ($status == 'Diterima') { ?>
+                                                <span class="badge badge-success shadow-sm" style="font-size: 11px;">
+                                                    <i class="fas fa-box-open mr-1"></i> Box/Bantek Diterima
+                                                </span>
                                             <?php } else { ?>
-                                                <span class="badge badge-danger"><i class="fas fa-times mr-1"></i> Ditolak</span>
+                                                <span class="badge badge-danger shadow-sm" style="font-size: 11px;">
+                                                    <i class="fas fa-times-circle mr-1"></i> Ditolak
+                                                </span>
                                             <?php } ?>
                                         </td>
 
                                         <td class="text-center"> 
                                             <?php if ($status == 'Pending') { ?>
-                                                <button onclick="prosesApproval(<?= $id ?>, 'terima')" class="btn btn-success btn-sm btn-round shadow-sm mr-1" data-toggle="tooltip" title="Terima Pengajuan">
+                                                <button onclick="prosesApproval(<?= $id ?>, 'terima')" class="btn btn-success btn-sm btn-round shadow-sm mr-1" data-toggle="tooltip" title="Terima Barang (ACC)">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                                 
-                                                <button onclick="prosesApproval(<?= $id ?>, 'tolak')" class="btn btn-danger btn-sm btn-round shadow-sm" data-toggle="tooltip" title="Tolak Pengajuan">
+                                                <button onclick="prosesApproval(<?= $id ?>, 'tolak')" class="btn btn-danger btn-sm btn-round shadow-sm" data-toggle="tooltip" title="Tolak / Kembalikan">
                                                     <i class="fas fa-times"></i>
                                                 </button>
+                                            <?php } elseif ($status == 'Diterima') { ?>
+                                                <small class="text-muted font-weight-bold"><i class="fas fa-check-circle text-success"></i> Selesai</small>
                                             <?php } else { ?>
-                                                <small class="text-muted"><i class="fas fa-check-circle text-success"></i> Selesai</small>
+                                                <small class="text-muted">Closed</small>
                                             <?php } ?>
                                         </td>
                                     </tr>
@@ -159,20 +169,59 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('[data-toggle="tooltip"]').tooltip();
         });
 
+        // LOGIKA APPROVAL DENGAN SWEETALERT
         function prosesApproval(id, aksi) {
-            let pesan = aksi === 'terima' ? "Pengajuan akan disetujui." : "Pengajuan akan ditolak.";
-            let warna = aksi === 'terima' ? "success" : "warning";
+            let judul, pesan, icon, tombol;
+
+            if (aksi === 'terima') {
+                judul = "Terima Barang?";
+                pesan = "Pastikan fisik box dan bantex sudah diterima di gudang sesuai data.";
+                icon = "info"; // Ikon Info/Success
+                tombol = "Ya, Barang Diterima";
+            } else {
+                judul = "Tolak Pengajuan?";
+                pesan = "Pengajuan akan dikembalikan ke user untuk diperbaiki.";
+                icon = "warning"; // Ikon Warning
+                tombol = "Ya, Tolak";
+            }
 
             swal({
-                title: "Konfirmasi " + aksi.toUpperCase() + "?",
+                title: judul,
                 text: pesan,
-                icon: warna,
-                buttons: ["Batal", "Ya, Lanjutkan"],
+                icon: icon,
+                buttons: {
+                    cancel: {
+                        text: "Batal",
+                        value: null,
+                        visible: true,
+                        className: "btn btn-secondary",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: tombol,
+                        value: true,
+                        visible: true,
+                        className: aksi === 'terima' ? "btn btn-success" : "btn btn-danger",
+                        closeModal: false
+                    }
+                }
             })
             .then((willProses) => {
                 if (willProses) {
-                    // Redirect simulasi (karena dummy, ini tidak akan mengubah data asli)
-                    window.location.href = "modules/barang-masuk/proses_approval.php?id=" + id + "&aksi=" + aksi;
+                    // Simulasi Loading
+                    swal({
+                        title: "Memproses...",
+                        text: "Mohon tunggu sebentar",
+                        icon: "info",
+                        buttons: false,
+                        closeOnClickOutside: false,
+                    });
+
+                    // Redirect ke proses PHP (Ganti URL sesuai file backend Anda)
+                    // Contoh: modules/barang-masuk/proses_approval.php?id=...
+                    setTimeout(function() {
+                        window.location.href = "modules/barang-masuk/proses_approval.php?id=" + id + "&aksi=" + aksi;
+                    }, 1000);
                 }
             });
         }
