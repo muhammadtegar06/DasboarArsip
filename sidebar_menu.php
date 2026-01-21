@@ -254,7 +254,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=pengiriman_box">
 					<i class='fas fa-tasks'></i>
-					<p>Pengisian Data Box</p>
+					<p>Pengiriman Data Box</p>
 				</a>
 			</li>
 			<?php
