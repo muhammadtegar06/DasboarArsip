@@ -56,7 +56,7 @@ else {
 						</li>
 						<li>
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Dokumen</span>
+								<span class="sub-item">RF-ID Box</span>
 							</a>
 						</li>
 						<!--<li>
@@ -94,7 +94,7 @@ else {
 						</li>
 						<li class="active">
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Dokumen</span>
+								<span class="sub-item">RF-ID Box</span>
 							</a>
 						</li>
 						<!--<li>
@@ -132,7 +132,7 @@ else {
 						</li>
 						<li>
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Dokumen</span>
+								<span class="sub-item">RF-ID Box</span>
 							</a>
 						</li>
 						<!--<li class="active">
@@ -170,7 +170,7 @@ else {
 						</li>
 						<li>
 							<a href="?module=jenis">
-								<span class="sub-item">Jenis Dokumen</span>
+								<span class="sub-item">RF-ID Box</span>
 							</a>
 						</li>
 						<!--<li>
