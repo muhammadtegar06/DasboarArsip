@@ -3,7 +3,7 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 } else {
-?>
+    ?>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-45">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
@@ -32,7 +32,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         <thead class="bg-light">
                             <tr>
                                 <th class="text-center" width="5%">#</th>
-                                <th width="20%">ID Transaksi</th> 
+                                <th width="20%">ID Transaksi</th>
                                 <th>Divisi & Tanggal</th>
                                 <th class="text-center">Volume Arsip</th>
                                 <th width="15%">Status Barang</th>
@@ -41,93 +41,71 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         </thead>
                         <tbody>
                             <?php
-                            // --- DATA DUMMY UPDATE (FORMAT ID BARU) ---
-                            // Format: KODE-YYMMDD-NO (Cth: DAPN-260113-00001)
-                            $data_dummy = [
-                                [
-                                    'id' => 1,
-                                    'id_transaksi' => 'DAPN-260113-00001', // Updated
-                                    'divisi' => 'DAPN - Divisi Akuntansi & Perpajakan',
-                                    'tanggal' => '2026-01-13',
-                                    'total_box' => 1,
-                                    'status' => 'Diterima' 
-                                ],
-                                [
-                                    'id' => 2,
-                                    'id_transaksi' => 'DTIS-260113-00001', // Updated (DTI -> DTIS)
-                                    'divisi' => 'DTIS - Divisi Teknologi Informasi',
-                                    'tanggal' => '2026-01-13',
-                                    'total_box' => 3,
-                                    'status' => 'Pending' 
-                                ],
-                                [
-                                    'id' => 3,
-                                    'id_transaksi' => 'DAPN-260113-00002', // Updated (Urutan ke-2 hari yg sama)
-                                    'divisi' => 'DAPN - Divisi Akuntansi & Perpajakan',
-                                    'tanggal' => '2026-01-13',
-                                    'total_box' => 2,
-                                    'status' => 'Pending' 
-                                ],
-                                [
-                                    'id' => 4,
-                                    'id_transaksi' => 'DPSR-260112-00001', // Updated (Tgl 12 Jan 26 -> 260112)
-                                    'divisi' => 'DPSR - Divisi PSR dan Plasma',
-                                    'tanggal' => '2026-01-12',
-                                    'total_box' => 1,
-                                    'status' => 'Diterima'
-                                ],
-                                [
-                                    'id' => 5,
-                                    'id_transaksi' => 'DSMS-251224-00001', // Updated (Tgl 24 Des 25 -> 251224)
-                                    'divisi' => 'DSMS - Divisi Sistem Manajemen',
-                                    'tanggal' => '2025-12-24',
-                                    'total_box' => 1,
-                                    'status' => 'Ditolak'
-                                ]
-                            ];
+                            // --- QUERY DATABASE UPDATE ---
+                            // Sekarang kita ambil langsung kolom 'jumlah_box' dari tabel pengajuan
+                            $query = mysqli_query($mysqli, "
+                                SELECT 
+                                    p.id AS id_pengajuan,
+                                    p.no_pengajuan,
+                                    p.tanggal_pengajuan,
+                                    p.jumlah_box,        -- Kolom BARU yang ditambahkan
+                                    p.status,
+                                    d.nama_divisi,
+                                    d.singkatan_divisi
+                                FROM tbl_pengajuan p
+                                INNER JOIN tbl_divisi d ON p.id_divisi = d.id
+                                ORDER BY p.id DESC
+                            ");
 
-                            if (empty($data_dummy)) {
+                            if (mysqli_num_rows($query) == 0) {
                                 echo '<tr><td colspan="6" class="text-center py-5 text-muted">Belum ada pengajuan masuk.</td></tr>';
                             } else {
                                 $no = 1;
-                                foreach ($data_dummy as $data) {
-                                    $id       = $data['id'];
-                                    $id_trx   = $data['id_transaksi'];
-                                    $divisi   = $data['divisi'];
-                                    $tanggal  = date('d M Y', strtotime($data['tanggal']));
-                                    
-                                    // LOGIKA VOLUME
-                                    $box      = $data['total_box'];
-                                    $bantex   = $box * 6; 
-                                    $status   = $data['status'];
-                            ?>
+                                while ($data = mysqli_fetch_assoc($query)) {
+                                    $id = $data['id_pengajuan'];
+                                    $id_trx = $data['no_pengajuan'];
+
+                                    // Format Divisi & Tanggal
+                                    $divisi = $data['singkatan_divisi'] . " - " . $data['nama_divisi'];
+                                    $tanggal = date('d M Y', strtotime($data['tanggal_pengajuan']));
+
+                                    // LOGIKA VOLUME (Rule: 1 Box = 6 Bantex)
+                                    // Mengambil langsung dari kolom database baru
+                                    $box = $data['jumlah_box'];
+                                    $bantex = $box * 6;
+
+                                    $status = $data['status'];
+                                    ?>
                                     <tr>
                                         <td class="text-center text-muted"><?= $no++; ?></td>
-                                        
+
                                         <td>
-                                            <span class="badge badge-light border text-dark font-weight-bold" style="font-family: monospace; font-size: 13px; letter-spacing: 0.5px;">
+                                            <span class="badge badge-light border text-dark font-weight-bold"
+                                                style="font-family: monospace; font-size: 13px; letter-spacing: 0.5px;">
                                                 <?= $id_trx ?>
                                             </span>
                                         </td>
 
                                         <td>
                                             <div class="font-weight-bold text-dark"><?= $divisi ?></div>
-                                            <div class="small text-muted"><i class="far fa-calendar-alt mr-1"></i> <?= $tanggal ?></div>
+                                            <div class="small text-muted"><i class="far fa-calendar-alt mr-1"></i> <?= $tanggal ?>
+                                            </div>
                                         </td>
 
                                         <td class="text-center">
                                             <h5 class="mb-0 font-weight-bold text-dark"><?= $box ?> Box</h5>
-                                            <small class="text-muted text-primary font-weight-bold">(Estimasi <?= $bantex ?> Bantex)</small>
+                                            <small class="text-muted text-primary font-weight-bold">(Estimasi <?= $bantex ?>
+                                                Bantex)</small>
                                         </td>
 
                                         <td>
                                             <?php if ($status == 'Pending') { ?>
                                                 <span class="badge badge-warning text-white shadow-sm" style="font-size: 11px;">
-                                                    <i class="fas fa-truck-loading mr-1"></i> Menunggu Box/Bantek
+                                                    <i class="fas fa-truck-loading mr-1"></i> Menunggu Approval
                                                 </span>
-                                            <?php } elseif ($status == 'Diterima') { ?>
+                                            <?php } elseif ($status == 'Disetujui' || $status == 'Diterima') { ?>
                                                 <span class="badge badge-success shadow-sm" style="font-size: 11px;">
-                                                    <i class="fas fa-box-open mr-1"></i> Box/Bantek Diterima
+                                                    <i class="fas fa-box-open mr-1"></i> Disetujui
                                                 </span>
                                             <?php } else { ?>
                                                 <span class="badge badge-danger shadow-sm" style="font-size: 11px;">
@@ -136,25 +114,30 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                             <?php } ?>
                                         </td>
 
-                                        <td class="text-center"> 
+                                        <td class="text-center">
                                             <?php if ($status == 'Pending') { ?>
-                                                <button onclick="prosesApproval(<?= $id ?>, 'terima')" class="btn btn-success btn-sm btn-round shadow-sm mr-1" data-toggle="tooltip" title="Terima Barang (ACC)">
+                                                <button onclick="prosesApproval(<?= $id ?>, 'terima')"
+                                                    class="btn btn-success btn-sm btn-round shadow-sm mr-1" data-toggle="tooltip"
+                                                    title="Setujui Pengajuan">
                                                     <i class="fas fa-check"></i>
                                                 </button>
-                                                
-                                                <button onclick="prosesApproval(<?= $id ?>, 'tolak')" class="btn btn-danger btn-sm btn-round shadow-sm" data-toggle="tooltip" title="Tolak / Kembalikan">
+
+                                                <button onclick="prosesApproval(<?= $id ?>, 'tolak')"
+                                                    class="btn btn-danger btn-sm btn-round shadow-sm" data-toggle="tooltip"
+                                                    title="Tolak Pengajuan">
                                                     <i class="fas fa-times"></i>
                                                 </button>
-                                            <?php } elseif ($status == 'Diterima') { ?>
-                                                <small class="text-muted font-weight-bold"><i class="fas fa-check-circle text-success"></i> Selesai</small>
+                                            <?php } elseif ($status == 'Disetujui' || $status == 'Diterima') { ?>
+                                                <small class="text-muted font-weight-bold"><i
+                                                        class="fas fa-check-circle text-success"></i> Selesai</small>
                                             <?php } else { ?>
                                                 <small class="text-muted">Closed</small>
                                             <?php } ?>
                                         </td>
                                     </tr>
-                            <?php 
-                                } 
-                            } 
+                                    <?php
+                                }
+                            }
                             ?>
                         </tbody>
                     </table>
@@ -163,65 +146,77 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
         </div>
     </div>
 
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
 
-        // LOGIKA APPROVAL DENGAN SWEETALERT
         function prosesApproval(id, aksi) {
-            let judul, pesan, icon, tombol;
+            let judul, pesan, icon, warnaConfirm;
 
             if (aksi === 'terima') {
-                judul = "Terima Barang?";
-                pesan = "Pastikan fisik box dan bantex sudah diterima di gudang sesuai data.";
-                icon = "info"; // Ikon Info/Success
-                tombol = "Ya, Barang Diterima";
+                judul = "Setujui Pengajuan?";
+                pesan = "Setelah box disetujui, maka box akan masuk ke bagian Pengisian Box.";
+                icon = "question";
+                warnaConfirm = "#28a745"; // Hijau
+                teksTombol = "Ya, Terima";
             } else {
                 judul = "Tolak Pengajuan?";
-                pesan = "Pengajuan akan dikembalikan ke user untuk diperbaiki.";
-                icon = "warning"; // Ikon Warning
-                tombol = "Ya, Tolak";
+                pesan = "Pengajuan akan dikembalikan ke user.";
+                icon = "warning";
+                warnaConfirm = "#dc3545"; // Merah
+                teksTombol = "Ya, Tolak";
             }
 
-            swal({
+            // 1. TAMPILKAN KONFIRMASI
+            Swal.fire({
                 title: judul,
                 text: pesan,
                 icon: icon,
-                buttons: {
-                    cancel: {
-                        text: "Batal",
-                        value: null,
-                        visible: true,
-                        className: "btn btn-secondary",
-                        closeModal: true,
-                    },
-                    confirm: {
-                        text: tombol,
-                        value: true,
-                        visible: true,
-                        className: aksi === 'terima' ? "btn btn-success" : "btn btn-danger",
-                        closeModal: false
-                    }
-                }
-            })
-            .then((willProses) => {
-                if (willProses) {
-                    // Simulasi Loading
-                    swal({
-                        title: "Memproses...",
-                        text: "Mohon tunggu sebentar",
-                        icon: "info",
-                        buttons: false,
-                        closeOnClickOutside: false,
+                showCancelButton: true,
+                confirmButtonColor: warnaConfirm,
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: teksTombol,
+                cancelButtonText: 'Batal',
+                reverseButtons: true, // Tombol aksi di kanan
+                backdrop: `
+                    rgba(0,0,123,0.4)
+                `
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    // 2. TAMPILKAN LOADING (SPINNER BERPUTAR)
+                    let timerInterval;
+                    Swal.fire({
+                        title: 'Sedang Memproses...',
+                        html: 'Mohon tunggu, data sedang diupdate.',
+                        timer: 1000, // Simulasi loading 1 detik
+                        timerProgressBar: true,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading(); // Memunculkan Spinner Loading
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval);
+                        }
+                    }).then((result) => {
+                        // 3. SETELAH LOADING SELESAI -> MUNCUL SUKSES
+                        if (result.dismiss === Swal.DismissReason.timer) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Data berhasil disimpan.',
+                                icon: 'success',
+                                showConfirmButton: false, // Hilangkan tombol OK
+                                timer: 1500 // Otomatis tutup dalam 1.5 detik
+                            }).then(() => {
+                                // 4. REDIRECT HALAMAN
+                                window.location.href = "modules/barang-masuk/proses_approval.php?id=" + id + "&aksi=" + aksi;
+                            });
+                        }
                     });
 
-                    // Redirect ke proses PHP (Ganti URL sesuai file backend Anda)
-                    // Contoh: modules/barang-masuk/proses_approval.php?id=...
-                    setTimeout(function() {
-                        window.location.href = "modules/barang-masuk/proses_approval.php?id=" + id + "&aksi=" + aksi;
-                    }, 1000);
                 }
             });
         }
