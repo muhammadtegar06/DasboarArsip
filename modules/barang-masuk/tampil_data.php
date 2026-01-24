@@ -32,8 +32,9 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         <thead class="bg-light">
                             <tr>
                                 <th class="text-center" width="5%">#</th>
-                                <th width="20%">ID Transaksi</th>
+                                <th width="15%">ID Transaksi</th>
                                 <th>Divisi & Tanggal</th>
+                                <th class="text-center">Dokumen</th>
                                 <th class="text-center">Volume Arsip</th>
                                 <th width="15%">Status Barang</th>
                                 <th class="text-center" width="15%">Aksi Approval</th>
@@ -41,14 +42,14 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         </thead>
                         <tbody>
                             <?php
-                            // --- QUERY DATABASE UPDATE ---
-                            // Sekarang kita ambil langsung kolom 'jumlah_box' dari tabel pengajuan
+                            // QUERY DATABASE
                             $query = mysqli_query($mysqli, "
                                 SELECT 
                                     p.id AS id_pengajuan,
                                     p.no_pengajuan,
                                     p.tanggal_pengajuan,
-                                    p.jumlah_box,        -- Kolom BARU yang ditambahkan
+                                    p.jumlah_box,
+                                    p.file_surat,
                                     p.status,
                                     d.nama_divisi,
                                     d.singkatan_divisi
@@ -58,23 +59,21 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             ");
 
                             if (mysqli_num_rows($query) == 0) {
-                                echo '<tr><td colspan="6" class="text-center py-5 text-muted">Belum ada pengajuan masuk.</td></tr>';
+                                echo '<tr><td colspan="7" class="text-center py-5 text-muted">Belum ada pengajuan masuk.</td></tr>';
                             } else {
                                 $no = 1;
                                 while ($data = mysqli_fetch_assoc($query)) {
                                     $id = $data['id_pengajuan'];
                                     $id_trx = $data['no_pengajuan'];
-
-                                    // Format Divisi & Tanggal
                                     $divisi = $data['singkatan_divisi'] . " - " . $data['nama_divisi'];
                                     $tanggal = date('d M Y', strtotime($data['tanggal_pengajuan']));
-
-                                    // LOGIKA VOLUME (Rule: 1 Box = 6 Bantex)
-                                    // Mengambil langsung dari kolom database baru
                                     $box = $data['jumlah_box'];
                                     $bantex = $box * 6;
-
                                     $status = $data['status'];
+
+                                    // LOGIKA TOMBOL SURAT
+                                    $file_surat = $data['file_surat'];
+                                    $path_surat = "uploads/surat/" . $file_surat;
                                     ?>
                                     <tr>
                                         <td class="text-center text-muted"><?= $no++; ?></td>
@@ -93,8 +92,29 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         </td>
 
                                         <td class="text-center">
+                                            <?php
+                                            // 1. Tentukan Path
+                                            $folder = "uploads/surat/";
+                                            $file_db = $data['file_surat'];
+                                            $target_cek = $folder . $file_db;
+
+                                            // 2. Cek Apakah File Fisik Benar-Benar Ada?
+                                            $cek_fisik = file_exists($target_cek);
+                                            ?>
+
+                                            <?php if ($cek_fisik && !empty($file_db)) { ?>
+                                                <a href="<?= $target_cek ?>" target="_blank"
+                                                    class="btn btn-sm btn-round btn-outline-primary shadow-sm font-weight-bold"
+                                                    data-toggle="tooltip" title="Preview Dokumen"
+                                                    style="border-width: 1px; padding: 5px 15px;">
+                                                    <i class="fas fa-file-pdf mr-1"></i> Lihat Surat
+                                                </a>
+                                            <?php } ?>
+                                        </td>
+
+                                        <td class="text-center">
                                             <h5 class="mb-0 font-weight-bold text-dark"><?= $box ?> Box</h5>
-                                            <small class="text-muted text-primary font-weight-bold">(Estimasi <?= $bantex ?>
+                                            <small class="text-muted text-primary font-weight-bold">(Est. <?= $bantex ?>
                                                 Bantex)</small>
                                         </td>
 
@@ -147,30 +167,28 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
 
         function prosesApproval(id, aksi) {
-            let judul, pesan, icon, warnaConfirm;
+            let judul, pesan, icon, warnaConfirm, teksTombol;
 
             if (aksi === 'terima') {
                 judul = "Setujui Pengajuan?";
-                pesan = "Setelah box disetujui, maka box akan masuk ke bagian Pengisian Box.";
+                pesan = "Anda akan menerima box ini masuk ke gudang.";
                 icon = "question";
-                warnaConfirm = "#28a745"; // Hijau
+                warnaConfirm = "#28a745";
                 teksTombol = "Ya, Terima";
             } else {
                 judul = "Tolak Pengajuan?";
                 pesan = "Pengajuan akan dikembalikan ke user.";
                 icon = "warning";
-                warnaConfirm = "#dc3545"; // Merah
+                warnaConfirm = "#dc3545";
                 teksTombol = "Ya, Tolak";
             }
 
-            // 1. TAMPILKAN KONFIRMASI
             Swal.fire({
                 title: judul,
                 text: pesan,
@@ -180,43 +198,31 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: teksTombol,
                 cancelButtonText: 'Batal',
-                reverseButtons: true, // Tombol aksi di kanan
-                backdrop: `
-                    rgba(0,0,123,0.4)
-                `
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-
-                    // 2. TAMPILKAN LOADING (SPINNER BERPUTAR)
                     let timerInterval;
                     Swal.fire({
                         title: 'Sedang Memproses...',
-                        html: 'Mohon tunggu, data sedang diupdate.',
-                        timer: 1000, // Simulasi loading 1 detik
+                        html: 'Mohon tunggu sebentar.',
+                        timer: 1000,
                         timerProgressBar: true,
                         allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading(); // Memunculkan Spinner Loading
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval);
-                        }
+                        didOpen: () => { Swal.showLoading(); },
+                        willClose: () => { clearInterval(timerInterval); }
                     }).then((result) => {
-                        // 3. SETELAH LOADING SELESAI -> MUNCUL SUKSES
                         if (result.dismiss === Swal.DismissReason.timer) {
                             Swal.fire({
                                 title: 'Berhasil!',
                                 text: 'Data berhasil disimpan.',
                                 icon: 'success',
-                                showConfirmButton: false, // Hilangkan tombol OK
-                                timer: 1500 // Otomatis tutup dalam 1.5 detik
+                                showConfirmButton: false,
+                                timer: 1500
                             }).then(() => {
-                                // 4. REDIRECT HALAMAN
                                 window.location.href = "modules/barang-masuk/proses_approval.php?id=" + id + "&aksi=" + aksi;
                             });
                         }
                     });
-
                 }
             });
         }
