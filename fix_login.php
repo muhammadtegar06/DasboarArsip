@@ -7,7 +7,7 @@ echo "<h3>Perbaikan Akun Admin...</h3>";
 $cek_kolom = mysqli_query($mysqli, "SHOW COLUMNS FROM tbl_user LIKE 'id'");
 if (mysqli_num_rows($cek_kolom) > 0) {
     $pk = "id";
-} else {    
+} else {
     $pk = "id_user";
 }
 echo "Nama kolom Primary Key di database Anda adalah: <b>$pk</b><br>";
