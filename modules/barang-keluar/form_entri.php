@@ -218,7 +218,7 @@ if (!$header) {
                     <div>
                         <h6 class="font-weight-bold text-dark mb-0" id="modal_nama_bantex">-</h6>
                         <small class="text-muted">Isi detail dokumen sesuai arsip fisik.</small>
-                    </div>
+                    </div> x
                 </div>
 
                 <div class="card shadow-sm border mb-4">
