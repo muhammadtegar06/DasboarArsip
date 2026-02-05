@@ -41,37 +41,7 @@ try {
 
 
     // -----------------------------------------------------------------
-    // LANGKAH 2: PROSES UPLOAD FILE SURAT
-    // -----------------------------------------------------------------
-    $file_surat_name = null;
-
-    // Cek apakah ada file yang diupload dan tidak error
-    if (isset($_FILES['file_surat']) && $_FILES['file_surat']['error'] == 0) {
-        $target_dir = "../../uploads/surat/";
-
-        // Buat folder jika belum ada
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true);
-        }
-
-        // Ambil ekstensi file (pdf/jpg)
-        $ext = pathinfo($_FILES['file_surat']['name'], PATHINFO_EXTENSION);
-
-        // Nama file baru disesuaikan dengan ID Transaksi agar rapi (TRX_2026_001.pdf)
-        $new_name = str_replace(['-', ' '], '_', $no_pengajuan) . '.' . $ext;
-        $target_file = $target_dir . $new_name;
-
-        // Pindahkan file dari folder sementara ke folder tujuan
-        if (move_uploaded_file($_FILES['file_surat']['tmp_name'], $target_file)) {
-            $file_surat_name = $new_name;
-        } else {
-            throw new Exception("Gagal mengupload file surat. Cek permission folder.");
-        }
-    }
-
-
-    // -----------------------------------------------------------------
-    // LANGKAH 3: CARI ID DIVISI
+    // LANGKAH 2: CARI ID DIVISI (Langkah Upload File Dihapus)
     // -----------------------------------------------------------------
     $q_div = mysqli_query($mysqli, "SELECT id FROM tbl_divisi WHERE singkatan_divisi = '$kode_divisi'");
     $d_div = mysqli_fetch_assoc($q_div);
@@ -83,12 +53,12 @@ try {
 
 
     // -----------------------------------------------------------------
-    // LANGKAH 4: INSERT HEADER PENGAJUAN
+    // LANGKAH 3: INSERT HEADER PENGAJUAN (Tanpa file_surat)
     // -----------------------------------------------------------------
     $q_header = "INSERT INTO tbl_pengajuan 
-                 (no_pengajuan, id_divisi, tanggal_pengajuan, jumlah_box, file_surat, status) 
+                 (no_pengajuan, id_divisi, tanggal_pengajuan, jumlah_box, status) 
                  VALUES 
-                 ('$no_pengajuan', '$id_divisi', '$tanggal', '$jumlah_box', '$file_surat_name', 'Pending')";
+                 ('$no_pengajuan', '$id_divisi', '$tanggal', '$jumlah_box', 'Pending')";
 
     if (!mysqli_query($mysqli, $q_header)) {
         throw new Exception("Gagal simpan Header Pengajuan: " . mysqli_error($mysqli));
@@ -99,12 +69,11 @@ try {
 
 
     // -----------------------------------------------------------------
-    // LANGKAH 5: GENERATE BOX & BANTEX KOSONG
+    // LANGKAH 4: GENERATE BOX & BANTEX KOSONG
     // -----------------------------------------------------------------
     for ($i = 1; $i <= $jumlah_box; $i++) {
 
         // Insert Box (Detail Level 1)
-        // Keterangan box dihapus karena kode box nanti diisi saat ACC (ref_id/kode_box)
         $q_box = "INSERT INTO tbl_box (id_pengajuan, lokasi_arsip, status_acc) 
                   VALUES ('$id_pengajuan', '$lokasi', 'Pending')";
 
@@ -136,11 +105,6 @@ try {
 } catch (Exception $e) {
     // Jika ada error, batalkan semua perubahan database
     mysqli_rollback($mysqli);
-
-    // Hapus file yang terlanjur diupload jika database gagal
-    if ($file_surat_name && file_exists("../../uploads/surat/" . $file_surat_name)) {
-        unlink("../../uploads/surat/" . $file_surat_name);
-    }
 
     echo json_encode([
         'status' => 'error',

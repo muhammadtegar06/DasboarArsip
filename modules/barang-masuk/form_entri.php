@@ -33,8 +33,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                     </div>
 
                     <div class="card-body p-4">
-                        <form id="formPengajuan" enctype="multipart/form-data">
-
+                        <form id="formPengajuan">
                             <div class="row mb-4">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -42,7 +41,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                                 class="text-danger">*</span></label>
                                         <select id="divisi" name="divisi"
                                             class="form-control select2-single font-weight-bold text-dark"
-                                            style="height: 45px; style=" width:100%>
+                                            style="height: 45px; width:100%">
                                             <option value="">-- Pilih Divisi --</option>
                                             <?php
                                             // AMBIL DATA REAL DARI DATABASE
@@ -65,7 +64,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                 </div>
                             </div>
 
-                            <div class="row mb-4 bg-light rounded p-3 mx-1 border">
+                            <div class="row mb-5 bg-light rounded p-3 mx-1 border">
                                 <div class="col-md-6 border-right">
                                     <div class="form-group">
                                         <label class="font-weight-bold text-uppercase small text-primary">Jumlah Box
@@ -89,37 +88,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         <h2 class="font-weight-bold text-success mb-0" id="displayBantex">0</h2>
                                         <small class="text-success font-weight-bold">(1 Box = 6 Bantex)</small>
                                         <input type="hidden" id="estimasi_bantex" name="estimasi_bantex" value="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-5">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="font-weight-bold text-uppercase small text-dark">Upload Surat
-                                            Pengantar / Memo <span class="text-danger">*</span></label>
-
-                                        <div class="custom-file-upload text-center border p-4 rounded bg-white"
-                                            style="border: 2px dashed #d1d3e2 !important; cursor: pointer;"
-                                            onclick="document.getElementById('file_surat').click()">
-                                            <input type="file" id="file_surat" name="file_surat"
-                                                accept=".pdf,.jpg,.png,.jpeg" style="display: none;"
-                                                onchange="previewFile()">
-
-                                            <div id="uploadPlaceholder">
-                                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
-                                                <h5 class="font-weight-bold text-dark">Klik untuk Upload Surat</h5>
-                                                <p class="text-muted small mb-0">Format: PDF atau Gambar (JPG/PNG). Maksimal
-                                                    5MB.</p>
-                                            </div>
-
-                                            <div id="fileInfo" style="display: none;">
-                                                <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
-                                                <h5 class="font-weight-bold text-dark" id="fileName">Nama File.pdf</h5>
-                                                <button type="button" class="btn btn-sm btn-outline-danger btn-round mt-2"
-                                                    onclick="resetFile(event)">Hapus File</button>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -165,34 +133,9 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             document.getElementById('estimasi_bantex').value = bantex;
         }
 
-        // 2. Preview Nama File Upload
-        function previewFile() {
-            let input = document.getElementById('file_surat');
-            if (input.files && input.files[0]) {
-                let file = input.files[0];
+        // FUNGSI PREVIEW FILE & RESET FILE DIHAPUS
 
-                // Validasi Ukuran (Max 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    Swal.fire('Gagal', 'Ukuran file terlalu besar (Max 5MB)', 'error');
-                    input.value = '';
-                    return;
-                }
-
-                document.getElementById('uploadPlaceholder').style.display = 'none';
-                document.getElementById('fileInfo').style.display = 'block';
-                document.getElementById('fileName').innerText = file.name;
-            }
-        }
-
-        // 3. Reset File
-        function resetFile(event) {
-            event.stopPropagation(); // Mencegah trigger klik parent
-            document.getElementById('file_surat').value = '';
-            document.getElementById('uploadPlaceholder').style.display = 'block';
-            document.getElementById('fileInfo').style.display = 'none';
-        }
-
-        // 4. Proses Submit dengan AJAX & SweetAlert2
+        // 2. Proses Submit dengan AJAX & SweetAlert2
         function submitPengajuan() {
             let form = document.getElementById('formPengajuan');
             let formData = new FormData(form);
@@ -200,7 +143,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             // Validasi Manual
             if (formData.get('divisi') === "") { Swal.fire('Peringatan', 'Pilih Divisi terlebih dahulu', 'warning'); return; }
             if (formData.get('jumlah_box') === "") { Swal.fire('Peringatan', 'Isi Jumlah Box', 'warning'); return; }
-            if (document.getElementById('file_surat').files.length === 0) { Swal.fire('Peringatan', 'Upload Surat Pengantar wajib diisi', 'warning'); return; }
+
+            // VALIDASI FILE SURAT SUDAH DIHAPUS
 
             // Konfirmasi
             Swal.fire({
