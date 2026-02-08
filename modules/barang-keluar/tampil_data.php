@@ -3,7 +3,7 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 } else {
-    ?>
+?>
 
     <style>
         /* --- Stylesheet Khusus --- */
@@ -33,6 +33,27 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             color: #0e7490;
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Badge Status Styles */
+        .badge-pill-custom {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-soft-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-soft-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
         }
 
         /* Kartu Statistik & Modal */
@@ -65,36 +86,12 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             font-size: 24px;
         }
 
-        .theme-cyan .icon-circle-modern {
-            background-color: #ccfbf1;
-            color: #0f766e;
-        }
-
-        .theme-green .icon-circle-modern {
-            background-color: #dcfce7;
-            color: #15803d;
-        }
-
-        .theme-orange .icon-circle-modern {
-            background-color: #ffedd5;
-            color: #c2410c;
-        }
-
-        .stat-number-modern {
-            font-size: 36px;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 4px;
-            line-height: 1;
-        }
-
-        .stat-label-modern {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
+        .theme-cyan .icon-circle-modern { background-color: #ccfbf1; color: #0f766e; }
+        .theme-green .icon-circle-modern { background-color: #dcfce7; color: #15803d; }
+        
+        .stat-number-modern { font-size: 36px; font-weight: 800; color: #111827; margin-bottom: 4px; line-height: 1; }
+        .stat-label-modern { font-size: 14px; color: #6b7280; font-weight: 600; letter-spacing: 0.3px; }
+        
         .avatar-divisi {
             width: 45px;
             height: 45px;
@@ -109,87 +106,19 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             box-shadow: 0 4px 6px rgba(118, 75, 162, 0.3);
         }
 
-        .badge-pill-custom {
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 11px;
-        }
-
-        .badge-soft-success {
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-
         /* Modal View */
-        .modal-content-elegant {
-            border: none;
-            border-radius: 24px;
-            overflow: hidden;
-        }
-
-        .modal-header-elegant {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            padding: 25px;
-            border: none;
-        }
-
-        .modal-body-elegant {
-            background-color: #f9fafb;
-            padding: 40px;
-            min-height: 500px;
-        }
-
-        .view-section {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .view-section.active {
-            display: block;
-            opacity: 1;
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .item-card {
-            background: white;
-            border-radius: 15px;
-            border: 1px solid #f1f5f9;
-        }
-
-        .item-icon-wrapper {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-
-        .bg-icon-box {
-            background-color: #fff7ed;
-            color: #ea580c;
-        }
-
-        .bg-icon-bantex {
-            background-color: #eff6ff;
-            color: #2563eb;
-        }
+        .modal-content-elegant { border: none; border-radius: 24px; overflow: hidden; }
+        .modal-header-elegant { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 25px; border: none; }
+        .modal-body-elegant { background-color: #f9fafb; padding: 40px; min-height: 500px; }
+        
+        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .view-section.active { display: block; opacity: 1; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .item-card { background: white; border-radius: 15px; border: 1px solid #f1f5f9; }
+        .item-icon-wrapper { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .bg-icon-box { background-color: #fff7ed; color: #ea580c; }
+        .bg-icon-bantex { background-color: #eff6ff; color: #2563eb; }
     </style>
 
     <div class="panel-header bg-primary-gradient">
@@ -208,7 +137,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             <div class="card-header bg-white border-0 pt-4 pb-2" style="border-radius: 15px 15px 0 0;">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="card-title font-weight-bold text-dark">Daftar Box Siap Input</h4>
-                    <span class="badge badge-success px-3 py-2 shadow-sm">Status: Approved</span>
                 </div>
             </div>
             <div class="card-body">
@@ -219,13 +147,13 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                 <th class="text-center py-3 border-0 rounded-left">No.</th>
                                 <th class="py-3 border-0">Divisi & Tanggal</th>
                                 <th class="text-center py-3 border-0">Volume</th>
-                                <th class="text-center py-3 border-0">Status</th>
+                                <th class="text-center py-3 border-0">Progres Input</th>
                                 <th class="text-center py-3 border-0 rounded-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            // --- QUERY MODIFIED: HANYA MENAMPILKAN STATUS 'Disetujui' ---
+                            // --- QUERY MODIFIED: Tambah hitung box yg RFID nya kosong (pending_rfid) ---
                             $query = mysqli_query($mysqli, "
                                 SELECT 
                                     p.id, 
@@ -237,7 +165,13 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     d.singkatan_divisi,
                                     (SELECT COUNT(*) FROM tbl_bantex b 
                                      JOIN tbl_box bx ON b.id_box = bx.id 
-                                     WHERE bx.id_pengajuan = p.id) as total_bantex
+                                     WHERE bx.id_pengajuan = p.id) as total_bantex,
+                                    
+                                    -- Subquery Cek Berapa Box yang RFID-nya masih Kosong/NULL
+                                    (SELECT COUNT(*) FROM tbl_box bx2 
+                                     WHERE bx2.id_pengajuan = p.id 
+                                     AND (bx2.rfid_code IS NULL OR bx2.rfid_code = '')) as pending_rfid
+
                                 FROM tbl_pengajuan p
                                 JOIN tbl_divisi d ON p.id_divisi = d.id
                                 WHERE p.status = 'Disetujui' OR p.status = 'Diterima'
@@ -255,60 +189,76 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     $tanggal = date('d M Y', strtotime($data['tanggal_pengajuan']));
                                     $total_box = $data['jumlah_box'];
                                     $total_bantex = $data['total_bantex'];
-                                    $status = $data['status'];
-                                    ?>
-                                    <tr>
-                                        <td class="text-center font-weight-bold text-muted"><?= $no++; ?></td>
+                                    
+                                    // LOGIKA STATUS
+                                    $pending_rfid = $data['pending_rfid'];
+                                    
+                                    if ($pending_rfid == 0 && $total_box > 0) {
+                                        // Semua box sudah ada RFID
+                                        $status_label = '<span class="badge badge-pill-custom badge-soft-success"><i class="fas fa-check-double mr-1"></i> SELESAI DIINPUT</span>';
+                                        $btn_text = "Edit Data";
+                                        $btn_icon = "fa-edit";
+                                    } else {
+                                        // Masih ada box yg kosong RFID-nya
+                                        $status_label = '<span class="badge badge-pill-custom badge-soft-warning"><i class="fas fa-clock mr-1"></i> SIAP INPUT</span>';
+                                        $btn_text = "Input";
+                                        $btn_icon = "fa-plus";
+                                    }
+                            ?>
+                                <tr>
+                                    <td class="text-center font-weight-bold text-muted"><?= $no++; ?></td>
 
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-divisi mr-3"><?= $singkatan ?></div>
-                                                <div>
-                                                    <div class="font-weight-bold text-dark"><?= $divisi ?></div>
-                                                    <div class="small text-muted"><i class="far fa-calendar-alt mr-1"></i>
-                                                        <?= $tanggal ?></div>
-                                                    <div class="small text-primary mt-1" style="font-family: monospace;">
-                                                        <?= $id_trx ?>
-                                                    </div>
-                                                </div>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-divisi mr-3"><?= $singkatan ?></div>
+                                            <div>
+                                                <div class="font-weight-bold text-dark"><?= $divisi ?></div>
+                                                <div class="small text-muted"><i class="far fa-calendar-alt mr-1"></i> <?= $tanggal ?></div>
+                                                <div class="small text-primary mt-1" style="font-family: monospace;"><?= $id_trx ?></div>
                                             </div>
-                                        </td>
+                                        </div>
+                                    </td>
 
-                                        <td class="text-center">
-                                            <div class="badge badge-light border px-3 py-2">
-                                                <i class="fas fa-box text-warning mr-1"></i> <?= $total_box ?> Box
-                                                <span class="mx-1 text-muted">|</span>
-                                                <i class="fas fa-folder text-primary mr-1"></i> <?= $total_bantex ?> Bantex
+                                    <td class="text-center">
+                                        <div class="badge badge-light border px-3 py-2">
+                                            <i class="fas fa-box text-warning mr-1"></i> <?= $total_box ?> Box
+                                            <span class="mx-1 text-muted">|</span>
+                                            <i class="fas fa-folder text-primary mr-1"></i> <?= $total_bantex ?> Bantex
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <?= $status_label ?>
+                                        <?php if($pending_rfid > 0): ?>
+                                            <div class="mt-1 small text-danger font-weight-bold">
+                                                (<?= $pending_rfid ?> Box belum diisi RFID)
                                             </div>
-                                        </td>
+                                        <?php endif; ?>
+                                    </td>
 
-                                        <td class="text-center">
-                                            <span class="badge badge-pill-custom badge-soft-success">SIAP INPUT</span>
-                                        </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center align-items-center" style="gap: 8px;">
 
-                                        <td class="text-center">
-                                            <div class="d-flex justify-content-center align-items-center" style="gap: 8px;">
+                                            <button type="button"
+                                                onclick="bukaModalLihat('<?= $singkatan ?>', <?= $total_box ?>, <?= $total_bantex ?>)"
+                                                class="btn btn-soft-info btn-round btn-sm font-weight-bold px-3"
+                                                data-toggle="tooltip" title="Lihat Struktur">
+                                                <i class="fas fa-eye mr-1"></i> Lihat
+                                            </button>
 
-                                                <button type="button"
-                                                    onclick="bukaModalLihat('<?= $singkatan ?>', <?= $total_box ?>, <?= $total_bantex ?>)"
-                                                    class="btn btn-soft-info btn-round btn-sm font-weight-bold px-3"
-                                                    data-toggle="tooltip" title="Lihat Struktur">
-                                                    <i class="fas fa-eye mr-1"></i> Lihat
-                                                </button>
+                                            <a href="?module=form_entri_barang_keluar&id=<?= $data['id'] ?>"
+                                                class="btn btn-soft-primary btn-round btn-sm font-weight-bold px-3"
+                                                data-toggle="tooltip" title="Kelola Data">
+                                                <i class="fas <?= $btn_icon ?> mr-1"></i> <?= $btn_text ?>
+                                            </a>
 
-                                                <a href="?module=form_entri_barang_keluar&id=<?= $data['id'] ?>"
-                                                    class="btn btn-soft-primary btn-round btn-sm font-weight-bold px-3"
-                                                    data-toggle="tooltip" title="Input Dokumen & RFID">
-                                                    <i class="fas fa-plus mr-1"></i> Input
-                                                </a>
+                                        </div>
+                                    </td>
 
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                    <?php
-                                }
-                            }
+                                </tr>
+                            <?php 
+                                } 
+                            } 
                             ?>
                         </tbody>
                     </table>

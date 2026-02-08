@@ -54,11 +54,6 @@ else {
 								<span class="sub-item">Data Dokumen (all)</span>
 							</a>
 						</li>
-						<li>
-							<a href="?module=jenis">
-								<span class="sub-item">RF-ID Box</span>
-							</a>
-						</li>
 						<!--<li>
 							<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
@@ -90,11 +85,6 @@ else {
 						<li>
 							<a href="?module=barang">
 								<span class="sub-item">Data Dokumen (all)</span>
-							</a>
-						</li>
-						<li class="active">
-							<a href="?module=jenis">
-								<span class="sub-item">RF-ID Box</span>
 							</a>
 						</li>
 						<!--<li>
@@ -130,11 +120,6 @@ else {
 								<span class="sub-item">Data Dokumen (all)</span>
 							</a>
 						</li>
-						<li>
-							<a href="?module=jenis">
-								<span class="sub-item">RF-ID Box</span>
-							</a>
-						</li>
 						<!--<li class="active">
 							<a href="?module=satuan">
 								<span class="sub-item">Satuan</span>
@@ -166,11 +151,6 @@ else {
 						<li>
 							<a href="?module=barang">
 								<span class="sub-item">Data Dokumen (all)</span>
-							</a>
-						</li>
-						<li>
-							<a href="?module=jenis">
-								<span class="sub-item">RF-ID Box</span>
 							</a>
 						</li>
 						<!--<li>
