@@ -227,10 +227,10 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         </div>
                                     </td>
 
-                                    <td class="text-center">
+                                    <td title="" class="text-center">
                                         <?= $status_label ?>
                                         <?php if($pending_rfid > 0): ?>
-                                            <div class="mt-1 small text-danger font-weight-bold">
+                                            <div title="jika seluru box sudah penuh maka status akan berubah" class="mt-1 small text-danger font-weight-bold">
                                                 (<?= $pending_rfid ?> Box belum diisi RFID)
                                             </div>
                                         <?php endif; ?>
