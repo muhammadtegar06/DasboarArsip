@@ -182,15 +182,15 @@ if (!$header) {
                         <div>
                             <h6 class="font-weight-bold text-warning mb-0"><i class="fas fa-barcode mr-2"></i>Identifikasi
                                 Fisik Box</h6>
-                            <small class="text-muted">Scan atau ketik kode RFID yang tertempel di Box.</small>
+                            <small class="text-muted">Input kode RFID yang tertempel di Box.</small>
                         </div>
-                        <div style="width: 300px;">
+                        <div style="width: 300px;   ">
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text bg-white"><i class="fas fa-wifi text-warning"></i></span>
                                 </div>
                                 <input type="text" name="rfid[<?= $id_box ?>]" class="form-control input-rfid"
-                                    placeholder="Scan RFID disini..." value="<?= $box['rfid_code'] ?>" autocomplete="off">
+                                    placeholder="Input RFID disini..." value="<?= $box['rfid_code'] ?>" autocomplete="off">
                             </div>
                         </div>
                     </div>
