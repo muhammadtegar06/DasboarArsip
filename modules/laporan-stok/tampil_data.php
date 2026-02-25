@@ -278,7 +278,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     </style>
 
     <div class="hero-section">
-        <h1 style="font-weight:800;">Laporan Arsip Digital</h1>
+        <h1 style="font-weight:800;">Laporan Penyimpanan Arsip</h1>
         <p style="opacity:0.9;">Rekapitulasi Penyimpanan Dokumen Fisik</p>
     </div>
 

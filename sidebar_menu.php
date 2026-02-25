@@ -252,7 +252,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_stok">
 					<i class="fas fa-file-signature"></i>
-					<p>Laporan Stok</p>
+					<p>Laporan (all)</p>
 				</a>
 			</li>
 			<?php
@@ -269,7 +269,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_stok">
 					<i class="fas fa-file-signature"></i>
-					<p>Laporan Stok Box Seluruhnya</p>
+					<p>Laporan (all)</p>
 				</a>
 			</li>
 			<?php
@@ -280,7 +280,7 @@ else {
 			<li class="nav-item active">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Pengajuan Box</p>
+					<p>Laporan Per Divisi</p>
 				</a>
 			</li>
 			<?php
@@ -290,7 +290,7 @@ else {
 			<li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
-					<p>Laporan Pengajuan Box</p>
+					<p>Laporan Per Divisi</p>
 				</a>
 			</li>
 			<?php
@@ -316,7 +316,6 @@ else {
 			</li>
 			<?php
 		}
-
 		// jika menu manajemen user (tampil data / form entri / form ubah) dipilih, menu manajemen user aktif
 		if ($_GET['module'] == 'user' || $_GET['module'] == 'form_entri_user' || $_GET['module'] == 'form_ubah_user') { ?>
 			<li class="nav-section">
