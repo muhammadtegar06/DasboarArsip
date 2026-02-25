@@ -65,7 +65,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                 <th class="text-center" width="5%">No</th>
                                 <th width="25%">Nama Dokumen</th>
                                 <th width="15%" class="text-center">RFID Box</th>
-                                <th width="10%" class="text-center">Box</th>
                                 <th width="15%">Bantex / Ordner</th>
                                 <th width="20%">Divisi Pemilik</th>
                                 <th width="10%" class="text-center">Aksi</th>
@@ -129,10 +128,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 
                                         <td class="text-center">
                                             <?= $rfid_display ?>
-                                        </td>
-
-                                        <td class="text-center">
-                                            <span class="box-info"><?= $box_display ?></span>
                                         </td>
 
                                         <td>
