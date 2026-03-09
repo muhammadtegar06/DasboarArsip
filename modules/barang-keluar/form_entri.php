@@ -4,10 +4,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 }
 
-// 1. Ambil ID Pengajuan dari URL
 $id_pengajuan = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-// 2. Ambil Data Header
 $q_header = mysqli_query($mysqli, "
     SELECT p.*, d.nama_divisi, d.singkatan_divisi 
     FROM tbl_pengajuan p
@@ -17,7 +15,7 @@ $q_header = mysqli_query($mysqli, "
 $header = mysqli_fetch_assoc($q_header);
 
 if (!$header) {
-    echo "<script>alert('Data tidak ditemukan!'); window.location='?module=pengisian_data_box';</script>";
+    echo "<script>alert('Data tidak ditemukan atau status belum disetujui!'); window.location='?module=pengisian_data_box';</script>";
     exit;
 }
 ?>
@@ -38,7 +36,6 @@ if (!$header) {
         border-bottom: 1px solid #e2e8f0;
     }
 
-    /* Update Footer Area untuk Input RFID */
     .box-footer-area {
         background: #fff7ed;
         padding: 15px 20px;
@@ -51,6 +48,7 @@ if (!$header) {
         padding: 6px 10px;
         width: 100%;
         font-size: 13px;
+        transition: border-color 0.3s;
     }
 
     .input-clean:focus {
@@ -63,6 +61,20 @@ if (!$header) {
         color: #c2410c;
         letter-spacing: 1px;
     }
+
+    .img-preview-box {
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 4px;
+        background: #fff;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .img-preview-box:hover {
+        border-color: #3b82f6;
+        transform: scale(1.05);
+    }
 </style>
 
 <div class="panel-header bg-primary-gradient">
@@ -73,7 +85,7 @@ if (!$header) {
                 <h5 class="text-white op-7 mb-2">Lengkapi dokumen, label bantex, dan Scan RFID Box.</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
-                <a href="?module=barang_keluar" class="btn btn-white btn-border btn-round">
+                <a href="?module=pengisian_data_box" class="btn btn-white btn-border btn-round">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali
                 </a>
             </div>
@@ -100,7 +112,7 @@ if (!$header) {
         </div>
     </div>
 
-    <form id="formInputData">
+    <form id="formInputData" enctype="multipart/form-data">
         <input type="hidden" name="id_pengajuan" value="<?= $id_pengajuan ?>">
 
         <?php
@@ -135,9 +147,8 @@ if (!$header) {
                             <tr>
                                 <th width="5%" class="text-center pl-3">No</th>
                                 <th width="20%">Kode Bantex</th>
-                                <th width="35%">Label / Judul Arsip <span class="text-danger">*</span></th>
-                                <th width="25%">Keterangan</th>
-                                <th width="15%" class="text-center pr-3">File Digital</th>
+                                <th width="55%">Label / Judul Arsip <span class="text-danger">*</span></th>
+                                <th width="20%" class="text-center pr-3">File Digital</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,23 +157,19 @@ if (!$header) {
                             $no_bantex = 1;
                             while ($bantex = mysqli_fetch_assoc($q_bantex)) {
                                 $id_bantex = $bantex['id'];
-                                // Hitung jumlah dokumen existing
                                 $q_doc = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT COUNT(*) as jml FROM tbl_dokumen WHERE id_bantex='$id_bantex'"));
                                 $jml_doc = $q_doc['jml'];
 
                                 $btn_class = ($jml_doc > 0) ? "btn-info" : "btn-outline-secondary";
-                                $btn_text = ($jml_doc > 0) ? '<i class="fas fa-check-circle mr-1"></i> ' . $jml_doc . ' File' : '<i class="fas fa-upload mr-1"></i> Upload';
+                                $btn_text = ($jml_doc > 0) ? '<i class="fas fa-check-circle mr-1"></i> ' . $jml_doc . ' File' : '<i class="fas fa-pen mr-1"></i> Entri Dokumen';
                                 ?>
                                 <tr class="bantex-row">
                                     <td class="text-center py-3 pl-3 text-muted"><?= $no_bantex++ ?></td>
                                     <td class="py-3 font-weight-bold text-dark"><?= $bantex['nama_bantex'] ?></td>
                                     <td class="py-3">
-                                        <input type="text" name="judul[<?= $id_bantex ?>]" class="input-clean font-weight-bold"
-                                            placeholder="Label Judul..." value="<?= $bantex['label_judul'] ?>">
-                                    </td>
-                                    <td class="py-3">
-                                        <input type="text" class="input-clean text-muted" placeholder="Ket..." disabled
-                                            style="background: #f1f1f1;" title="Kolom keterangan bantex belum ada di DB">
+                                        <input type="text" name="judul[<?= $id_bantex ?>]"
+                                            class="input-clean font-weight-bold input-wajib" placeholder="Label Judul Bantex..."
+                                            value="<?= trim($bantex['label_judul']) ?>" required>
                                     </td>
                                     <td class="text-center py-3 pr-3">
                                         <button type="button"
@@ -178,31 +185,63 @@ if (!$header) {
                 </div>
 
                 <div class="box-footer-area">
-                    <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
                             <h6 class="font-weight-bold text-warning mb-0"><i class="fas fa-barcode mr-2"></i>Identifikasi
                                 Fisik Box</h6>
-                            <small class="text-muted">Input kode RFID yang tertempel di Box.</small>
+                            <small class="text-muted">Scan atau ketik kode RFID yang tertempel di Box.</small>
                         </div>
-                        <div style="width: 300px;   ">
+                        <div style="width: 300px;">
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text bg-white"><i class="fas fa-wifi text-warning"></i></span>
                                 </div>
                                 <input type="text" name="rfid[<?= $id_box ?>]" class="form-control input-rfid"
-                                    placeholder="Input RFID disini..." value="<?= $box['rfid_code'] ?>" autocomplete="off">
+                                    placeholder="Scan RFID disini..." value="<?= $box['rfid_code'] ?>" autocomplete="off">
                             </div>
                         </div>
                     </div>
-                </div>
 
+                    <div class="d-flex align-items-start justify-content-between pt-3"
+                        style="border-top: 1px dashed #fdba74;">
+                        <div>
+                            <h6 class="font-weight-bold text-info mb-0"><i class="fas fa-camera mr-2"></i>Foto Fisik Box
+                            </h6>
+                            <small class="text-muted">Upload foto kondisi box saat ini.</small>
+                        </div>
+                        <div style="width: 300px;">
+                            <?php if (!empty($box['foto_box'])): ?>
+                                <div class="d-flex align-items-center mb-2 bg-white p-2 border rounded">
+                                    <a href="uploads/box/<?= $box['foto_box'] ?>" target="_blank" class="img-preview-box mr-2">
+                                        <img src="uploads/box/<?= $box['foto_box'] ?>" alt="Foto Box"
+                                            style="width: 40px; height: 40px; object-fit: cover;">
+                                    </a>
+                                    <div style="line-height: 1.2;">
+                                        <span class="d-block text-success font-weight-bold" style="font-size: 11px;"><i
+                                                class="fas fa-check-circle"></i> Foto Tersimpan</span>
+                                        <a href="uploads/box/<?= $box['foto_box'] ?>" target="_blank" class="text-primary"
+                                            style="font-size: 11px;">Lihat Ukuran Penuh</a>
+                                    </div>
+                                </div>
+                                <input type="file" name="foto_box[<?= $id_box ?>]" class="form-control form-control-sm bg-white"
+                                    accept="image/*" title="Upload foto baru jika ingin mengganti">
+                                <small class="text-warning mt-1 d-block font-weight-bold"><i class="fas fa-info-circle"></i>
+                                    Pilih file baru jika ingin mengganti foto lama.</small>
+                            <?php else: ?>
+                                <input type="file" name="foto_box[<?= $id_box ?>]" class="form-control form-control-sm bg-white"
+                                    accept="image/*">
+                                <small class="text-muted mt-1 d-block">Belum ada foto. (Opsional)</small>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         <?php } ?>
     </form>
 </div>
 
 <div class="modal fade" id="modalDokumen" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 80% !important;">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content border-0">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title font-weight-bold"><i class="fas fa-folder-open mr-2"></i> Kelola Dokumen</h5>
@@ -247,37 +286,35 @@ if (!$header) {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // --- TEMPLATE BARIS INPUT ---
     function getHtmlBaris() {
         return `
-        <div class="card p-3 mb-2 border input-row" style="background-color: #fff;">
+        <div class="card p-3 mb-2 border input-row" style="background-color: #f8fafc;">
             <div class="row">
                 <div class="col-md-5 mb-2">
                     <label class="small font-weight-bold text-muted">Nama Dokumen <span class="text-danger">*</span></label>
                     <input type="text" name="nama_dokumen[]" class="form-control form-control-sm" placeholder="Contoh: SK Pengangkatan" required>
                 </div>
                 <div class="col-md-4 mb-2">
-                    <label class="small font-weight-bold text-muted">Nomor Dokumen</label>
-                    <input type="text" name="nomor_dokumen[]" class="form-control form-control-sm" placeholder="No. Surat / Arsip">
+                    <label class="small font-weight-bold text-muted">Nomor Dokumen <span class="text-danger">*</span></label>
+                    <input type="text" name="nomor_dokumen[]" class="form-control form-control-sm" placeholder="No. Surat / Arsip" required>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <label class="small font-weight-bold text-muted">Tahun</label>
-                    <input type="number" name="tahun_dokumen[]" class="form-control form-control-sm" value="<?= date('Y') ?>">
+                    <label class="small font-weight-bold text-muted">Tahun <span class="text-danger">*</span></label>
+                    <input type="number" name="tahun_dokumen[]" class="form-control form-control-sm" value="<?= date('Y') ?>" required>
                 </div>
                 <div class="col-md-1 mb-2 text-right">
                      <label class="small text-white">Del</label>
-                     <button type="button" class="btn btn-sm btn-icon btn-danger btn-round shadow-sm" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
+                     <button type="button" class="btn btn-sm btn-icon btn-danger btn-round shadow-sm" onclick="hapusBaris(this)" title="Hapus Baris"><i class="fas fa-times"></i></button>
                 </div>
             </div>
-            <div class="row align-items-center">
+            <div class="row align-items-center mt-2">
                 <div class="col-md-6">
-                    <input type="text" name="keterangan[]" class="form-control form-control-sm" placeholder="Keterangan tambahan...">
+                    <label class="small font-weight-bold text-muted">Keterangan Tambahan (Opsional)</label>
+                    <input type="text" name="keterangan[]" class="form-control form-control-sm" placeholder="Keterangan dokumen...">
                 </div>
                 <div class="col-md-6">
-                    <div class="input-group input-group-sm">
-                        <div class="input-group-prepend"><span class="input-group-text">File</span></div>
-                        <input type="file" name="file_dokumen[]" class="form-control" required accept=".pdf,.jpg,.png">
-                    </div>
+                    <label class="small font-weight-bold text-muted">File Dokumen (Opsional)</label>
+                    <input type="file" name="file_dokumen[]" class="form-control form-control-sm bg-white" accept=".pdf,.jpg,.png">
                 </div>
             </div>
         </div>`;
@@ -293,27 +330,19 @@ if (!$header) {
     function kelolaDokumen(idBantex, namaBantex) {
         $('#modal_id_bantex').val(idBantex);
         $('#modal_nama_bantex').text(namaBantex);
-        $('#dynamicInputArea').html(getHtmlBaris()); // Reset input form
+        $('#dynamicInputArea').html(getHtmlBaris());
         $('#modalDokumen').modal('show');
-        loadListDokumen(idBantex); // Load preview tabel
+        loadListDokumen(idBantex);
     }
 
-    // LOAD PREVIEW DOKUMEN (AJAX)
     function loadListDokumen(idBantex) {
         $.get('modules/barang-keluar/dokumen/get_dokumen_list.php?id_bantex=' + idBantex, function (html) {
             $('#listDokumenArea').html(html);
         });
     }
 
-    // UPLOAD DOKUMEN
     $('#formUploadDokumen').on('submit', function (e) {
         e.preventDefault();
-
-        // Validasi File minimal 1
-        let hasFile = false;
-        $('input[name="file_dokumen[]"]').each(function () { if ($(this).val()) hasFile = true; });
-        if (!hasFile) { Swal.fire('Peringatan', 'Pilih minimal satu file.', 'warning'); return; }
-
         let formData = new FormData(this);
         formData.append('id_bantex', $('#modal_id_bantex').val());
         let btn = $(this).find('button[type="submit"]');
@@ -326,8 +355,8 @@ if (!$header) {
             success: function (resp) {
                 btn.html(htmlBtn).prop('disabled', false);
                 if (resp.status === 'success') {
-                    $('#dynamicInputArea').html(getHtmlBaris()); // Reset input
-                    loadListDokumen($('#modal_id_bantex').val()); // Refresh Preview
+                    $('#dynamicInputArea').html(getHtmlBaris());
+                    loadListDokumen($('#modal_id_bantex').val());
                     Swal.fire({ icon: 'success', title: 'Tersimpan!', text: resp.message, timer: 1500, showConfirmButton: false });
                 } else { Swal.fire('Gagal', resp.message, 'error'); }
             },
@@ -335,33 +364,67 @@ if (!$header) {
         });
     });
 
-    // SIMPAN UTAMA (RFID & LABEL)
     function simpanSemuaData() {
+        let formValid = true;
+        $('.input-wajib').each(function () {
+            if ($(this).val().trim() === '') {
+                formValid = false;
+                $(this).css('border', '2px solid #ef4444');
+            } else {
+                $(this).css('border', '1px solid #cbd5e1');
+            }
+        });
+
+        if (!formValid) {
+            Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap!', text: 'Harap isi Label/Judul Arsip pada Bantex yang ditandai dengan garis merah.' });
+            return;
+        }
+
         Swal.fire({
-            title: 'Simpan Data?', text: "Pastikan RFID dan Label sudah benar.", icon: 'question',
-            showCancelButton: true, confirmButtonText: 'Ya, Simpan', confirmButtonColor: '#28a745'
+            title: 'Simpan Data Box?', text: "Pastikan label bantex, lokasi rak, dan foto (jika ada) sudah terisi.",
+            icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Simpan', confirmButtonColor: '#28a745'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({ title: 'Menyimpan...', didOpen: () => { Swal.showLoading() } });
+
+                let formElement = document.getElementById('formInputData');
+                let formData = new FormData(formElement);
+
                 $.ajax({
                     url: 'modules/barang-keluar/dokumen/proses_update_data.php',
-                    type: 'POST', data: $('#formInputData').serialize(), dataType: 'json',
+                    type: 'POST', data: formData, contentType: false, processData: false, dataType: 'json',
                     success: function (response) {
                         if (response.status === 'success') {
-                            Swal.fire('Berhasil!', 'Data tersimpan.', 'success').then(() => location.reload());
-                        } else { Swal.fire('Gagal!', response.message, 'error'); }
+                            Swal.fire('Berhasil!', 'Data header tersimpan.', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Gagal!', response.message, 'error');
+                        }
                     },
-                    error: function () { Swal.fire('Error', 'Server Error', 'error'); }
+                    error: function () { Swal.fire('Error', 'Kesalahan Server', 'error'); }
                 });
             }
         });
     }
 
     function hapusDokumen(id) {
-        if (confirm('Hapus dokumen ini?')) {
-            $.post('modules/barang-keluar/dokumen/proses_hapus_dokumen.php', { id: id }, function (r) {
-                loadListDokumen($('#modal_id_bantex').val());
-            });
-        }
+        Swal.fire({
+            title: 'Hapus Dokumen?', text: "Data dan file dokumen ini akan dihapus secara permanen.",
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                $.ajax({
+                    url: 'modules/barang-keluar/dokumen/proses_hapus_dokumen.php',
+                    type: 'POST', data: { id: id }, dataType: 'json',
+                    success: function (res) {
+                        if (res.status === 'success') {
+                            Swal.fire({ icon: 'success', title: 'Terhapus!', text: res.message, timer: 1500, showConfirmButton: false });
+                            loadListDokumen($('#modal_id_bantex').val());
+                        } else { Swal.fire('Gagal!', res.message, 'error'); }
+                    },
+                    error: function () { Swal.fire('Error', 'Terjadi kesalahan server.', 'error'); }
+                });
+            }
+        });
     }
 </script>
