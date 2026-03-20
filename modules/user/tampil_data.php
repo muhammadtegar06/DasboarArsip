@@ -1,74 +1,14 @@
 <?php
-// mencegah direct access file PHP agar file PHP tidak bisa diakses secara langsung dari browser dan hanya dapat dijalankan ketika di include oleh file lain
-// jika file diakses secara langsung
+// mencegah direct access file PHP
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
-	// alihkan ke halaman error 404
 	header('location: 404.html');
-}
-// jika file di include oleh file lain, tampilkan isi file
-else {
-	// menampilkan pesan sesuai dengan proses yang dijalankan
-	// jika pesan tersedia
-	if (isset($_GET['pesan'])) {
-		// jika pesan = 1
-		if ($_GET['pesan'] == 1) {
-			// tampilkan pesan sukses simpan data
-			echo '  <div class="alert alert-notify alert-success alert-dismissible fade show" role="alert">
-                        <span data-notify="icon" class="fas fa-check"></span> 
-                        <span data-notify="title" class="text-success">Sukses!</span> 
-                        <span data-notify="message">Data user berhasil disimpan.</span>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>';
-		}
-		// jika pesan = 2
-		elseif ($_GET['pesan'] == 2) {
-			// tampilkan pesan sukses ubah data
-			echo '  <div class="alert alert-notify alert-success alert-dismissible fade show" role="alert">
-                        <span data-notify="icon" class="fas fa-check"></span> 
-                        <span data-notify="title" class="text-success">Sukses!</span> 
-                        <span data-notify="message">Data user berhasil diubah.</span>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>';
-		}
-		// jika pesan = 3
-		elseif ($_GET['pesan'] == 3) {
-			// tampilkan pesan sukses hapus data
-			echo '  <div class="alert alert-notify alert-success alert-dismissible fade show" role="alert">
-                        <span data-notify="icon" class="fas fa-check"></span> 
-                        <span data-notify="title" class="text-success">Sukses!</span> 
-                        <span data-notify="message">Data user berhasil dihapus.</span>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>';
-		}
-		// jika pesan = 4
-		elseif ($_GET['pesan'] == 4) {
-			// ambil data GET dari proses simpan/ubah
-			$username = $_GET['username'];
-			// tampilkan pesan gagal simpan data
-			echo '  <div class="alert alert-notify alert-danger alert-dismissible fade show" role="alert">
-                        <span data-notify="icon" class="fas fa-times"></span> 
-                        <span data-notify="title" class="text-danger">Gagal!</span> 
-                        <span data-notify="message">Username <strong>' . $username . '</strong> sudah ada. Silahkan ganti username yang Anda masukan.</span>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>';
-		}
-	}
-?>
+} else {
+	?>
 	<div class="panel-header bg-secondary-gradient">
 		<div class="page-inner py-45">
 			<div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
 				<div class="page-header text-white">
-					<!-- judul halaman -->
-					<h4 class="page-title text-white"><i class="fas fa-user mr-2"></i> Manajemen User</h4>
-					<!-- breadcrumbs -->
+					<h4 class="page-title text-white"><i class="fas fa-users mr-2"></i> Manajemen User</h4>
 					<ul class="breadcrumbs">
 						<li class="nav-home"><a href="?module=dashboard"><i class="flaticon-home text-white"></i></a></li>
 						<li class="separator"><i class="flaticon-right-arrow"></i></li>
@@ -78,7 +18,6 @@ else {
 					</ul>
 				</div>
 				<div class="ml-md-auto py-2 py-md-0">
-					<!-- button entri data -->
 					<a href="?module=form_entri_user" class="btn btn-secondary btn-round mr-2">
 						<span class="btn-label"><i class="fa fa-plus mr-2"></i></span> Entri Data
 					</a>
@@ -90,47 +29,58 @@ else {
 	<div class="page-inner mt--5">
 		<div class="card">
 			<div class="card-header">
-				<!-- judul tabel -->
-				<div class="card-title">Data User</div>
+				<div class="card-title">Data User Terdaftar</div>
 			</div>
 			<div class="card-body">
 				<div class="table-responsive">
-					<!-- tabel untuk menampilkan data dari database -->
 					<table id="basic-datatables" class="display table table-bordered table-striped table-hover">
-						<thead>
+						<thead class="bg-light">
 							<tr>
-								<th class="text-center">No.</th>
-								<th class="text-center">Nama User</th>
-								<th class="text-center">Username</th>
-								<th class="text-center">Hak Akses</th>
-								<th class="text-center">Aksi</th>
+								<th class="text-center" width="5%">No.</th>
+								<th class="text-center" width="20%">Nama User</th>
+								<th class="text-center" width="15%">Username</th>
+								<th class="text-center" width="25%">Divisi</th>
+								<th class="text-center" width="15%">Hak Akses</th>
+								<th class="text-center" width="15%">Aksi</th>
 							</tr>
 						</thead>
 						<tbody>
 							<?php
-							// variabel untuk nomor urut tabel
 							$no = 1;
-							// sql statement untuk menampilkan data dari tabel "tbl_user"
-							$query = mysqli_query($mysqli, "SELECT id_user, nama_user, username, hak_akses FROM tbl_user ORDER BY id_user DESC")
-															or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
-							// ambil data hasil query
-							while ($data = mysqli_fetch_assoc($query)) { ?>
-								<!-- tampilkan data -->
+							$query = mysqli_query($mysqli, "
+                                SELECT u.id, u.nama_user, u.username, u.hak_akses, d.nama_divisi 
+                                FROM tbl_user u
+                                LEFT JOIN tbl_divisi d ON u.id_divisi = d.id
+                                ORDER BY u.id DESC
+                            ") or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+
+							while ($data = mysqli_fetch_assoc($query)) {
+								$badge_color = ($data['hak_akses'] == 'Administrator' || $data['hak_akses'] == 'Super Admin') ? 'badge-primary' : 'badge-info';
+								$nama_divisi = !empty($data['nama_divisi']) ? $data['nama_divisi'] : '<span class="text-muted font-italic">- Tidak Ada Divisi -</span>';
+								?>
 								<tr>
-									<td width="30" class="text-center"><?php echo $no++; ?></td>
-									<td width="180"><?php echo $data['nama_user']; ?></td>
-									<td width="180"><?php echo $data['username']; ?></td>
-									<td width="100"><?php echo $data['hak_akses']; ?></td>
-									<td width="70" class="text-center">
+									<td class="text-center"><?php echo $no++; ?></td>
+									<td class="font-weight-bold text-dark"><?php echo $data['nama_user']; ?></td>
+									<td><?php echo $data['username']; ?></td>
+									<td><?php echo $nama_divisi; ?></td>
+									<td class="text-center">
+										<span
+											class="badge <?php echo $badge_color; ?> px-3 py-1"><?php echo $data['hak_akses']; ?></span>
+									</td>
+									<td class="text-center">
 										<div>
-											<!-- button ubah data -->
-											<a href="?module=form_ubah_user&id=<?php echo $data['id_user']; ?>" class="btn btn-icon btn-round btn-secondary btn-sm mr-md-1" data-toggle="tooltip" data-placement="top" title="Ubah">
+											<a href="?module=form_ubah_user&id=<?php echo $data['id']; ?>"
+												class="btn btn-icon btn-round btn-secondary btn-sm mr-md-1"
+												data-toggle="tooltip" data-placement="top" title="Ubah">
 												<i class="fas fa-pencil-alt fa-sm"></i>
 											</a>
-											<!-- button hapus data -->
-											<a href="modules/user/proses_hapus.php?id=<?php echo $data['id_user']; ?>" onclick="return confirm('Anda yakin ingin menghapus data user dengan username <?php echo $data['username']; ?>?')" class="btn btn-icon btn-round btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Hapus">
+
+											<button type="button"
+												onclick="konfirmasiHapus(<?php echo $data['id']; ?>, '<?php echo $data['username']; ?>')"
+												class="btn btn-icon btn-round btn-danger btn-sm" data-toggle="tooltip"
+												data-placement="top" title="Hapus">
 												<i class="fas fa-trash fa-sm"></i>
-											</a>
+											</button>
 										</div>
 									</td>
 								</tr>
@@ -141,4 +91,39 @@ else {
 			</div>
 		</div>
 	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		// Notifikasi Otomatis Berdasarkan parameter ?pesan=...
+		<?php if (isset($_GET['pesan'])) { ?>
+			<?php if ($_GET['pesan'] == 1) { ?>
+				Swal.fire({ icon: 'success', title: 'Sukses!', text: 'Data user berhasil disimpan.', timer: 2000, showConfirmButton: false });
+			<?php } elseif ($_GET['pesan'] == 2) { ?>
+				Swal.fire({ icon: 'success', title: 'Sukses!', text: 'Data user berhasil diubah.', timer: 2000, showConfirmButton: false });
+			<?php } elseif ($_GET['pesan'] == 3) { ?>
+				Swal.fire({ icon: 'success', title: 'Terhapus!', text: 'Data user berhasil dihapus.', timer: 2000, showConfirmButton: false });
+			<?php } elseif ($_GET['pesan'] == 4) { ?>
+				Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Username <?php echo htmlspecialchars($_GET['username']); ?> sudah digunakan. Silahkan ganti.' });
+			<?php } ?>
+		<?php } ?>
+
+		// Fungsi Konfirmasi Hapus
+		function konfirmasiHapus(id, username) {
+			Swal.fire({
+				title: 'Hapus Data?',
+				text: "Anda yakin ingin menghapus user '" + username + "'?",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#d33',
+				cancelButtonColor: '#3085d6',
+				confirmButtonText: 'Ya, Hapus!',
+				cancelButtonText: 'Batal'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					// Jika Ya, arahkan ke proses hapus
+					window.location.href = "modules/user/proses_hapus.php?id=" + id;
+				}
+			});
+		}
+	</script>
 <?php } ?>

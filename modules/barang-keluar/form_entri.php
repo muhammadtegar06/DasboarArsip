@@ -82,7 +82,7 @@ if (!$header) {
         <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
             <div>
                 <h2 class="text-white pb-2 fw-bold"><i class="fas fa-file-upload mr-2"></i> Input Dokumen & Fisik</h2>
-                <h5 class="text-white op-7 mb-2">Lengkapi dokumen, label bantex, dan Scan RFID Box.</h5>
+                <h5 class="text-white op-7 mb-2">Lengkapi dokumen, label bantex, RFID Box.</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
                 <a href="?module=pengisian_data_box" class="btn btn-white btn-border btn-round">
@@ -136,7 +136,8 @@ if (!$header) {
                                         class="fas fa-map-marker-alt text-danger"></i></span>
                             </div>
                             <input type="text" name="lokasi[<?= $id_box ?>]" class="form-control border-left-0"
-                                placeholder="Lokasi Rak (Cth: A-01)" value="<?= $box['lokasi_arsip'] ?>">
+                                placeholder="Lokasi Rak (Cth: A-01)"
+                                value="<?= htmlspecialchars($box['lokasi_arsip'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                         </div>
                     </div>
                 </div>
@@ -162,14 +163,19 @@ if (!$header) {
 
                                 $btn_class = ($jml_doc > 0) ? "btn-info" : "btn-outline-secondary";
                                 $btn_text = ($jml_doc > 0) ? '<i class="fas fa-check-circle mr-1"></i> ' . $jml_doc . ' File' : '<i class="fas fa-pen mr-1"></i> Entri Dokumen';
+
+                                // PEMBERSIHAN STRING: Ditambahkan fallback "?? ''" agar tidak error jika NULL
+                                $label_asli = $bantex['label_judul'] ?? '';
+                                $label_bersih = preg_replace('/\s+/', ' ', $label_asli);
+                                $label_bersih = htmlspecialchars(trim($label_bersih), ENT_QUOTES, 'UTF-8');
                                 ?>
                                 <tr class="bantex-row">
                                     <td class="text-center py-3 pl-3 text-muted"><?= $no_bantex++ ?></td>
                                     <td class="py-3 font-weight-bold text-dark"><?= $bantex['nama_bantex'] ?></td>
                                     <td class="py-3">
                                         <input type="text" name="judul[<?= $id_bantex ?>]"
-                                            class="input-clean font-weight-bold input-wajib" placeholder="Label Judul Bantex..."
-                                            value="<?= trim($bantex['label_judul']) ?>" required>
+                                            class="input-clean font-weight-bold input-wajib" placeholder="Ketik Label Judul..."
+                                            value="<?= $label_bersih ?>" required>
                                     </td>
                                     <td class="text-center py-3 pr-3">
                                         <button type="button"
@@ -189,7 +195,7 @@ if (!$header) {
                         <div>
                             <h6 class="font-weight-bold text-warning mb-0"><i class="fas fa-barcode mr-2"></i>Identifikasi
                                 Fisik Box</h6>
-                            <small class="text-muted">Scan atau ketik kode RFID yang tertempel di Box.</small>
+                            <small class="text-muted">Ketik kode RFID yang tertempel di Box.</small>
                         </div>
                         <div style="width: 300px;">
                             <div class="input-group">
@@ -197,7 +203,9 @@ if (!$header) {
                                     <span class="input-group-text bg-white"><i class="fas fa-wifi text-warning"></i></span>
                                 </div>
                                 <input type="text" name="rfid[<?= $id_box ?>]" class="form-control input-rfid"
-                                    placeholder="Scan RFID disini..." value="<?= $box['rfid_code'] ?>" autocomplete="off">
+                                    placeholder="Input RFID disini..."
+                                    value="<?= htmlspecialchars($box['rfid_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                    autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -241,7 +249,7 @@ if (!$header) {
 </div>
 
 <div class="modal fade" id="modalDokumen" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 90% !important;">
         <div class="modal-content border-0">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title font-weight-bold"><i class="fas fa-folder-open mr-2"></i> Kelola Dokumen</h5>
