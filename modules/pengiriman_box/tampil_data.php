@@ -3,6 +3,17 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 } else {
+    // 1. TANGKAP DATA FILTER DARI URL (GET)
+    $selected_divisi = isset($_GET['filter_divisi']) ? mysqli_real_escape_string($mysqli, $_GET['filter_divisi']) : '';
+    $tgl_awal = isset($_GET['tgl_awal']) ? mysqli_real_escape_string($mysqli, $_GET['tgl_awal']) : '';
+    $tgl_akhir = isset($_GET['tgl_akhir']) ? mysqli_real_escape_string($mysqli, $_GET['tgl_akhir']) : '';
+
+    // 2. AMBIL DATA DIVISI UNTUK DROPDOWN FILTER
+    $divisi_query = mysqli_query($mysqli, "SELECT id, nama_divisi, singkatan_divisi FROM tbl_divisi ORDER BY nama_divisi ASC");
+    $divisi_options = [];
+    while ($d = mysqli_fetch_assoc($divisi_query)) {
+        $divisi_options[] = $d;
+    }
     ?>
 
     <style>
@@ -23,7 +34,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             text-transform: uppercase;
         }
 
-        /* Warna Status */
         .st-siap {
             background: #e0f2fe;
             color: #0284c7;
@@ -36,14 +46,12 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             border-color: #bbf7d0;
         }
 
-        /* Untuk To Send */
         .st-batal {
             background: #fee2e2;
             color: #b91c1c;
             border-color: #fecaca;
         }
 
-        /* Untuk Cancel */
         .st-default {
             background: #f3f4f6;
             color: #374151;
@@ -265,6 +273,24 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
         .val-green {
             color: #16a34a;
         }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: block;
+        }
     </style>
 
     <div class="panel-header bg-primary-gradient">
@@ -284,6 +310,48 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                 <h4 class="card-title font-weight-bold text-dark">Daftar Pengiriman</h4>
             </div>
             <div class="card-body">
+
+                <div class="filter-panel">
+                    <form action="" method="GET" class="row align-items-end">
+                        <input type="hidden" name="module"
+                            value="<?= isset($_GET['module']) ? htmlspecialchars($_GET['module']) : 'pengiriman_box' ?>">
+
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="filter-label"><i class="fas fa-building mr-1"></i> Divisi Pengaju</label>
+                            <select name="filter_divisi" class="form-control form-control-sm">
+                                <option value="">-- Semua Divisi --</option>
+                                <?php foreach ($divisi_options as $d): ?>
+                                    <option value="<?= $d['id'] ?>" <?= ($selected_divisi == $d['id']) ? 'selected' : ''; ?>>
+                                        <?= $d['singkatan_divisi'] . ' - ' . $d['nama_divisi'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="filter-label"><i class="far fa-calendar-alt mr-1"></i> Tanggal Awal</label>
+                            <input type="date" name="tgl_awal" class="form-control form-control-sm"
+                                value="<?= htmlspecialchars($tgl_awal) ?>">
+                        </div>
+
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="filter-label"><i class="far fa-calendar-check mr-1"></i> Tanggal Akhir</label>
+                            <input type="date" name="tgl_akhir" class="form-control form-control-sm"
+                                value="<?= htmlspecialchars($tgl_akhir) ?>">
+                        </div>
+
+                        <div class="col-md-3 mb-0">
+                            <button type="submit" class="btn btn-primary btn-sm btn-round shadow-sm mr-1">
+                                <i class="fas fa-filter mr-1"></i> Filter
+                            </button>
+                            <a href="?module=<?= isset($_GET['module']) ? htmlspecialchars($_GET['module']) : 'pengiriman_box' ?>"
+                                class="btn btn-light btn-sm btn-round border shadow-sm text-muted">
+                                <i class="fas fa-sync-alt mr-1"></i> Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="table-responsive">
                     <table id="basic-datatables" class="table table-hover align-middle">
                         <thead class="bg-light">
@@ -298,7 +366,21 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         </thead>
                         <tbody>
                             <?php
-                            // Query disesuaikan agar membaca status "To Send", "Cancel", "Siap Kirim"
+                            // 3. SUSUN QUERY BERDASARKAN FILTER
+                            $conditions = ["p.status IN ('Disetujui', 'Diterima', 'Siap Kirim', 'To Send', 'Cancel', 'Telah Dikirim', 'Dibatalkan')"];
+
+                            if ($selected_divisi != '') {
+                                $conditions[] = "p.id_divisi = '$selected_divisi'";
+                            }
+                            if ($tgl_awal != '') {
+                                $conditions[] = "DATE(p.tanggal_pengajuan) >= '$tgl_awal'";
+                            }
+                            if ($tgl_akhir != '') {
+                                $conditions[] = "DATE(p.tanggal_pengajuan) <= '$tgl_akhir'";
+                            }
+
+                            $where_sql = implode(" AND ", $conditions);
+
                             $query = mysqli_query($mysqli, "
                                 SELECT 
                                     p.id, p.no_pengajuan, p.tanggal_pengajuan, p.jumlah_box, p.status,
@@ -307,13 +389,12 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     (SELECT rfid_code FROM tbl_box bx3 WHERE bx3.id_pengajuan = p.id LIMIT 1) as sample_rfid
                                 FROM tbl_pengajuan p
                                 JOIN tbl_divisi d ON p.id_divisi = d.id
-                                WHERE 
-                                    p.status IN ('Disetujui', 'Diterima', 'Siap Kirim', 'To Send', 'Cancel', 'Telah Dikirim', 'Dibatalkan')
+                                WHERE $where_sql
                                 ORDER BY p.id DESC
                             ");
 
                             if (mysqli_num_rows($query) == 0) {
-                                echo '<tr><td colspan="6" class="text-center py-4 text-muted">Belum ada data pengajuan yang diproses.</td></tr>';
+                                echo '<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-inbox fa-2x mb-3 d-block"></i>Belum ada data pengajuan yang cocok dengan filter.</td></tr>';
                             } else {
                                 $no = 1;
                                 while ($data = mysqli_fetch_assoc($query)) {
@@ -327,7 +408,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     $label = 'DISETUJUI';
                                     $tooltip_text = "Pengajuan telah disetujui, menunggu proses.";
 
-                                    // Support nama status baru & status lama yang tersimpan
                                     if ($db_status == 'To Send' || $db_status == 'Telah Dikirim') {
                                         $badge_class = 'st-kirim';
                                         $icon = 'fa-truck';
@@ -349,8 +429,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     // PEMBENTUKAN TIMELINE REAL-TIME
                                     // ==========================================
                                     $history_data = [];
-
-                                    // STEP 1: Pengajuan Disetujui
                                     $history_data[] = [
                                         'status' => 'Pengajuan Disetujui',
                                         'date' => date('d M Y H:i', strtotime($data['tanggal_pengajuan'])),
@@ -359,7 +437,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         'color' => 'info'
                                     ];
 
-                                    // STEP 2: Input Fisik
                                     $q_input = mysqli_query($mysqli, "
                                         SELECT MAX(d.tgl_upload) as last_input 
                                         FROM tbl_dokumen d
@@ -378,7 +455,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         ];
                                     }
 
-                                    // STEP 3: History Lainnya (Siap Kirim, To Send, Cancel)
                                     $q_hist = mysqli_query($mysqli, "
                                         SELECT h.waktu, h.status, h.keterangan 
                                         FROM tbl_history_pengiriman h
@@ -460,7 +536,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                                     class="btn-icon-soft btn-lacak" data-toggle="tooltip" title="Lacak">
                                                     <i class="fas fa-search-location"></i>
                                                 </button>
-
                                                 <button type="button"
                                                     onclick="bukaModalStatus('<?= $data['id'] ?>', '<?= $id_trx ?>', '<?= $db_status ?>')"
                                                     class="btn-icon-soft btn-edit" data-toggle="tooltip" title="Ubah Status">
@@ -469,10 +544,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                             </div>
                                         </td>
                                     </tr>
-                                    <?php
-                                }
-                            }
-                            ?>
+                                <?php }
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -549,7 +622,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 
                         <div class="form-group">
                             <label class="font-weight-bold">Pilih Status <span class="text-danger">*</span></label>
-
                             <div class="row px-2 mt-2">
                                 <div class="col-12 mb-2">
                                     <label class="selectgroup-item w-100">
@@ -573,7 +645,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     </label>
                                 </div>
                             </div>
-
                         </div>
 
                         <div class="mt-4">
@@ -596,7 +667,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('#status_trx_display').text(noTrx);
             $('input[name="status_baru"]').prop('checked', false);
 
-            // Konversi nilai status lama jika ada yang memencet record lawas
             if (currentStatus == 'Telah Dikirim') currentStatus = 'To Send';
             if (currentStatus == 'Dibatalkan') currentStatus = 'Cancel';
 
@@ -639,7 +709,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('#modalLacak').modal('show');
         }
 
-        // AJAX Update Status
         $('#formUpdateStatus').on('submit', function (e) {
             e.preventDefault();
 
