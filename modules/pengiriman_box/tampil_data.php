@@ -371,6 +371,12 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             // SUSUN QUERY BERDASARKAN FILTER (Termasuk Status Lama & Baru)
                             $conditions = ["p.status IN ('Disetujui', 'Diterima', 'Selesai Diinput', 'Siap Kirim', 'Akan Di Kirim', 'To Send', 'Terkirim', 'Cancel', 'Telah Dikirim', 'Dibatalkan')"];
 
+                            // FILTER TAMBAHAN: Tampilkan JIKA SEMUA BOX SUDAH DIISI RFID (Tidak ada yang kosong)
+                            $conditions[] = "(SELECT COUNT(*) FROM tbl_box bx_cek WHERE bx_cek.id_pengajuan = p.id AND (bx_cek.rfid_code IS NULL OR bx_cek.rfid_code = '')) = 0";
+
+                            // FILTER TAMBAHAN: Pastikan pengajuan tersebut minimal punya 1 box
+                            $conditions[] = "p.jumlah_box > 0";
+
                             if ($selected_divisi != '') {
                                 $conditions[] = "p.id_divisi = '$selected_divisi'";
                             }
@@ -396,17 +402,17 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             ");
 
                             if (mysqli_num_rows($query) == 0) {
-                                echo '<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-inbox fa-2x mb-3 d-block"></i>Belum ada data pengajuan yang cocok dengan filter.</td></tr>';
+                                echo '<tr><td colspan=\"6\" class=\"text-center py-5 text-muted\"><i class=\"fas fa-inbox fa-2x mb-3 d-block\"></i>Belum ada data pengajuan yang siap dikirim / cocok dengan filter.</td></tr>';
                             } else {
                                 $no = 1;
                                 while ($data = mysqli_fetch_assoc($query)) {
                                     $id_trx = $data['no_pengajuan'];
                                     $id_pengajuan = $data['id'];
 
-                                    // PENENTUAN LABEL STATUS & WARNA (Sesuai Permintaan Baru)
+                                    // PENENTUAN LABEL STATUS & WARNA
                                     $db_status = $data['status'];
 
-                                    // Default (Sebelumnya Disetujui)
+                                    // Default
                                     $badge_class = 'st-default';
                                     $icon = 'fa-check';
                                     $label = 'SELESAI DIINPUT';
@@ -672,12 +678,10 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('#status_trx_display').text(noTrx);
             $('input[name="status_baru"]').prop('checked', false);
 
-            // Pemetaan jika mengklik record dengan status versi lama
             if (currentStatus == 'Telah Dikirim' || currentStatus == 'To Send') currentStatus = 'Terkirim';
             if (currentStatus == 'Siap Kirim') currentStatus = 'Akan Di Kirim';
             if (currentStatus == 'Dibatalkan') currentStatus = 'Cancel';
 
-            // Jangan centang radio button jika statusnya masih di tahap persiapan/default
             if (currentStatus && currentStatus != 'Disetujui' && currentStatus != 'Diterima' && currentStatus != 'Selesai Diinput') {
                 $('input[name="status_baru"][value="' + currentStatus + '"]').prop('checked', true);
             }
