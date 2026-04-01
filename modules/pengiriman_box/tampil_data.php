@@ -28,12 +28,14 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             letter-spacing: 0.5px;
             transition: all 0.3s;
             border: 1px solid transparent;
-            width: 120px;
+            width: 130px;
+            /* Diperlebar sedikit agar teks muat */
             justify-content: center;
             cursor: help;
             text-transform: uppercase;
         }
 
+        /* Warna Status */
         .st-siap {
             background: #e0f2fe;
             color: #0284c7;
@@ -366,8 +368,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         </thead>
                         <tbody>
                             <?php
-                            // 3. SUSUN QUERY BERDASARKAN FILTER
-                            $conditions = ["p.status IN ('Disetujui', 'Diterima', 'Siap Kirim', 'To Send', 'Cancel', 'Telah Dikirim', 'Dibatalkan')"];
+                            // SUSUN QUERY BERDASARKAN FILTER (Termasuk Status Lama & Baru)
+                            $conditions = ["p.status IN ('Disetujui', 'Diterima', 'Selesai Diinput', 'Siap Kirim', 'Akan Di Kirim', 'To Send', 'Terkirim', 'Cancel', 'Telah Dikirim', 'Dibatalkan')"];
 
                             if ($selected_divisi != '') {
                                 $conditions[] = "p.id_divisi = '$selected_divisi'";
@@ -401,28 +403,30 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     $id_trx = $data['no_pengajuan'];
                                     $id_pengajuan = $data['id'];
 
-                                    // Tentukan Label Status & Warna
+                                    // PENENTUAN LABEL STATUS & WARNA (Sesuai Permintaan Baru)
                                     $db_status = $data['status'];
+
+                                    // Default (Sebelumnya Disetujui)
                                     $badge_class = 'st-default';
                                     $icon = 'fa-check';
-                                    $label = 'DISETUJUI';
-                                    $tooltip_text = "Pengajuan telah disetujui, menunggu proses.";
+                                    $label = 'SELESAI DIINPUT';
+                                    $tooltip_text = "Pengajuan selesai diinput, menunggu diproses logistik.";
 
-                                    if ($db_status == 'To Send' || $db_status == 'Telah Dikirim') {
+                                    if ($db_status == 'Terkirim' || $db_status == 'To Send' || $db_status == 'Telah Dikirim') {
                                         $badge_class = 'st-kirim';
                                         $icon = 'fa-truck';
-                                        $label = 'TO SEND';
-                                        $tooltip_text = 'Sedang dalam pengiriman ke gudang';
+                                        $label = 'TERKIRIM';
+                                        $tooltip_text = 'Dokumen telah dikirim ke gudang';
                                     } elseif ($db_status == 'Cancel' || $db_status == 'Dibatalkan') {
                                         $badge_class = 'st-batal';
                                         $icon = 'fa-times-circle';
                                         $label = 'CANCEL';
                                         $tooltip_text = 'Proses pengiriman dibatalkan';
-                                    } elseif ($db_status == 'Siap Kirim') {
+                                    } elseif ($db_status == 'Akan Di Kirim' || $db_status == 'Siap Kirim') {
                                         $badge_class = 'st-siap';
                                         $icon = 'fa-box-open';
-                                        $label = 'SIAP KIRIM';
-                                        $tooltip_text = 'Data fisik siap untuk dikirim';
+                                        $label = 'AKAN DI KIRIM';
+                                        $tooltip_text = 'Data fisik akan dikirim';
                                     }
 
                                     // ==========================================
@@ -447,7 +451,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     $cek_input = mysqli_fetch_assoc($q_input);
                                     if (!empty($cek_input['last_input'])) {
                                         $history_data[] = [
-                                            'status' => 'Input Dokumen & Fisik',
+                                            'status' => 'Selesai Diinput',
                                             'date' => date('d M Y H:i', strtotime($cek_input['last_input'])),
                                             'user' => 'Admin Divisi',
                                             'icon' => 'fa-keyboard',
@@ -469,15 +473,15 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                             $h_icon = 'fa-clock';
                                             $h_color = 'primary';
 
-                                            if (strpos($stat_text, 'send') !== false || strpos($stat_text, 'kirim') !== false) {
-                                                $h_icon = 'fa-truck';
-                                                $h_color = 'primary';
-                                            } elseif (strpos($stat_text, 'cancel') !== false || strpos($stat_text, 'batal') !== false) {
+                                            if (strpos($stat_text, 'cancel') !== false || strpos($stat_text, 'batal') !== false) {
                                                 $h_icon = 'fa-times-circle';
                                                 $h_color = 'danger';
-                                            } elseif (strpos($stat_text, 'siap') !== false) {
+                                            } elseif (strpos($stat_text, 'akan di kirim') !== false || strpos($stat_text, 'siap') !== false) {
                                                 $h_icon = 'fa-box-open';
                                                 $h_color = 'info';
+                                            } elseif (strpos($stat_text, 'terkirim') !== false || strpos($stat_text, 'send') !== false || strpos($stat_text, 'telah dikirim') !== false) {
+                                                $h_icon = 'fa-truck';
+                                                $h_color = 'success';
                                             }
 
                                             $history_data[] = [
@@ -527,7 +531,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                         <td class="text-center">
                                             <span class="badge-status-pill <?= $badge_class ?>" data-toggle="tooltip"
                                                 title="<?= $tooltip_text ?>">
-                                                <i class="fas <?= $icon ?>"></i> <?= $label ?>
+                                                <i class="fas <?= $icon ?> mr-1"></i> <?= $label ?>
                                             </span>
                                         </td>
                                         <td class="text-center">
@@ -625,16 +629,17 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             <div class="row px-2 mt-2">
                                 <div class="col-12 mb-2">
                                     <label class="selectgroup-item w-100">
-                                        <input type="radio" name="status_baru" value="Siap Kirim" class="selectgroup-input">
+                                        <input type="radio" name="status_baru" value="Akan Di Kirim"
+                                            class="selectgroup-input">
                                         <span class="selectgroup-button selectgroup-button-icon py-3"><i
-                                                class="fas fa-box-open d-block mb-1"></i> SIAP KIRIM</span>
+                                                class="fas fa-box-open d-block mb-1"></i> AKAN DI KIRIM</span>
                                     </label>
                                 </div>
                                 <div class="col-6 mb-2">
                                     <label class="selectgroup-item w-100">
-                                        <input type="radio" name="status_baru" value="To Send" class="selectgroup-input">
+                                        <input type="radio" name="status_baru" value="Terkirim" class="selectgroup-input">
                                         <span class="selectgroup-button selectgroup-button-icon py-3"><i
-                                                class="fas fa-truck d-block mb-1"></i> TO SEND</span>
+                                                class="fas fa-truck d-block mb-1"></i> TERKIRIM</span>
                                     </label>
                                 </div>
                                 <div class="col-6 mb-2">
@@ -667,12 +672,16 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('#status_trx_display').text(noTrx);
             $('input[name="status_baru"]').prop('checked', false);
 
-            if (currentStatus == 'Telah Dikirim') currentStatus = 'To Send';
+            // Pemetaan jika mengklik record dengan status versi lama
+            if (currentStatus == 'Telah Dikirim' || currentStatus == 'To Send') currentStatus = 'Terkirim';
+            if (currentStatus == 'Siap Kirim') currentStatus = 'Akan Di Kirim';
             if (currentStatus == 'Dibatalkan') currentStatus = 'Cancel';
 
-            if (currentStatus && currentStatus != 'Disetujui' && currentStatus != 'Diterima') {
+            // Jangan centang radio button jika statusnya masih di tahap persiapan/default
+            if (currentStatus && currentStatus != 'Disetujui' && currentStatus != 'Diterima' && currentStatus != 'Selesai Diinput') {
                 $('input[name="status_baru"][value="' + currentStatus + '"]').prop('checked', true);
             }
+
             $('#modalStatus').modal('show');
         }
 
