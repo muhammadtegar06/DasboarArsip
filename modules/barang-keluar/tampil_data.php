@@ -86,12 +86,19 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         </thead>
                         <tbody>
                             <?php
+                            // Penambahan Subquery untuk mengecek kelengkapan Label & Dokumen per Bantex
                             $query = mysqli_query($mysqli, "
                                 SELECT 
                                     p.id, p.no_pengajuan, p.tanggal_pengajuan, p.status, p.jumlah_box,
                                     d.nama_divisi, d.singkatan_divisi,
                                     (SELECT COUNT(*) FROM tbl_bantex b JOIN tbl_box bx ON b.id_box = bx.id WHERE bx.id_pengajuan = p.id) as total_bantex,
-                                    (SELECT COUNT(*) FROM tbl_box bx2 WHERE bx2.id_pengajuan = p.id AND (bx2.rfid_code IS NULL OR bx2.rfid_code = '')) as pending_rfid
+                                    
+                                    (SELECT COUNT(*) FROM tbl_box bx2 WHERE bx2.id_pengajuan = p.id AND (bx2.rfid_code IS NULL OR TRIM(bx2.rfid_code) = '')) as pending_rfid,
+                                    
+                                    (SELECT COUNT(*) FROM tbl_bantex b3 JOIN tbl_box bx3 ON b3.id_box = bx3.id WHERE bx3.id_pengajuan = p.id AND (b3.label_judul IS NULL OR TRIM(b3.label_judul) = '')) as pending_label,
+                                    
+                                    (SELECT COUNT(*) FROM tbl_bantex b4 JOIN tbl_box bx4 ON b4.id_box = bx4.id WHERE bx4.id_pengajuan = p.id AND NOT EXISTS (SELECT 1 FROM tbl_dokumen doc WHERE doc.id_bantex = b4.id)) as pending_dokumen
+
                                 FROM tbl_pengajuan p
                                 JOIN tbl_divisi d ON p.id_divisi = d.id
                                 WHERE p.status = 'Disetujui' OR p.status = 'Diterima'
@@ -109,9 +116,13 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     $tanggal = date('d M Y', strtotime($data['tanggal_pengajuan']));
                                     $total_box = $data['jumlah_box'];
                                     $total_bantex = $data['total_bantex'];
-                                    $pending_rfid = $data['pending_rfid'];
                                     
-                                    if ($pending_rfid == 0 && $total_box > 0) {
+                                    $pending_rfid = $data['pending_rfid'];
+                                    $pending_label = $data['pending_label'];
+                                    $pending_dokumen = $data['pending_dokumen'];
+                                    
+                                    // Semua kondisi harus 0 agar dianggap Selesai Diinput
+                                    if ($pending_rfid == 0 && $pending_label == 0 && $pending_dokumen == 0 && $total_box > 0) {
                                         $status_label = '<span class="badge badge-pill-custom badge-soft-success"><i class="fas fa-check-double mr-1"></i> SELESAI DIINPUT</span>';
                                         $btn_text = "Edit Data";
                                         $btn_icon = "fa-edit";
@@ -142,8 +153,17 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                     </td>
                                     <td class="text-center">
                                         <?= $status_label ?>
+                                        
                                         <?php if($pending_rfid > 0): ?>
                                             <div class="mt-1 small text-danger font-weight-bold">(<?= $pending_rfid ?> Box belum diisi RFID)</div>
+                                        <?php endif; ?>
+                                        
+                                        <?php if($pending_label > 0): ?>
+                                            <div class="mt-1 small text-danger font-weight-bold">(<?= $pending_label ?> Bantex belum ada Label)</div>
+                                        <?php endif; ?>
+                                        
+                                        <?php if($pending_dokumen > 0): ?>
+                                            <div class="mt-1 small text-danger font-weight-bold">(<?= $pending_dokumen ?> Bantex belum diisi dokumen)</div>
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">

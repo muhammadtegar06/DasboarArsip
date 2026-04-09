@@ -49,8 +49,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 							<option selected disabled value="">-- Pilih --</option>
 							<option value="Super Admin">Super Admin</option>
 							<option value="Administrator">Administrator</option>
-							<option value="Admin Gudang">Admin Gudang</option>
-							<option value="Kepala Gudang">Kepala Gudang</option>
 							<option value="User Divisi">User Divisi</option>
 						</select>
 						<div class="invalid-feedback">Hak akses tidak boleh kosong.</div>
@@ -66,18 +64,18 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 								echo "<option value='{$div['id']}'>{$div['nama_divisi']}</option>";
 							}
 							?>
-				</select>
-				<div class="invalid-feedback">Divisi tidak boleh kosong.</div>
-			</div>
-			</div>
-			<div class="card-action">
+						</select>
+						<div class="invalid-feedback">Divisi tidak boleh kosong.</div>
+					</div>
+				</div>
+				<div class="card-action">
 					<input type="hidden" name="simpan" value="Simpan">
-						<button type="button" onclick="konfirmasiSimpan()"
+					<button type="button" onclick="konfirmasiSimpan()"
 						class="btn btn-secondary btn-round pl-4 pr-4 mr-2">Simpan</button>
 					<a href="?module=user" class="btn btn-default btn-round pl-4 pr-4">Batal</a>
 				</div>
 			</form>
-			</div>
+		</div>
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -101,11 +99,11 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 				cancelButtonColor: '#d33',
 				confirmButtonText: 'Ya, Simpan!',
 				cancelButtonText: 'Batal'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						form.submit(); // Eksekusi pengiriman data
-					}
-				});
-			}
-		</script>
+			}).then((result) => {
+				if (result.isConfirmed) {
+					form.submit(); // Eksekusi pengiriman data
+				}
+			});
+		}
+	</script>
 <?php } ?>

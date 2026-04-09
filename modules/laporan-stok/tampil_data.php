@@ -13,12 +13,17 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
         $divisi_options[] = $d;
     }
 
-    // Query Utama Laporan (HANYA MENGAMBIL STATUS 'To Send')
-    $where_clause = "WHERE p.status = 'To Send'";
+    // PERBAIKAN: Masukkan variasi status lama ("To Send", "Telah Dikirim") agar tetap terbaca sebagai "Terkirim"
+    $where_clause = "WHERE p.status IN ('Terkirim', 'To Send', 'Telah Dikirim')";
+
+    // Logika: Hanya tampilkan jika divisi dipilih
     if ($selected_divisi != '') {
         $where_clause .= " AND d.singkatan_divisi = '$selected_divisi'";
+    } else {
+        $where_clause .= " AND 1=0"; // Memaksa data kosong jika divisi belum dipilih
     }
 
+    // PERBAIKAN PADA SUBQUERY: tgl_terkirim juga mencari variasi status lama
     $query_laporan = mysqli_query($mysqli, "
         SELECT 
             p.id, 
@@ -30,8 +35,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             d.singkatan_divisi as kode_divisi,
             (SELECT COUNT(*) FROM tbl_bantex b JOIN tbl_box bx ON b.id_box = bx.id WHERE bx.id_pengajuan = p.id) as jml_bantex,
             (SELECT COUNT(*) FROM tbl_dokumen doc JOIN tbl_bantex b2 ON doc.id_bantex = b2.id JOIN tbl_box bx2 ON b2.id_box = bx2.id WHERE bx2.id_pengajuan = p.id) as total_dok,
-            (SELECT rfid_code FROM tbl_box bx3 WHERE bx3.id_pengajuan = p.id AND rfid_code IS NOT NULL LIMIT 1) as rf_id,
-            (SELECT h.waktu FROM tbl_history_pengiriman h JOIN tbl_pengiriman pg ON h.id_pengiriman = pg.id WHERE pg.id_pengajuan = p.id AND h.status = 'To Send' ORDER BY h.waktu DESC LIMIT 1) as tgl_to_send
+            (SELECT h.waktu FROM tbl_history_pengiriman h JOIN tbl_pengiriman pg ON h.id_pengiriman = pg.id WHERE pg.id_pengajuan = p.id AND h.status IN ('Terkirim', 'To Send', 'Telah Dikirim') ORDER BY h.waktu DESC LIMIT 1) as tgl_terkirim
         FROM tbl_pengajuan p
         JOIN tbl_divisi d ON p.id_divisi = d.id
         $where_clause
@@ -115,6 +119,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     }
     ?>
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <style>
         /* --- STYLING RINGKAS DAN RAPI --- */
         .stat-box {
@@ -152,16 +158,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             font-size: 13px;
             color: #1e293b;
             border-bottom: 1px solid #f1f5f9;
-        }
-
-        .badge-rfid {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            background: #f1f5f9;
-            border: 1px dashed #cbd5e1;
-            padding: 4px 8px;
-            border-radius: 5px;
-            color: #475569;
         }
 
         /* MODAL & TABS */
@@ -280,16 +276,32 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             border: 3px solid white;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        /* Select2 Custom Styling agar selaras dengan template */
+        .select2-container .select2-selection--single {
+            height: 35px !important;
+            border: 1px solid #ebedf2 !important;
+            border-radius: 5px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 35px !important;
+            color: #495057 !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 35px !important;
+        }
     </style>
 
     <div class="panel-header bg-primary-gradient">
         <div class="page-inner py-4">
             <div class="d-flex align-items-left align-items-md-top flex-column flex-md-row">
                 <div>
-                    <h2 class="text-white pb-2 fw-bold"><i class="fas fa-file-contract mr-2"></i> Laporan Arsip (To Send)
+                    <h2 class="text-white pb-2 fw-bold"><i class="fas fa-file-contract mr-2"></i> Laporan Arsip Terkirim
                     </h2>
-                    <h5 class="text-white op-7 mb-2">Rekapitulasi seluruh dokumen fisik yang telah berstatus siap dikirim ke
-                        Gudang.</h5>
+                    <h5 class="text-white op-7 mb-2">Rekapitulasi seluruh dokumen fisik per divisi yang telah berstatus
+                        Terkirim ke Gudang.</h5>
                 </div>
             </div>
         </div>
@@ -299,32 +311,35 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
             <div class="card-header bg-white pt-4 pb-3" style="border-radius: 12px 12px 0 0;">
                 <div class="row align-items-center">
+
                     <div class="col-md-5 mb-3 mb-md-0">
-                        <div class="d-flex">
-                            <div class="stat-box">
-                                <i class="fas fa-file-alt text-primary"></i>
-                                <div><span class="text-muted d-block" style="font-size: 10px; line-height: 1;">Total
-                                        Dokumen</span> <?= number_format($total_dokumen, 0, ',', '.') ?> File</div>
+                        <?php if ($selected_divisi != ''): ?>
+                            <div class="d-flex">
+                                <div class="stat-box">
+                                    <i class="fas fa-file-alt text-primary"></i>
+                                    <div><span class="text-muted d-block" style="font-size: 10px; line-height: 1;">Total
+                                            Dokumen</span> <?= number_format($total_dokumen, 0, ',', '.') ?> File</div>
+                                </div>
+                                <div class="stat-box">
+                                    <i class="fas fa-box text-warning"></i>
+                                    <div><span class="text-muted d-block" style="font-size: 10px; line-height: 1;">Total
+                                            Box</span> <?= number_format($total_box_fisik, 0, ',', '.') ?> Box</div>
+                                </div>
                             </div>
-                            <div class="stat-box">
-                                <i class="fas fa-box text-warning"></i>
-                                <div><span class="text-muted d-block" style="font-size: 10px; line-height: 1;">Total
-                                        Box</span> <?= number_format($total_box_fisik, 0, ',', '.') ?> Box</div>
-                            </div>
-                        </div>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="col-md-7 text-md-right">
-                        <form action="" method="GET" class="d-inline-block form-inline mr-2">
+                    <div class="col-md-7">
+                        <form action="" method="GET" class="d-flex align-items-center justify-content-md-end">
                             <input type="hidden" name="module"
                                 value="<?= isset($_GET['module']) ? htmlspecialchars($_GET['module']) : 'laporan_arsip' ?>">
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light font-weight-bold">Filter:</span>
-                                </div>
-                                <select name="filter_divisi" class="form-control form-control-sm"
-                                    onchange="this.form.submit()" style="min-width: 180px;">
-                                    <option value="">Semua Divisi</option>
+
+                            <label class="font-weight-bold mr-3 mb-0 text-dark"><i class="fas fa-filter mr-1"></i> Filter
+                                Divisi :</label>
+                            <div style="min-width: 250px;">
+                                <select name="filter_divisi" class="form-control select2-single"
+                                    onchange="this.form.submit()">
+                                    <option value="" <?= ($selected_divisi == '') ? 'selected' : ''; ?>></option>
                                     <?php foreach ($divisi_options as $d): ?>
                                         <option value="<?= $d['singkatan_divisi'] ?>"
                                             <?= ($selected_divisi == $d['singkatan_divisi']) ? 'selected' : ''; ?>>
@@ -334,17 +349,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                                 </select>
                             </div>
                         </form>
-
-                        <div class="d-inline-block">
-                            <button onclick="window.print()"
-                                class="btn btn-dark btn-sm btn-round font-weight-bold mr-1 shadow-sm">
-                                <i class="fas fa-print mr-1"></i> Cetak
-                            </button>
-                            <a href="modules/laporan-stok/export_excel.php?filter_divisi=<?= urlencode($selected_divisi) ?>"
-                                target="_blank" class="btn btn-success btn-sm btn-round font-weight-bold shadow-sm">
-                                <i class="fas fa-file-excel mr-1"></i> Export Excel
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -355,59 +359,66 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                         <thead>
                             <tr>
                                 <th width="5%" class="text-center pl-4">No</th>
-                                <th width="15%">ID Transaksi</th>
-                                <th width="18%">Divisi</th>
-                                <th width="20%">Tgl Update Status</th>
-                                <th width="12%">RF ID</th>
-                                <th width="10%" class="text-center">Isi Box</th>
+                                <th width="18%">ID Transaksi</th>
+                                <th width="20%">Divisi</th>
+                                <th width="22%">Tgl Update Status</th>
+                                <th width="15%" class="text-center">Isi Box</th>
                                 <th width="10%" class="text-center">Status</th>
                                 <th width="10%" class="text-center pr-4">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            if (empty($data_tampil)) {
-                                echo '<tr><td colspan="8" class="text-center py-4 text-muted font-italic">Tidak ada laporan dengan status To Send pada divisi ini.</td></tr>';
-                            } else {
+                            // Tampilan jika divisi belum dipilih
+                            if ($selected_divisi == '') {
+                                echo '<tr><td colspan="7" class="text-center py-5 text-muted"><i class="fas fa-building fa-3x mb-3 d-block text-light"></i><span class="font-weight-bold">Silakan pilih divisi terlebih dahulu</span><br>Pilih pada filter dropdown di atas untuk menampilkan laporan.</td></tr>';
+                            }
+                            // Tampilan jika data kosong setelah divisi dipilih
+                            else if (empty($data_tampil)) {
+                                echo '<tr><td colspan="7" class="text-center py-5 text-muted font-italic"><i class="fas fa-inbox fa-3x mb-3 d-block text-light"></i>Belum ada riwayat dokumen Terkirim pada divisi ini.</td></tr>';
+                            }
+                            // Tampilan Data
+                            else {
                                 $no = 1;
                                 foreach ($data_tampil as $row) {
-                                    $rfid_text = $row['rf_id'] ? $row['rf_id'] : '-';
-                                    $tgl_to_send = !empty($row['tgl_to_send']) ? date('d M Y, H:i', strtotime($row['tgl_to_send'])) : '<i class="text-muted small">Belum Tercatat</i>';
+                                    $tgl_terkirim = !empty($row['tgl_terkirim']) ? date('d M Y, H:i', strtotime($row['tgl_terkirim'])) : '<i class="text-muted small">Belum Tercatat</i>';
+
+                                    // Mapping label visual jika di DB masih To Send
+                                    $label_status = (in_array($row['status'], ['To Send', 'Telah Dikirim'])) ? 'TERKIRIM' : strtoupper($row['status']);
 
                                     // Encode Row untuk dikirim ke Javascript Modal
                                     $jsonData = htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8');
                                     ?>
-                                    <tr>
-                                        <td class="text-center text-muted pl-4"><?= $no++; ?></td>
-                                        <td><span class="font-weight-bold text-primary"><?= $row['id_transaksi'] ?></span></td>
-                                        <td>
-                                            <span class="font-weight-bold"><?= $row['kode_divisi'] ?></span><br>
-                                            <span class="text-muted small">Aju:
+                                        <tr>
+                                            <td class="text-center text-muted pl-4"><?= $no++; ?></td>
+                                            <td><span class="font-weight-bold text-primary"><?= $row['id_transaksi'] ?></span></td>
+                                            <td>
+                                                <span class="font-weight-bold"><?= $row['kode_divisi'] ?></span><br>
+                                                <span class="text-muted small">Aju:
                                                 <?= date('d M Y', strtotime($row['tanggal_pengajuan'])) ?></span>
-                                        </td>
-                                        <td>
-                                            <i class="far fa-clock text-warning mr-1"></i>
-                                            <span class="font-weight-bold text-dark"><?= $tgl_to_send ?></span>
-                                        </td>
-                                        <td><span class="badge-rfid"><?= $rfid_text ?></span></td>
-                                        <td class="text-center">
-                                            <div class="badge badge-light border text-dark">
+                                            </td>
+                                            <td>
+                                                <i class="far fa-clock text-warning mr-1"></i>
+                                                <span class="font-weight-bold text-dark"><?= $tgl_terkirim ?></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="badge badge-light border text-dark">
                                                 <?= $row['jml_box'] ?> Box | <?= $row['jml_bantex'] ?> Btx
-                                            </div>
-                                        </td>
-                                        <td class="text-center">
-                                            <span class="badge badge-success px-3 py-1 font-weight-bold shadow-sm"
-                                                style="border-radius: 20px;">
-                                                <i class="fas fa-truck mr-1"></i> <?= strtoupper($row['status']) ?>
-                                            </span>
-                                        </td>
-                                        <td class="text-center pr-4">
-                                            <button type="button" onclick="openModal(<?= $jsonData ?>)"
-                                                class="btn btn-sm btn-info btn-round shadow-sm px-3">
-                                                <i class="fas fa-eye mr-1"></i> Detail
-                                            </button>
-                                        </td>
-                                    </tr>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-success px-3 py-1 font-weight-bold shadow-sm"
+                                                    style="border-radius: 20px;">
+                                                    <i class="fas fa-check-circle mr-1"></i> <?= $label_status ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-center pr-4">
+                                                <button type="button" onclick="openModal(<?= $jsonData ?>)"
+                                                    class="btn btn-sm btn-info btn-round shadow-sm px-3">
+                                                    <i class="fas fa-eye mr-1"></i> Detail
+                                                </button>
+                                            </td>
+                                        </tr>
                                     <?php
                                 }
                             }
@@ -417,8 +428,8 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                 </div>
             </div>
             <div class="card-footer bg-white border-top text-center py-3" style="border-radius: 0 0 12px 12px;">
-                <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Tabel ini bersifat read-only dan hanya
-                    merangkum data arsip yang siap kirim.</small>
+                <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Tabel ini bersifat read-only dan khusus
+                    merangkum data arsip yang sudah dikirim ke gudang.</small>
             </div>
         </div>
     </div>
@@ -451,29 +462,20 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                 <div class="modal-body bg-light" style="min-height: 400px;">
 
                     <div id="tab-lacak" class="tab-pane active">
-                        <div class="row mb-4">
-                            <div class="col-4">
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-6">
                                 <div class="card card-stats card-round mb-0 border shadow-sm">
                                     <div class="card-body p-3 text-center">
-                                        <div class="text-muted small font-weight-bold">JUMLAH BOX</div>
-                                        <h3 class="font-weight-bold text-primary mb-0" id="m_jmlBox">0</h3>
+                                        <div class="text-muted small font-weight-bold">TOTAL BOX</div>
+                                        <h3 class="font-weight-bold text-primary mb-0 mt-1" id="m_jmlBox">0</h3>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <div class="card card-stats card-round mb-0 border shadow-sm">
                                     <div class="card-body p-3 text-center">
-                                        <div class="text-muted small font-weight-bold">JUMLAH BANTEX</div>
-                                        <h3 class="font-weight-bold text-info mb-0" id="m_jmlBantex">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card card-stats card-round mb-0 border shadow-sm">
-                                    <div class="card-body p-3 text-center">
-                                        <div class="text-muted small font-weight-bold">RF ID SAMPLE</div>
-                                        <h5 class="font-weight-bold text-success mb-0 mt-1" id="m_rfid"
-                                            style="font-family: monospace;">-</h5>
+                                        <div class="text-muted small font-weight-bold">TOTAL BANTEX</div>
+                                        <h3 class="font-weight-bold text-info mb-0 mt-1" id="m_jmlBantex">0</h3>
                                     </div>
                                 </div>
                             </div>
@@ -486,7 +488,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                     </div>
 
                     <div id="tab-isi" class="tab-pane">
-
                         <div id="view-box">
                             <div class="text-center mb-3">
                                 <h6 class="font-weight-bold text-muted"><i class="fas fa-boxes mr-2"></i>Pilih Box untuk
@@ -524,8 +525,16 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Inisialisasi Select2
+            $('.select2-single').select2({
+                placeholder: "-- Silakan Pilih Divisi --",
+                allowClear: true
+            });
+
+            // Inisialisasi DataTable
             $('#laporan-datatables').DataTable({
                 "pageLength": 10,
                 "ordering": false,
@@ -552,17 +561,19 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('#m_divisi').text(data.divisi);
             $('#m_jmlBox').text(data.jml_box);
             $('#m_jmlBantex').text(data.jml_bantex);
-            $('#m_rfid').text(data.rf_id || 'Tidak Tersedia');
 
             // Render Timeline History
             let htmlTimeline = '';
             if (data.history && data.history.length > 0) {
                 data.history.forEach(h => {
+                    // Update visual label for older DB statuses
+                    let visualStatus = (h.status === 'TO SEND' || h.status === 'TELAH DIKIRIM') ? 'TERKIRIM' : h.status;
+
                     htmlTimeline += `
                     <div class="t-item">
                         <div class="t-icon bg-${h.color}"><i class="fas fa-check"></i></div>
                         <div>
-                            <div class="font-weight-bold text-dark">${h.status}</div>
+                            <div class="font-weight-bold text-dark">${visualStatus}</div>
                             <small class="text-muted"><i class="far fa-clock mr-1"></i> ${h.date}</small>
                             <div class="small text-${h.color} font-weight-bold mt-1"><i class="fas fa-user mr-1"></i> ${h.user}</div>
                         </div>
@@ -573,7 +584,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             }
             $('#timelineContainer').html(htmlTimeline);
 
-            // Render Box Explorer
+            // Render Box Explorer (Tanpa info RFID)
             generateBox(data.boxes);
 
             // Buka Modal & Reset ke Tab Lacak
@@ -602,17 +613,16 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             $('#' + viewId).fadeIn(300);
         }
 
-        // 1. Generate Struktur Box
+        // 1. Generate Struktur Box (Tanpa RFID)
         function generateBox(boxes) {
             let html = '';
             if (boxes && boxes.length > 0) {
                 boxes.forEach((bx, index) => {
-                    let rfidStr = bx.rfid_code ? `<i class="fas fa-wifi text-success mr-1"></i> ${bx.rfid_code}` : 'Tidak ada RFID';
                     html += `
                     <div class="grid-item" onclick="openBantex(${index})">
                         <span class="grid-icon text-warning"><i class="fas fa-box"></i></span>
                         <div class="grid-text">BOX ${index + 1}</div>
-                        <div class="small text-muted mt-2">${rfidStr}</div>
+                        <div class="small text-muted mt-2">Buka Isi Box</div>
                     </div>`;
                 });
             } else {
@@ -652,7 +662,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
 
             if (bantex.dokumen && bantex.dokumen.length > 0) {
                 bantex.dokumen.forEach(doc => {
-                    // Cek jika ada file atau tidak
                     let btnAction = doc.file_dokumen
                         ? `<a href="uploads/dokumen/${doc.file_dokumen}" target="_blank" class="btn btn-sm btn-primary btn-round shadow-sm"><i class="fas fa-download mr-1"></i> Buka</a>`
                         : `<span class="badge badge-light border text-muted">File Fisik Saja</span>`;
