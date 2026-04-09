@@ -3,23 +3,26 @@
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     header('location: 404.html');
 } else {
-    // --- 1. LOGIKA MENANGKAP INPUT FILTER (SUDAH DIPERBAIKI) ---
-    if (isset($_POST['filter'])) {
-        // Hanya menangkap tahun, jika kosong default ke tahun saat ini
-        $tahun_pilih = isset($_POST['tahun']) ? $_POST['tahun'] : date('Y');
-    } else {
-        $tahun_pilih = date('Y'); // Default tahun ini
-    }
+    // --- 1. LOGIKA TAHUN DINAMIS (ANTI KOSONG) ---
+    // Cari tahun paling baru yang ada datanya di database
+    $q_max_year = mysqli_query($mysqli, "SELECT MAX(YEAR(tanggal_pengajuan)) as max_thn FROM tbl_pengajuan");
+    $row_thn = mysqli_fetch_assoc($q_max_year);
+    $tahun_terbaru_db = !empty($row_thn['max_thn']) ? $row_thn['max_thn'] : date('Y');
 
-    $tahun_filter = empty($tahun_pilih) ? date('Y') : $tahun_pilih;
+    // Tangkap tahun dari filter, jika tidak ada, gunakan tahun terbaru dari database
+    if (isset($_POST['tahun'])) {
+        $tahun_filter = $_POST['tahun'];
+    } else {
+        $tahun_filter = $tahun_terbaru_db;
+    }
 
     // --- 2. QUERY KARTU STATISTIK (CARD) ---
     // A. Total Pengajuan
     $q_pengajuan = mysqli_query($mysqli, "SELECT COUNT(*) as total FROM tbl_pengajuan");
     $tot_pengajuan = mysqli_fetch_assoc($q_pengajuan)['total'] ?? 0;
 
-    // B. Total Box To Send / Terkirim
-    $q_box = mysqli_query($mysqli, "SELECT SUM(jumlah_box) as total FROM tbl_pengajuan WHERE status IN ('To Send', 'Telah Dikirim')");
+    // B. Total Box To Send / Terkirim (Menambahkan status Terkirim)
+    $q_box = mysqli_query($mysqli, "SELECT SUM(jumlah_box) as total FROM tbl_pengajuan WHERE status IN ('To Send', 'Telah Dikirim', 'Terkirim')");
     $tot_box_kirim = mysqli_fetch_assoc($q_box)['total'] ?? 0;
 
     // C. Total Dokumen Digital
@@ -31,21 +34,37 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     $tot_bantex = mysqli_fetch_assoc($q_bantex)['total'] ?? 0;
 
 
-    // --- 3. QUERY GRAFIK (PER BULAN DALAM 1 TAHUN) ---
-    $data_diajukan = [];
-    $data_dikirim = [];
+    // --- 3. QUERY GRAFIK YANG DIPERBAIKI (LEBIH CEPAT & AKURAT) ---
+    // Siapkan array kosong untuk 12 bulan
+    $diajukan_arr = array_fill(1, 12, 0);
+    $dikirim_arr = array_fill(1, 12, 0);
 
-    for ($m = 1; $m <= 12; $m++) {
-        $bulan_sql = str_pad($m, 2, '0', STR_PAD_LEFT);
-
-        // Box Diajukan bulan ini
-        $q_chart1 = mysqli_query($mysqli, "SELECT SUM(jumlah_box) as total FROM tbl_pengajuan WHERE MONTH(tanggal_pengajuan) = '$bulan_sql' AND YEAR(tanggal_pengajuan) = '$tahun_filter'");
-        $data_diajukan[] = (int) (mysqli_fetch_assoc($q_chart1)['total'] ?? 0);
-
-        // Box To Send / Dikirim bulan ini
-        $q_chart2 = mysqli_query($mysqli, "SELECT SUM(jumlah_box) as total FROM tbl_pengajuan WHERE status IN ('To Send', 'Telah Dikirim') AND MONTH(tanggal_pengajuan) = '$bulan_sql' AND YEAR(tanggal_pengajuan) = '$tahun_filter'");
-        $data_dikirim[] = (int) (mysqli_fetch_assoc($q_chart2)['total'] ?? 0);
+    // Ambil Data Box Diajukan Per Bulan di Tahun Terpilih
+    $q_diajukan = mysqli_query($mysqli, "
+        SELECT MONTH(tanggal_pengajuan) as bulan, SUM(jumlah_box) as total 
+        FROM tbl_pengajuan 
+        WHERE YEAR(tanggal_pengajuan) = '$tahun_filter'
+        GROUP BY MONTH(tanggal_pengajuan)
+    ");
+    while ($row = mysqli_fetch_assoc($q_diajukan)) {
+        $diajukan_arr[$row['bulan']] = (int) $row['total'];
     }
+
+    // Ambil Data Box Dikirim/Terkirim Per Bulan di Tahun Terpilih
+    $q_dikirim = mysqli_query($mysqli, "
+        SELECT MONTH(tanggal_pengajuan) as bulan, SUM(jumlah_box) as total 
+        FROM tbl_pengajuan 
+        WHERE YEAR(tanggal_pengajuan) = '$tahun_filter' 
+        AND status IN ('To Send', 'Telah Dikirim', 'Terkirim')
+        GROUP BY MONTH(tanggal_pengajuan)
+    ");
+    while ($row = mysqli_fetch_assoc($q_dikirim)) {
+        $dikirim_arr[$row['bulan']] = (int) $row['total'];
+    }
+
+    // Reset index array (mulai dari 0) agar terbaca oleh Javascript (Chart.js)
+    $data_diajukan = array_values($diajukan_arr);
+    $data_dikirim = array_values($dikirim_arr);
     ?>
 
     <style>
@@ -122,7 +141,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             </div>
                             <div class="col col-stats ml-3 ml-sm-0">
                                 <div class="numbers">
-                                    <p class="card-category">Box To Send</p>
+                                    <p class="card-category">Box Terkirim</p>
                                     <h4 class="card-title"><?= number_format($tot_box_kirim, 0, ',', '.') ?>
                                         <small>Box</small>
                                     </h4>
@@ -186,13 +205,24 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             <div class="card-tools">
                                 <form action="?module=dashboard" method="post" class="d-flex">
                                     <select name="tahun" class="form-control form-control-sm mr-2" required>
-                                        <option value="">Pilih Tahun</option>
                                         <?php
-                                        // Looping tahun otomatis dari 3 tahun lalu sampai tahun depan
-                                        $thn_skr = date('Y');
-                                        for ($x = $thn_skr - 3; $x <= $thn_skr + 1; $x++) {
-                                            $selected = ($x == $tahun_filter) ? 'selected' : '';
-                                            echo "<option value='$x' $selected>$x</option>";
+                                        // Ambil daftar tahun yang ada di database agar pilihan dropdown selalu relevan
+                                        $q_list_tahun = mysqli_query($mysqli, "SELECT DISTINCT YEAR(tanggal_pengajuan) as thn FROM tbl_pengajuan ORDER BY thn DESC");
+                                        $list_tahun = [];
+                                        while ($r = mysqli_fetch_assoc($q_list_tahun)) {
+                                            if (!empty($r['thn']))
+                                                $list_tahun[] = $r['thn'];
+                                        }
+
+                                        // Pastikan tahun yang difilter ada di dalam list dropdown
+                                        if (!in_array($tahun_filter, $list_tahun)) {
+                                            $list_tahun[] = $tahun_filter;
+                                            rsort($list_tahun);
+                                        }
+
+                                        foreach ($list_tahun as $thn) {
+                                            $selected = ($thn == $tahun_filter) ? 'selected' : '';
+                                            echo "<option value='$thn' $selected>$thn</option>";
                                         }
                                         ?>
                                     </select>
@@ -289,7 +319,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                     labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"],
                     datasets: [
                         {
-                            label: "Box Diajukan",
+                            label: "Volume Box Diajukan",
                             borderColor: '#f3545d',
                             pointBackgroundColor: 'rgba(243, 84, 93, 0.6)',
                             pointRadius: 0,
@@ -300,7 +330,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                             data: <?php echo json_encode($data_diajukan); ?>
                         },
                         {
-                            label: "Box Dikirim (To Send)",
+                            label: "Volume Box Terkirim",
                             borderColor: '#1d7af3',
                             pointBackgroundColor: 'rgba(29, 122, 243, 0.6)',
                             pointRadius: 0,
