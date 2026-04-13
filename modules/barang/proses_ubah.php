@@ -1,67 +1,84 @@
 <?php
-session_start();      // mengaktifkan session
+session_start();      // Mengaktifkan session
 
-// pengecekan session login user 
-// jika user belum login
+// Header JSON untuk response AJAX
+header('Content-Type: application/json');
+
+// Pengecekan session login user 
 if (empty($_SESSION['username']) && empty($_SESSION['password'])) {
-    // alihkan ke halaman login dan tampilkan pesan peringatan login
-    header('location: ../../login.php?pesan=2');
-}
-// jika user sudah login, maka jalankan perintah untuk update
-else {
-    // panggil file "database.php" untuk koneksi ke database
+    echo json_encode(['status' => 'error', 'message' => 'Silakan login terlebih dahulu.']);
+    exit;
+} else {
+    // Panggil file koneksi database
     require_once "../../config/database.php";
 
-    // mengecek data hasil submit dari form
-    if (isset($_POST['simpan'])) {
-        // ambil data hasil submit dari form
-        $id_barang          = mysqli_real_escape_string($mysqli, $_POST['id_barang']);
-        $nama_barang        = mysqli_real_escape_string($mysqli, trim($_POST['nama_barang']));
-        $jenis              = mysqli_real_escape_string($mysqli, $_POST['jenis']);
-        $stok_minimum       = mysqli_real_escape_string($mysqli, $_POST['stok_minimum']);
-        $satuan             = mysqli_real_escape_string($mysqli, $_POST['satuan']);
+    // Pastikan data dikirim melalui method POST
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Ambil data hasil submit dari form
+        $id_dokumen = mysqli_real_escape_string($mysqli, $_POST['id_dokumen']);
+        $nama_dokumen = mysqli_real_escape_string($mysqli, trim($_POST['nama_dokumen']));
 
-        // ambil data file hasil submit dari form
-        $nama_file          = $_FILES['foto']['name'];
-        $tmp_file           = $_FILES['foto']['tmp_name'];
-        $extension          = array_pop(explode(".", $nama_file));
-        // enkripsi nama file
-        $nama_file_enkripsi = sha1(md5(time() . $nama_file)) . '.' . $extension;
-        // tentukan direktori penyimpanan file foto
-        $path               = "../../images/" . $nama_file_enkripsi;
+        // Ambil data file hasil submit
+        $nama_file = $_FILES['file_dokumen']['name'];
+        $tmp_file = $_FILES['file_dokumen']['tmp_name'];
 
-        // mengecek data foto dari form ubah data
-        // jika data foto tidak ada (foto tidak diubah)
+        // Jika data file tidak diunggah (Hanya ubah nama dokumen)
         if (empty($nama_file)) {
-            // sql statement untuk update data di tabel "tbl_barang" berdasarkan "id_barang"
-            $update = mysqli_query($mysqli, "UPDATE tbl_barang
-                                            SET nama_barang='$nama_barang', jenis='$jenis', stok_minimum='$stok_minimum', satuan='$satuan'
-                                            WHERE id_barang='$id_barang'")
-                                            or die('Ada kesalahan pada query update : ' . mysqli_error($mysqli));
-            // cek query
-            // jika proses update berhasil
+            // SQL statement untuk update nama dokumen saja
+            $update = mysqli_query($mysqli, "UPDATE tbl_dokumen 
+                                            SET nama_dokumen = '$nama_dokumen' 
+                                            WHERE id = '$id_dokumen'")
+                or die('Error: ' . mysqli_error($mysqli));
+
             if ($update) {
-                // alihkan ke halaman barang dan tampilkan pesan berhasil ubah data
-                header('location: ../../main.php?module=barang&pesan=2');
+                echo json_encode(['status' => 'success', 'message' => 'Nama dokumen berhasil diperbarui.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data.']);
             }
         }
-        // jika data foto ada (foto diubah)
+        // Jika user mengunggah file baru
         else {
-            // lakukan proses unggah file
-            // jika file berhasil diunggah
+            // Ambil ekstensi file
+            $get_ext = explode(".", $nama_file);
+            $extension = end($get_ext);
+
+            // Enkripsi nama file agar unik seperti template Anda
+            $nama_file_baru = sha1(md5(time() . $nama_file)) . '.' . $extension;
+
+            // Tentukan direktori penyimpanan file (Sesuaikan dengan folder upload Anda)
+            $path = "../../uploads/dokumen/" . $nama_file_baru;
+
+            // Proses unggah file
             if (move_uploaded_file($tmp_file, $path)) {
-                // sql statement untuk update data di tabel "tbl_barang" berdasarkan "id_barang"
-                $update = mysqli_query($mysqli, "UPDATE tbl_barang
-                                                SET nama_barang='$nama_barang', jenis='$jenis', stok_minimum='$stok_minimum', satuan='$satuan', foto='$nama_file_enkripsi'
-                                                WHERE id_barang='$id_barang'")
-                                                or die('Ada kesalahan pada query update : ' . mysqli_error($mysqli));
-                // cek query
-                // jika proses update berhasil
-                if ($update) {
-                    // alihkan ke halaman barang dan tampilkan pesan berhasil ubah data
-                    header('location: ../../main.php?module=barang&pesan=2');
+
+                // OPTIONAL: Hapus file lama dari server agar tidak memenuhi disk
+                $query_lama = mysqli_query($mysqli, "SELECT file_dokumen FROM tbl_dokumen WHERE id = '$id_dokumen'");
+                $data_lama = mysqli_fetch_assoc($query_lama);
+                if (!empty($data_lama['file_dokumen'])) {
+                    $file_lama_path = "../../uploads/dokumen/" . $data_lama['file_dokumen'];
+                    if (file_exists($file_lama_path)) {
+                        unlink($file_lama_path); // Menghapus file fisik lama
+                    }
                 }
+
+                // SQL statement untuk update nama dokumen dan file baru
+                $update = mysqli_query($mysqli, "UPDATE tbl_dokumen 
+                                                SET nama_dokumen = '$nama_dokumen', 
+                                                    file_dokumen = '$nama_file_baru' 
+                                                WHERE id = '$id_dokumen'")
+                    or die('Error: ' . mysqli_error($mysqli));
+
+                if ($update) {
+                    echo json_encode(['status' => 'success', 'message' => 'Data dan file dokumen berhasil diperbarui.']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'File terupload, tapi gagal update database.']);
+                }
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Gagal mengunggah file ke server.']);
             }
         }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Metode akses tidak diizinkan.']);
     }
 }
+?>
