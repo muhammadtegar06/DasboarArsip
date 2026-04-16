@@ -277,43 +277,43 @@ else {
 
 		// jika menu laporan barang masuk dipilih, menu laporan barang masuk aktif
 		if ($_GET['module'] == 'laporan_barang_masuk') { ?>
-			<li class="nav-item active">
+			<!-- <li class="nav-item active">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
 					<p>Laporan Per Divisi</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 		// jika tidak dipilih, menu laporan barang masuk tidak aktif
 		else { ?>
-			<li class="nav-item">
+			<!-- <li class="nav-item">
 				<a href="?module=laporan_barang_masuk">
 					<i class="fas fa-file-import"></i>
 					<p>Laporan Per Divisi</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 
 		// jika menu laporan barang keluar dipilih, menu laporan barang keluar aktif
 		if ($_GET['module'] == 'laporan_barang_keluar') { ?>
-			<li class="nav-item active">
+			<!-- <li class="nav-item active">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
 					<p>Laporan Pengiriman Box</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 		// jika tidak dipilih, menu laporan barang keluar tidak aktif
 		else { ?>
-			<li class="nav-item">
+			<!-- <li class="nav-item">
 				<a href="?module=laporan_barang_keluar">
 					<i class="fas fa-file-export"></i>
 					<p>Laporan Pengiriman Box</p>
 				</a>
-			</li>
+			</li> -->
 			<?php
 		}
 		// jika menu manajemen user (tampil data / form entri / form ubah) dipilih, menu manajemen user aktif

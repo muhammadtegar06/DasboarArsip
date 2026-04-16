@@ -85,7 +85,7 @@ if (!$header) {
                 <h5 class="text-white op-7 mb-2">Lengkapi dokumen, label bantex, RFID Box.</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
-                <a href="?module=pengisian_data_box" class="btn btn-white btn-border btn-round">
+                <a href="?module=barang_keluar" class="btn btn-white btn-border btn-round">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali
                 </a>
             </div>
@@ -103,6 +103,10 @@ if (!$header) {
                     <div class="mt-1"><span class="badge badge-light border"><?= $header['no_pengajuan'] ?></span></div>
                 </div>
                 <div class="col-md-6 text-right">
+                    <a href="modules/barang-keluar/export_serah_terima.php?id=<?= $id_pengajuan ?>" target="_blank"
+                        class="btn btn-primary btn-lg btn-round shadow font-weight-bold mr-2">
+                        <i class="fas fa-file-excel mr-2"></i> BUAT DOKUMEN SERAH TERIMA
+                    </a>
                     <button type="button" onclick="simpanSemuaData()"
                         class="btn btn-success btn-lg btn-round shadow font-weight-bold">
                         <i class="fas fa-save mr-2"></i> SIMPAN SEMUA DATA
